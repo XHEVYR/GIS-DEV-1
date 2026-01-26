@@ -1,10 +1,10 @@
 "use client";
-import { MapContainer, TileLayer, Marker, Popup, LayerGroup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, LayerGroup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-export type data = {
+export type Data = {
     id: string;
     nama: string;
     kategori: string;
@@ -41,22 +41,35 @@ const cafeIcon = L.icon({
   shadowSize: [41, 41],
 })
 
-const LayerController = ({ hotels, fnb, cafe }: { hotels: data[], fnb: any[], cafe: any[] }) => {
+const LayerController = ({ hotels, fnb, cafe }: { hotels: Data[], fnb: Data[], cafe: Data[] }) => {
   const map = useMap();
   const [layerGroups] = useState({
     hotel: L.layerGroup().addTo(map),
     fnb: L.layerGroup().addTo(map),
     cafe: L.layerGroup().addTo(map),
   });
+  const layerControlRef = useRef<L.Control.Layers | null>(null);
 
   // Add layer control
   useEffect(() => {
+    // Hapus kontrol layer yang lama jika ada
+    if (layerControlRef.current) {
+      map.removeControl(layerControlRef.current);
+    }
+
     const overlays = {
       'Hotel': layerGroups.hotel,
       'Food & Beverage': layerGroups.fnb,
       'Cafe': layerGroups.cafe,
     };
-    L.control.layers({}, overlays).addTo(map);
+    layerControlRef.current = L.control.layers({}, overlays).addTo(map);
+
+    // Cleanup: hapus kontrol saat unmount
+    return () => {
+      if (layerControlRef.current) {
+        map.removeControl(layerControlRef.current);
+      }
+    };
   }, [map, layerGroups]);
 
   return (
@@ -111,9 +124,9 @@ const LayerController = ({ hotels, fnb, cafe }: { hotels: data[], fnb: any[], ca
 };
 
 const Map=() => {
-  const [hotels, setHotels] = useState<data[]>([]);
-  const [fnb, setFnb] = useState<any[]>([]);
-  const [cafe, setCafe] = useState<any[]>([]);
+  const [hotels, setHotels] = useState<Data[]>([]);
+  const [fnb, setFnb] = useState<Data[]>([]);
+  const [cafe, setCafe] = useState<Data[]>([]);
   
   useEffect(() => {
     fetch('/data-hotel.json')

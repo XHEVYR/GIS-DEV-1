@@ -1,38 +1,60 @@
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-export default function InputPage() {
-  const router = useRouter();
-  const [form, setForm] = useState({ name: "", lat: "", lon: "", category: "hotel", description: "" });
+export default function Dashboard() {
+  const [places, setPlaces] = useState<any[]>([]);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    await fetch('/api/places', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    });
-    alert("Data Berhasil Disimpan!");
-    router.push('/admin');
-  };
+  useEffect(() => {
+    fetch('/api/places')
+      .then(res => res.json())
+      .then(data => setPlaces(data));
+  }, []);
 
   return (
-    <div className="bg-white p-6 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Tambah Lokasi Baru</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input className="border p-2 rounded" placeholder="Nama Tempat" onChange={e => setForm({...form, name: e.target.value})} required />
-        <div className="flex gap-4">
-            <input className="border p-2 rounded w-1/2" placeholder="Latitude (Contoh: -7.81)" onChange={e => setForm({...form, lat: e.target.value})} required />
-            <input className="border p-2 rounded w-1/2" placeholder="Longitude (Contoh: 112.01)" onChange={e => setForm({...form, lon: e.target.value})} required />
-        </div>
-        <select className="border p-2 rounded" onChange={e => setForm({...form, category: e.target.value})}>
-            <option value="hotel">Hotel</option>
-            <option value="cafe">Cafe</option>
-            <option value="wisata">Wisata</option>
-        </select>
-        <textarea className="border p-2 rounded" placeholder="Deskripsi Singkat" onChange={e => setForm({...form, description: e.target.value})} />
-        <button className="bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700">SIMPAN DATA</button>
-      </form>
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Daftar Lokasi</h1>
+        <Link href="/admin/input" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 shadow transition">
+          + Tambah Data
+        </Link>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 border-b">
+            <tr>
+              <th className="p-4 font-semibold text-gray-600">Nama Tempat</th>
+              <th className="p-4 font-semibold text-gray-600">Kategori</th>
+              <th className="p-4 font-semibold text-gray-600">Koordinat</th>
+              <th className="p-4 font-semibold text-gray-600">Alamat</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {places.map((place) => (
+              <tr key={place.id} className="hover:bg-gray-50 transition">
+                <td className="p-4 font-medium text-gray-900">
+                  {place.name}
+                  {/* Tampilkan indikator kecil jika ada gambar */}
+                  {place.image && <span className="ml-2 text-xs text-green-600 font-bold">📷</span>}
+                </td>
+                <td className="p-4">
+                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800 uppercase">
+                    {place.category}
+                  </span>
+                </td>
+                <td className="p-4 text-gray-500 text-sm font-mono">
+                  {place.lat.toFixed(4)}, {place.lon.toFixed(4)}
+                </td>
+                <td className="p-4 text-gray-500 text-sm truncate max-w-xs">
+                  {place.address || "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {places.length === 0 && <p className="p-8 text-center text-gray-500">Belum ada data.</p>}
+      </div>
     </div>
   );
 }

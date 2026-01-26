@@ -2,9 +2,14 @@ import AdminSidebar from "@/components/adminsidebar";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar Statis */}
       <AdminSidebar />
-      <main className="flex-1 p-8 bg-gray-50 h-screen overflow-auto">{children}</main>
+      
+      {/* Konten Berubah-ubah */}
+      <main className="flex-1 p-8 ml-64"> 
+        {children}
+      </main>
     </div>
   );
 }

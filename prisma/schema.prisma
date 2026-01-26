@@ -13,16 +13,16 @@ datasource db {
   provider = "postgresql"
   // url      = env("DATABASE_URL")
 }
-// model admin
-model User {
-  id        Int      @id @default(autoincrement())
-  username     String   @unique
-  password      String
-  name   String?
-  createdAt DateTime @default(now())
+// // model admin
+// model User {
+//   id        Int      @id @default(autoincrement())
+//   username     String   @unique
+//   password      String
+//   name   String?
+//   createdAt DateTime @default(now())
 
-  @@map("users")
-}
+//   @@map("users")
+// }
 
 // model lokasi
 model Place {
@@ -34,9 +34,9 @@ model Place {
   lon   Float
   category    String
   image     String?
-  is_recommended Boolean  @default(false)
+  // is_recommended Boolean  @default(false)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // updatedAt   DateTime @updatedAt
 
   @@map("places")
 }

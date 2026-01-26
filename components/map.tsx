@@ -34,7 +34,7 @@ export default function Map() {
   }, []);
 
   return (
-    <MapContainer center={[-7.8166, 112.0117]} zoom={13} style={{ height: "100%", width: "100%" }}>
+    <MapContainer center={[-8.098064989795585, 112.16514038306394]} zoom={13} style={{ height: "100%", width: "100%" }}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
       
       {places.map((place) => (

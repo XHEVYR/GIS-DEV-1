@@ -62,19 +62,14 @@ export default function Map() {
       {places.map((place) => (
         <Marker key={place.id} position={[place.lat, place.lon]} icon={icon}>
           <Popup>
-            {/* <b>{place.image}</b> */}
-            {/* Tampilkan Gambar */}
+            <div className='w-60'>
               {place.image && (
-                <img 
-                  src={place.image} 
-                  alt={place.name}
-                  className="w-full h-40 object-cover rounded-lg mb-3"
-                />
-              )}
+                <img src={place.image} alt={place.name} className="w-full h-40 object-cover rounded-lg mb-3"/>)}
               <b>Nama:</b> {place.name}<br/>
               <b>Kategori:</b> {place.category}<br/>
             <b>Alamat:</b> {place.address}<br/>
             <b>Keterangan:</b> {place.description}<br/>
+            </div>
           </Popup>
         </Marker>
       ))}

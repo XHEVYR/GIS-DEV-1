@@ -4,7 +4,7 @@ export default function AdminSidebar() {
   return (
     <aside className="w-64 bg-black text-white h-screen fixed left-0 top-0">
       <div className="p-8">
-        <h2 className="text-3xl font-black mb-12 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-black mb-12 bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
           GIS
         </h2>
         

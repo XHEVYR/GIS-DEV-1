@@ -56,7 +56,7 @@ export default function Map() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <MapContainer center={[-8.098064989795585, 112.16514038306394]} zoom={10} style={{ height: "100%", width: "100%" }}>
+    <MapContainer center={[-8.098064989795585, 112.16514038306394]} zoom={13} style={{ height: "100%", width: "100%" }}>
       <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
       
       {places.map((place) => (

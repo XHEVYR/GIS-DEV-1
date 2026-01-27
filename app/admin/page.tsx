@@ -2,8 +2,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+interface Place {
+  id: string;
+  name: string;
+  category: string;
+  lat: number;
+  lon: number;
+  address?: string;
+  image?: string;
+}
+
 export default function Dashboard() {
-  const [places, setPlaces] = useState<any[]>([]);
+  const [places, setPlaces] = useState<Place[]>([]);
 
   useEffect(() => {
     fetch('/api/places')

@@ -53,10 +53,19 @@ export async function POST(request: Request) {
 }
 
 
-export async function PUT(request: Request) { {
+export async function PUT(request: Request) {
   try {
     const body = await request.json();
     const id = body.id;
+    
+    console.log("Data UPDATE diterima dari Frontend:", body);
+    console.log("ID yang akan di-update:", id);
+    
+    if (!id) {
+      console.log("Error: ID tidak ditemukan");
+      return NextResponse.json({ error: 'ID diperlukan' }, { status: 400 });
+    }
+    
     const updatedPlace = await prisma.place.update({
       where: { id: parseInt(id) },
       data: {
@@ -69,6 +78,8 @@ export async function PUT(request: Request) { {
         category: body.category,
       }
     });
+    
+    console.log("Berhasil di-update:", updatedPlace);
     return NextResponse.json(updatedPlace);
   } catch (error) {
     console.error("GAGAL UPDATE DATA:", error);
@@ -77,19 +88,27 @@ export async function PUT(request: Request) { {
       { status: 500 }
     );
   }
-}}
+}
 
 
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    
+    console.log("DELETE request URL:", request.url);
+    console.log("ID yang akan di-delete:", id);
+    
     if (!id) {
+      console.log("Error: ID tidak ditemukan di query parameter");
       return NextResponse.json({ error: 'ID diperlukan' }, { status: 400 });
     } 
+    
     const deletedPlace = await prisma.place.delete({
       where: { id: parseInt(id) }
     });
+    
+    console.log("Berhasil di-delete:", deletedPlace);
     return NextResponse.json(deletedPlace);
   } catch (error) {
     console.error("GAGAL DELETE DATA:", error);

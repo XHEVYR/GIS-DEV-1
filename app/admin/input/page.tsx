@@ -1,6 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const MapInput = dynamic(() => import("@/components/mapinput"), { 
+  ssr: false,
+  loading: () => <div className="h-96 bg-gray-200 flex items-center justify-center rounded-lg text-gray-600">Memuat Peta...</div>
+});
 
 export default function InputPage() {
   const router = useRouter();
@@ -11,9 +17,13 @@ export default function InputPage() {
     lon: "", 
     category: "", 
     description: "",
-    address: "",  // <-- Tambah state
-    image: ""     // <-- Tambah state
+    address: "",
+    image: ""
   });
+
+  const handleMapClick = (lat: number, lon: number) => {
+    setForm({...form, lat: lat.toString(), lon: lon.toString()});
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -30,72 +40,138 @@ export default function InputPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow border border-gray-200">
-      <h1 className="text-2xl font-bold mb-6 text-black">Input Lokasi Lengkap</h1>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* NAMA */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nama Tempat</label>
-          <input className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-black" 
-            onChange={e => setForm({...form, name: e.target.value})} required />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto h-screen flex flex-col">
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Tambah Lokasi Baru</h1>
+          <p className="text-gray-600">Pilih lokasi di peta dan isi data lengkap tempat Anda</p>
         </div>
-
-        {/* KOORDINAT */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-black mb-1">Latitude</label>
-            <input type="number" step="any" className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-black mb-1" 
-              placeholder="-7.xxxxx"
-              onChange={e => setForm({...form, lat: e.target.value})} required />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+          {/* MAP SECTION */}
+          <div className="lg:col-span-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4 flex-shrink-0">
+              <h2 className="text-white font-bold text-lg">📍 Pilih Lokasi</h2>
+              <p className="text-blue-100 text-sm mt-1">Klik atau geser pin</p>
+            </div>
+            <div className="flex-1 w-full">
+              <MapInput onLocationSelect={handleMapClick} />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
-            <input type="number" step="any" className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-black mb-1" 
-              placeholder="112.xxxxx"
-              onChange={e => setForm({...form, lon: e.target.value})} required />
-          </div>
-        </div>
 
-        {/* KATEGORI */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-          <select className="w-full border p-2 rounded bg-white text-black mb-1" 
-            onChange={e => setForm({...form, category: e.target.value})}>
-            <option value="hotel">Hotel</option>
-            <option value="cafe">Cafe / Resto</option>
-            <option value="wisata">Tempat Wisata</option>
-            <option value="kampus">Kampus / Sekolah</option>
-          </select>
-        </div>
+          {/* FORM SECTION */}
+          <form onSubmit={handleSubmit} className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-8 border border-gray-100 flex flex-col overflow-y-auto">
+            <div className="space-y-6">
+              {/* NAMA */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Nama Tempat *</label>
+                <input 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-800 transition" 
+                  placeholder="Contoh: Café Indah"
+                  onChange={e => setForm({...form, name: e.target.value})} 
+                  required 
+                />
+              </div>
 
-        {/* GAMBAR (URL) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Link Gambar (URL)</label>
-          <input className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-black mb-1" 
-            placeholder="https://..."
-            onChange={e => setForm({...form, image: e.target.value})} />
-            <p className="text-xs text-gray-400 mt-1">*Copy link gambar dari Google dulu</p>
-        </div>
+              {/* KOORDINAT (READ ONLY) */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-3">Koordinat (Otomatis dari Map)</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-2">Latitude</label>
+                    <input 
+                      type="number" 
+                      step="any" 
+                      className="w-full px-4 py-3 border-2 border-gray-200 bg-gray-50 rounded-lg text-gray-800 font-mono text-sm" 
+                      placeholder="Dari map"
+                      value={form.lat}
+                      readOnly 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-2">Longitude</label>
+                    <input 
+                      type="number" 
+                      step="any" 
+                      className="w-full px-4 py-3 border-2 border-gray-200 bg-gray-50 rounded-lg text-gray-800 font-mono text-sm" 
+                      placeholder="Dari map"
+                      value={form.lon}
+                      readOnly 
+                    />
+                  </div>
+                </div>
+              </div>
 
-        {/* ALAMAT */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
-          <textarea className="w-full border p-2 rounded h-20 text-black mb-1" 
-            onChange={e => setForm({...form, address: e.target.value})} />
-        </div>
+              {/* KATEGORI */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Kategori *</label>
+                <select 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition" 
+                  onChange={e => setForm({...form, category: e.target.value})}
+                  required
+                >
+                  <option value="">-- Pilih Kategori --</option>
+                  <option value="hotel">🏨 Hotel</option>
+                  <option value="cafe">☕ Cafe / Resto</option>
+                  <option value="wisata">✈️ Tempat Wisata</option>
+                  <option value="kampus">🎓 Kampus / Sekolah</option>
+                </select>
+              </div>
 
-        {/* DESKRIPSI */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
-          <textarea className="w-full border p-2 rounded h-24 text-black mb-1" 
-            onChange={e => setForm({...form, description: e.target.value})} />
-        </div>
+              {/* GAMBAR */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Link Gambar (URL)</label>
+                <input 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-800 transition" 
+                  placeholder="https://example.com/image.jpg"
+                  onChange={e => setForm({...form, image: e.target.value})} 
+                />
+                <p className="text-xs text-gray-500 mt-2">💡 Copy link gambar dari Google Images</p>
+              </div>
 
-        <button disabled={loading} className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">
-          {loading ? "Menyimpan..." : "SIMPAN DATA"}
-        </button>
-      </form>
+              {/* ALAMAT */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Alamat Lengkap *</label>
+                <textarea 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-800 transition resize-none" 
+                  placeholder="Masukkan alamat lengkap tempat ini"
+                  rows={3}
+                  onChange={e => setForm({...form, address: e.target.value})}
+                  required 
+                />
+              </div>
+
+              {/* DESKRIPSI */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Deskripsi</label>
+                <textarea 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-800 transition resize-none" 
+                  placeholder="Deskripsikan tempat ini..."
+                  rows={4}
+                  onChange={e => setForm({...form, description: e.target.value})} 
+                />
+              </div>
+
+              {/* BUTTON */}
+              <div className="flex gap-4 pt-6 border-t border-gray-200 mt-8">
+                <button 
+                  type="button"
+                  onClick={() => router.back()}
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
+                >
+                  Batal
+                </button>
+                <button 
+                  disabled={loading} 
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? "⏳ Menyimpan..." : "✓ Simpan Lokasi"}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

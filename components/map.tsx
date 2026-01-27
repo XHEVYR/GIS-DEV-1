@@ -56,13 +56,13 @@ export default function Map() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <MapContainer center={[-8.098064989795585, 112.16514038306394]} zoom={13} style={{ height: "100%", width: "100%" }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
+    <MapContainer center={[-8.098064989795585, 112.16514038306394]} zoom={10} style={{ height: "100%", width: "100%" }}>
+      <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
       
       {places.map((place) => (
         <Marker key={place.id} position={[place.lat, place.lon]} icon={icon}>
           <Popup>
-            <div className='w-60'>
+            <div className="w-60">
               {place.image && (
                 <img src={place.image} alt={place.name} className="w-full h-40 object-cover rounded-lg mb-3"/>)}
               <b>Nama:</b> {place.name}<br/>

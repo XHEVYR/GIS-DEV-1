@@ -42,9 +42,19 @@ export default function InputPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto h-screen flex flex-col">
-        <div className="mb-6">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Tambah Lokasi Baru</h1>
-          <p className="text-gray-600">Pilih lokasi di peta dan isi data lengkap tempat Anda</p>
+        
+        {/* HEADER DENGAN TOMBOL KEMBALI */}
+        <div className="mb-6 relative">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Tambah Lokasi Baru</h1>
+            <p className="text-gray-600">Pilih lokasi di peta dan isi data lengkap tempat Anda</p>
+          </div>
+          <button 
+            onClick={() => router.back()}
+            className="absolute top-0 right-0 text-gray-500 hover:text-gray-700 text-3xl transition"
+            title="Kembali">
+            ✕
+          </button>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">

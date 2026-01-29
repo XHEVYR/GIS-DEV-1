@@ -29,31 +29,31 @@ interface Place {
   id: string;
   name: string;
   category: string;
-  lat: number;
-  lon: number;
+  lat: number | string;
+  lon: number | string;
   address?: string;
   image?: string;
   description?: string;
 }
 
 // Interface Form Edit (String agar mudah diedit manual)
-interface EditFormState {
-  id: string;
-  name: string;
-  category: string;
-  lat: string | number; // Bisa string saat diketik
-  lon: string | number;
-  address: string;
-  image: string;
-  description: string;
-}
+// interface EditFormState {
+//   id: string;
+//   name: string;
+//   category: string;
+//   lat: string | number; // Bisa string saat diketik
+//   lon: string | number;
+//   address: string;
+//   image: string;
+//   description: string;
+// }
 
 export default function Dashboard() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
   
   // State form menggunakan tipe fleksibel agar input manual lancar
-  const [editForm, setEditForm] = useState<EditFormState | null>(null);
+  const [editForm, setEditForm] = useState<Place | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

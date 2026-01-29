@@ -1,11 +1,14 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup, LayerGroup, LayersControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, LayersControl } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
 import { useEffect, useState, useMemo } from 'react';
 import L from 'leaflet';
 
-// Define proper type for places
 interface Place {
   id: string;
   name: string;
@@ -17,7 +20,6 @@ interface Place {
   lon: number;
 }
 
-// Fix Icon Marker Hilang
 const icon = L.icon({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
@@ -27,6 +29,43 @@ const icon = L.icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
+
+// Custom cluster icon dengan angka
+const createClusterCustomIcon = (cluster: any) => {
+  const count = cluster.getChildCount();
+  let color = '#51aada'; // Biru default
+
+  if (count > 100) {
+    color = '#e41c3d'; // Merah untuk >100
+  } else if (count > 50) {
+    color = '#f97316'; // Orange untuk >50
+  } else if (count > 20) {
+    color = '#eab308'; // Kuning untuk >20
+  }
+
+  return L.divIcon({
+    html: `
+      <div style="
+        background-color: ${color};
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      ">
+        ${count}
+      </div>
+    `,
+    className: 'custom-cluster-icon',
+    iconSize: L.point(40, 40),
+    iconAnchor: L.point(20, 20),
+  });
+};
 
 export default function Map() {
   const [places, setPlaces] = useState<Place[]>([]);
@@ -39,7 +78,6 @@ export default function Map() {
         const res = await fetch('/api/places');
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         const data = await res.json();
-        console.log('Data dari API:', data);
         setPlaces(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Error fetch:', err);
@@ -52,10 +90,7 @@ export default function Map() {
     fetchPlaces();
   }, []);
 
-  // 1. EKSTRAKSI KATEGORI UNIK
-  // Kita menggunakan useMemo agar tidak menghitung ulang setiap render kecuali places berubah
   const categories = useMemo(() => {
-    // Ambil semua kategori, masukkan ke Set biar unik, lalu jadikan array lagi
     const uniqueCats = new Set(places.map(p => p.category));
     return Array.from(uniqueCats);
   }, [places]);
@@ -64,9 +99,11 @@ export default function Map() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <MapContainer center={[-8.098064989795585, 112.16514038306394]} zoom={13} style={{ height: "100%", width: "100%" }}>
-      
-      {/* Opsi Tambahan: Masukkan TileLayer ke BaseLayer agar rapi di control panel */}
+    <MapContainer 
+      center={[-8.098064989795585, 112.16514038306394]} 
+      zoom={13} 
+      style={{ height: "100%", width: "100%" }}
+    >
       <LayersControl position="topright">
         
         <LayersControl.BaseLayer checked name="Peta Satelit">
@@ -83,13 +120,14 @@ export default function Map() {
           />
         </LayersControl.BaseLayer>
 
-        
-
-        {/* 2. LOOPING KATEGORI UNTUK OVERLAY */}
+        {/* Looping kategori dengan cluster custom */}
         {categories.map((category) => (
           <LayersControl.Overlay checked name={category} key={category}>
-            <LayerGroup>
-              {/* 3. FILTER DATA BERDASARKAN KATEGORI */}
+            <MarkerClusterGroup
+              chunkedLoading
+              maxClusterRadius={80}
+              iconCreateFunction={createClusterCustomIcon}
+            >
               {places
                 .filter((place) => place.category === category)
                 .map((place) => (
@@ -111,7 +149,7 @@ export default function Map() {
                     </Popup>
                   </Marker>
               ))}
-            </LayerGroup>
+            </MarkerClusterGroup>
           </LayersControl.Overlay>
         ))}
 

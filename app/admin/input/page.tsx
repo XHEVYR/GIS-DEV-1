@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { 
   MapPin, 
   Image as ImageIcon, 
@@ -170,7 +171,7 @@ export default function InputPage() {
                   <label className={labelClass}>Nama Tempat</label>
                   <input 
                     className={inputClass} 
-                    placeholder="Contoh: Café Senja" 
+                    placeholder="Masukkan nama tempat" 
                     value={form.name}
                     onChange={e => setForm({ ...form, name: e.target.value })} 
                     required 
@@ -186,7 +187,7 @@ export default function InputPage() {
                     className={`${inputClass} font-mono`} 
                     value={form.lat} 
                     onChange={(e) => handleCoordinateChange(e, 'lat')}
-                    placeholder="-7.1234" 
+                    placeholder="-8.1234" 
                   />
                 </div>
 
@@ -232,13 +233,20 @@ export default function InputPage() {
                 </div>
 
                 {form.image && (
-                  <div className="md:col-span-2 border-2 border-slate-50 rounded-2xl overflow-hidden">
-                    <img src={form.image}
-                      alt="Preview"
-                      className="w-full h-44 object-cover"
-                      onError={(e) => e.currentTarget.src = "https://via.placeholder.com/600x300?text=Error"} />
-                  </div>
-                )}
+  <div className="md:col-span-2 border-2 border-slate-50 rounded-2xl overflow-hidden bg-slate-100 relative w-full h-44">
+    <Image
+      src={form.image}
+      alt="Preview"
+      fill
+      className="object-cover"
+      onError={(e) => {
+        const img = e.currentTarget as HTMLImageElement;
+        img.src = "https://via.placeholder.com/600x300?text=Error";
+        img.classList.add("opacity-50");
+      }}
+    />
+  </div>
+)}
 
                 <div className="md:col-span-2">
                   <label className={labelClass}>Alamat Lengkap</label>
@@ -255,7 +263,7 @@ export default function InputPage() {
                   <label className={labelClass}>Deskripsi</label>
                   <textarea 
                     className={`${inputClass} min-h-[100px]`} 
-                    placeholder="Deskripsi singkat..." 
+                    placeholder="Deskripsi singkat" 
                     value={form.description}
                     onChange={e => setForm({ ...form, description: e.target.value })} 
                   />

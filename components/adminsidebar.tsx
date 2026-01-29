@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, MapPin, Plus, Map } from 'lucide-react';
+import { Menu, X, MapPin, Plus, Map, HomeIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
   interface NavItemProps {
@@ -48,10 +48,17 @@ export default function AdminSidebar() {
       <nav className="flex-1 px-3 space-y-2">
         <NavItem 
           href="/admin" 
+          icon={<HomeIcon size={20} />}
+          label="Dashboard"
+          isMinimized={isMinimized}
+          active={isActive('/admin')}
+        />
+        <NavItem 
+          href="/admin/data" 
           icon={<MapPin size={20} />} 
           label="Data Lokasi" 
           isMinimized={isMinimized} 
-          active={isActive('/admin')}
+          active={isActive('/admin/data')}
         />
         <NavItem 
           href="/admin/input" 

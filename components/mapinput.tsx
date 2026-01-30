@@ -66,7 +66,6 @@ export default function MapInput({ onLocationSelect, inputLat, inputLon }: MapIn
     ? [inputLat, inputLon] 
     : null;
 
-  // Koordinat Default (Misal: Monas, Jakarta) untuk tampilan awal jika belum ada data
   const defaultCenter: [number, number] = [-8.097957655926255, 112.16521686600117];
 
   return (

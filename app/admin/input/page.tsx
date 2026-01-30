@@ -236,6 +236,7 @@ export default function InputPage() {
     <img
       src={form.image}
       alt="Preview"
+      referrerPolicy="no-referrer"
       className="object-cover w-full h-full"
       onError={(e) => {
         const img = e.currentTarget as HTMLImageElement;

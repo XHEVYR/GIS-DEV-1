@@ -278,6 +278,7 @@ export default function Dashboard() {
                     <div className="md:col-span-2 border-2 border-slate-50 rounded-2xl overflow-hidden">
                       <img src={editForm.image} 
                         alt="Preview" 
+                        referrerPolicy="no-referrer"
                         className="w-full h-44 object-cover" 
                         onError={(e) => e.currentTarget.src = "https://via.placeholder.com/600x300?text=Error"} 
                       />

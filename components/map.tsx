@@ -99,7 +99,7 @@ export default function Map() {
         
         {/* Base Maps */}
         <LayersControl.BaseLayer checked name="Peta Satelit">
-          <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; OSM' />
+          <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; OSM' loading="lazy"/>
         </LayersControl.BaseLayer>
         <LayersControl.BaseLayer name="Peta Jalan (OSM)">
            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OSM' />
@@ -147,7 +147,11 @@ export default function Map() {
               <Popup>
                 <div className="w-60">
                   {place.image && (
-                    <img src={place.image} alt={place.name} className="w-full h-40 object-cover rounded-lg mb-3" />
+                    <img src={place.image}
+                    alt={place.name} 
+                    className="w-full h-40 object-cover rounded-lg mb-3"
+                    referrerPolicy="no-referrer"
+                    loading="lazy" />
                   )}
                   <b>Nama:</b> {place.name}<br/>
                   <b>Kategori:</b> {place.category}<br/>

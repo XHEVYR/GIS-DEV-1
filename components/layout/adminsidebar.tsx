@@ -1,10 +1,23 @@
-'use client';
+"use client"; // File: components/AdminSidebar.tsx
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { Menu, X, MapPin, Plus, Map, HomeIcon, DoorOpenIcon, LogOut } from 'lucide-react';
-import { usePathname } from 'next/navigation';
-import { signOut } from "next-auth/react"; // <-- 1. IMPORT INI
+import Link from "next/link";
+import {
+  Menu,
+  X,
+  MapPin,
+  Plus,
+  Map,
+  HomeIcon,
+  DoorOpenIcon,
+} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+
+// 1. Tambahkan Interface untuk Props
+interface AdminSidebarProps {
+  isMinimized: boolean;
+  setIsMinimized: (value: boolean) => void;
+}
 
 interface NavItemProps {
   href: string;
@@ -14,28 +27,35 @@ interface NavItemProps {
   active: boolean;
 }
 
-export default function AdminSidebar() {
-  const [isMinimized, setIsMinimized] = useState(false);
+// 2. Terima props di fungsi komponen
+export default function AdminSidebar({
+  isMinimized,
+  setIsMinimized,
+}: AdminSidebarProps) {
   const pathname = usePathname();
-
-  // Helper untuk menentukan apakah link sedang aktif
   const isActive = (path: string) => pathname === path;
+
+  // Hapus useState internal, karena sekarang pakai props
 
   return (
     <aside
       className={`${
-        isMinimized ? 'w-20' : 'w-64'
+        isMinimized ? "w-20" : "w-64"
       } bg-white h-screen fixed left-0 top-0 border-r border-slate-200 transition-all duration-300 ease-in-out flex flex-col shadow-sm z-50`}
     >
       {/* Header */}
-      <div className={`flex items-center ${isMinimized ? 'justify-center' : 'justify-between'} p-6 mb-2`}>
+      <div
+        className={`flex items-center ${
+          isMinimized ? "justify-center" : "justify-between"
+        } p-6 mb-2`}
+      >
         {!isMinimized && (
           <h1 className="text-xl font-bold tracking-tight text-indigo-600">
             GIS<span className="text-slate-900">App</span>
           </h1>
         )}
         <button
-          onClick={() => setIsMinimized(!isMinimized)}
+          onClick={() => setIsMinimized(!isMinimized)} // Menggunakan fungsi dari props
           className="p-2 rounded-xl transition-colors hover:bg-slate-100 text-slate-500"
           title={isMinimized ? "Buka Menu" : "Tutup Menu"}
         >
@@ -45,54 +65,55 @@ export default function AdminSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-2">
-        <NavItem 
-          href="/admin" 
+        <NavItem
+          href="/admin"
           icon={<HomeIcon size={20} />}
           label="Dashboard"
           isMinimized={isMinimized}
-          active={isActive('/admin')}
+          active={isActive("/admin")}
         />
-        <NavItem 
-          href="/admin/data" 
-          icon={<MapPin size={20} />} 
-          label="Data Lokasi" 
-          isMinimized={isMinimized} 
-          active={isActive('/admin/data')} // Sesuaikan dengan route folder Anda (misal /admin saja kalau satu halaman)
+        <NavItem
+          href="/admin/data"
+          icon={<MapPin size={20} />}
+          label="Data Lokasi"
+          isMinimized={isMinimized}
+          active={isActive("/admin/data")}
         />
-        <NavItem 
-          href="/admin/input" 
-          icon={<Plus size={20} />} 
-          label="Tambah Baru" 
-          isMinimized={isMinimized} 
-          active={isActive('/admin/input')}
-        />        
-        <NavItem 
-          href="/" 
-          icon={<Map size={20} />} 
-          label="Lihat Peta" 
-          isMinimized={isMinimized} 
-          active={isActive('/')}
+        <NavItem
+          href="/admin/input"
+          icon={<Plus size={20} />}
+          label="Tambah Baru"
+          isMinimized={isMinimized}
+          active={isActive("/admin/input")}
+        />
+        <NavItem
+          href="/"
+          icon={<Map size={20} />}
+          label="Lihat Peta"
+          isMinimized={isMinimized}
+          active={isActive("/")}
         />
 
         <div className="my-7 mx-3 h-px bg-slate-100" />
 
-        {/* 2. TOMBOL LOGOUT (Bukan NavItem lagi) */}
+        {/* Logout Button */}
         <button
           onClick={() => signOut({ callbackUrl: "/auth/login" })}
           className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-200 group hover:bg-red-50 text-slate-500 hover:text-red-600 ${
-            isMinimized ? 'justify-center' : ''
+            isMinimized ? "justify-center" : ""
           }`}
-          title={isMinimized ? "Logout" : ''}
+          title={isMinimized ? "Logout" : ""}
         >
           <div className="shrink-0 group-hover:text-red-600 text-slate-400 transition-colors">
             <DoorOpenIcon size={20} />
           </div>
-          {!isMinimized && <span className="text-sm font-semibold">Logout</span>}
+          {!isMinimized && (
+            <span className="text-sm font-semibold">Logout</span>
+          )}
         </button>
-
       </nav>
 
-      {/* Footer (Opsional) */}
+      {/* Footer */}
       {!isMinimized && (
         <div className="p-6 border-t border-slate-100">
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">
@@ -104,19 +125,25 @@ export default function AdminSidebar() {
   );
 }
 
-// Komponen Kecil NavItem (Tetap sama)
+// Komponen NavItem (Tidak ada perubahan signifikan, hanya copy paste yg lama)
 function NavItem({ href, icon, label, isMinimized, active }: NavItemProps) {
   return (
     <Link
       href={href}
       className={`flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-200 group ${
-        active 
-          ? 'bg-indigo-50 text-indigo-600 shadow-sm' 
-          : 'hover:bg-slate-50 text-slate-500 hover:text-slate-900'
-      } ${isMinimized ? 'justify-center' : ''}`}
-      title={isMinimized ? label : ''}
+        active
+          ? "bg-indigo-50 text-indigo-600 shadow-sm"
+          : "hover:bg-slate-50 text-slate-500 hover:text-slate-900"
+      } ${isMinimized ? "justify-center" : ""}`}
+      title={isMinimized ? label : ""}
     >
-      <div className={`shrink-0 ${active ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
+      <div
+        className={`shrink-0 ${
+          active
+            ? "text-indigo-600"
+            : "text-slate-400 group-hover:text-slate-600"
+        }`}
+      >
         {icon}
       </div>
       {!isMinimized && <span className="text-sm font-semibold">{label}</span>}

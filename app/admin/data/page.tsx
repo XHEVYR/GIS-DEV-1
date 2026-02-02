@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import SearchBar from "@/components/searchbar"; 
 import { 
   MapPin, 
   Image as ImageIcon, 
@@ -14,7 +15,7 @@ import {
   Plus 
 } from 'lucide-react';
 
-// 1. IMPORT DYNAMIC MAP
+// Import Dynamic Map untuk Edit Mode
 const MapInput = dynamic(() => import("@/components/mapinput"), { 
   ssr: false,
   loading: () => (
@@ -24,7 +25,7 @@ const MapInput = dynamic(() => import("@/components/mapinput"), {
   )
 });
 
-// Interface Data dari API (Number)
+// Interface Data
 interface Place {
   id: string;
   name: string;
@@ -36,39 +37,52 @@ interface Place {
   description?: string;
 }
 
-// Interface Form Edit (String agar mudah diedit manual)
-// interface EditFormState {
-//   id: string;
-//   name: string;
-//   category: string;
-//   lat: string | number; // Bisa string saat diketik
-//   lon: string | number;
-//   address: string;
-//   image: string;
-//   description: string;
-// }
-
 export default function Dashboard() {
+  // STATE 1: Data Master (Database Asli)
   const [places, setPlaces] = useState<Place[]>([]);
-  const [editId, setEditId] = useState<string | null>(null);
   
-  // State form menggunakan tipe fleksibel agar input manual lancar
+  // STATE 2: Data Tampilan (Hasil Search) <--- 2. State untuk Filter
+  const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
+
+  const [editId, setEditId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Place | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch Data Awal
   useEffect(() => {
     fetch('/api/places')
       .then(res => res.json())
-      .then(data => setPlaces(data));
+      .then(data => {
+        const result = Array.isArray(data) ? data : [];
+        setPlaces(result);        
+        setFilteredPlaces(result); // <--- Isi kedua state saat pertama load
+      });
   }, []);
 
-  // --- HANDLERS ---
+  // --- 3. FUNGSI SEARCH ---
+  const handleSearch = (query: string) => {
+    if (!query) {
+      setFilteredPlaces(places); // Reset ke data master jika kosong
+      return;
+    }
+
+    const lowerQuery = query.toLowerCase();
+    const results = places.filter((place) => 
+      place.name.toLowerCase().includes(lowerQuery) || 
+      place.address?.toLowerCase().includes(lowerQuery) ||
+      place.category.toLowerCase().includes(lowerQuery)
+    );
+
+    setFilteredPlaces(results);
+  };
+
+  // --- HANDLERS LAINNYA ---
 
   const handleEditClick = (place: Place) => {
     setEditId(place.id);
     setError(null);
-    // Konversi Lat/Lon ke String saat masuk mode edit agar input tidak kaku
+    // Konversi Lat/Lon ke String agar mudah diedit
     setEditForm({ 
       ...place, 
       lat: place.lat.toString(),
@@ -80,17 +94,14 @@ export default function Dashboard() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handler Klik Peta
   const handleMapSelect = (lat: number, lon: number) => {
     if (editForm) {
       setEditForm({ ...editForm, lat: lat.toString(), lon: lon.toString() });
     }
   };
 
-  // Handler Input Manual Koordinat
   const handleCoordinateChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'lat' | 'lon') => {
     const value = e.target.value;
-    // Validasi regex: hanya angka, minus, dan titik
     if (/^-?[\d.]*$/.test(value) && editForm) {
       setEditForm({ ...editForm, [field]: value });
     }
@@ -101,14 +112,12 @@ export default function Dashboard() {
     if (!editForm) return;
     setLoading(true);
     
-    // Validasi sederhana
     if(!editForm.lat || !editForm.lon) {
        setError("Koordinat tidak boleh kosong.");
        setLoading(false);
        return;
     }
 
-    // Siapkan payload: Kembalikan string Lat/Lon menjadi Number
     const payload = {
       ...editForm,
       lat: parseFloat(editForm.lat.toString()),
@@ -123,8 +132,13 @@ export default function Dashboard() {
       });
       
       if (res.ok) {
-        // Update tabel lokal dengan data yang sudah di-parse ke number
-        setPlaces(places.map(p => p.id === editForm.id ? { ...payload, id: editForm.id } : p));
+        // Update di Master & Filtered agar tampilan sinkron
+        const updateStates = (prev: Place[]) => 
+            prev.map(p => p.id === editForm.id ? { ...payload, id: editForm.id } : p);
+
+        setPlaces(updateStates); 
+        setFilteredPlaces(updateStates); // <--- Update juga yang ditampilkan
+
         setEditId(null);
         setEditForm(null);
       } else {
@@ -141,7 +155,13 @@ export default function Dashboard() {
     if (window.confirm(`Yakin ingin menghapus "${name}"?`)) {
       try {
         await fetch(`/api/places/${id}`, { method: 'DELETE' });
-        setPlaces(places.filter(p => p.id !== id));
+        
+        // Hapus dari Master & Filtered
+        const deleteStates = (prev: Place[]) => prev.filter(p => p.id !== id);
+        
+        setPlaces(deleteStates);
+        setFilteredPlaces(deleteStates); // <--- Hapus juga dari tampilan
+
       } catch (err) {
         console.error('Error:', err);
       }
@@ -154,11 +174,10 @@ export default function Dashboard() {
     setError(null);
   };
 
-  // Style Variables (Sama dengan InputPage)
   const inputClass = "w-full px-4 py-3 rounded-xl border-2 border-slate-100 bg-white text-slate-800 transition-all outline-none text-sm focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50/50";
   const labelClass = "block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500";
 
-  // --- RENDER MODE EDIT (TAMPILAN MIRIP ADD PAGE) ---
+  // --- RENDER MODE EDIT (FORM LENGKAP) ---
   if (editId && editForm) {
     return (
       <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -224,7 +243,6 @@ export default function Dashboard() {
                     />
                   </div>
 
-                  {/* EDITABLE LATITUDE */}
                   <div>
                     <label className={labelClass}>Latitude</label>
                     <input 
@@ -236,7 +254,6 @@ export default function Dashboard() {
                     />
                   </div>
 
-                  {/* EDITABLE LONGITUDE */}
                   <div>
                     <label className={labelClass}>Longitude</label>
                     <input 
@@ -326,15 +343,24 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         
-        <div className="flex justify-between items-end mb-8">
+        {/* HEADER DENGAN SEARCH BAR */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900">
               Data <span className="text-indigo-600"> Lokasi</span></h1>
             <p className="text-slate-500 mt-1">Kelola data lokasi GIS Anda.</p>
           </div>
-          <Link href="/admin/input" className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">
-            <Plus size={20} /> Tambah Data
-          </Link>
+          
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            {/* 4. TEMPAT SEARCH BAR */}
+            <div className="w-full sm:w-64">
+                <SearchBar onSearch={handleSearch} placeholder="Cari nama / alamat..." />
+            </div>
+
+            <Link href="/admin/input" className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition whitespace-nowrap">
+              <Plus size={20} /> Tambah
+            </Link>
+          </div>
         </div>
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
@@ -350,59 +376,65 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {places.map((place) => (
-                  <tr key={place.id} className="hover:bg-slate-50/80 transition">
-                    <td className="p-5 font-bold text-slate-700">
-                      {place.name}
-                      {place.image && <span className="ml-2 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold">IMG</span>}
-                    </td>
-                    <td className="p-5">
-                      <span className={`px-3 py-1.5 text-xs font-bold rounded-lg border ${
-                        place.category === 'wisata' ? 'bg-purple-50 text-purple-700 border-purple-100' :
-                        place.category === 'hotel' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                        place.category === 'cafe' ? 'bg-orange-50 text-orange-700 border-orange-100' :
-                        'bg-slate-50 text-slate-700 border-slate-100'
-                      }`}>
-                        {place.category.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="p-5 text-slate-500 text-xs font-mono">
-                      {Number(place.lat).toFixed(5)}, <br/> {Number(place.lon).toFixed(5)}
-                    </td>
-                    <td className="p-5 text-slate-500 text-sm truncate max-w-[200px]">
-                      {place.address || "-"}
-                    </td>
-                    <td className="p-5">
-                      <div className="flex items-center justify-center gap-2">
-                        <button 
-                          onClick={() => handleEditClick(place)}
-                          className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition border border-indigo-100"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(place.id, place.name)}
-                          className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition border border-red-100"
-                          title="Hapus"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                
+                {/* 5. LOOPING MENGGUNAKAN FILTERED PLACES */}
+                {filteredPlaces.length > 0 ? (
+                  filteredPlaces.map((place) => (
+                    <tr key={place.id} className="hover:bg-slate-50/80 transition">
+                      <td className="p-5 font-bold text-slate-700">
+                        {place.name}
+                        {place.image && <span className="ml-2 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold">IMG</span>}
+                      </td>
+                      <td className="p-5">
+                        <span className={`px-3 py-1.5 text-xs font-bold rounded-lg border ${
+                          place.category === 'wisata' ? 'bg-purple-50 text-purple-700 border-purple-100' :
+                          place.category === 'hotel' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                          place.category === 'cafe' ? 'bg-orange-50 text-orange-700 border-orange-100' :
+                          'bg-slate-50 text-slate-700 border-slate-100'
+                        }`}>
+                          {place.category.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="p-5 text-slate-500 text-xs font-mono">
+                        {Number(place.lat).toFixed(5)}, <br/> {Number(place.lon).toFixed(5)}
+                      </td>
+                      <td className="p-5 text-slate-500 text-sm truncate max-w-[200px]">
+                        {place.address || "-"}
+                      </td>
+                      <td className="p-5">
+                        <div className="flex items-center justify-center gap-2">
+                          <button 
+                            onClick={() => handleEditClick(place)}
+                            className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition border border-indigo-100"
+                            title="Edit"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(place.id, place.name)}
+                            className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition border border-red-100"
+                            title="Hapus"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  // PESAN JIKA HASIL SEARCH KOSONG
+                  <tr>
+                    <td colSpan={5} className="p-12 text-center text-slate-500">
+                       <div className="flex flex-col items-center gap-2">
+                          <Info size={24} className="text-slate-300"/>
+                          <span>Data tidak ditemukan.</span>
+                       </div>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
-          {places.length === 0 && (
-            <div className="p-12 text-center flex flex-col items-center gap-3">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
-                <Info size={32} />
-              </div>
-              <p className="text-slate-500 font-medium">Belum ada data lokasi yang tersedia.</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

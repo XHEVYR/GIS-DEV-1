@@ -8,17 +8,10 @@ export default function AutoLogout() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    // LOGIKA BARU:
-    // Logout HANYA JIKA:
-    // 1. Sedang Login
-    // 2. BUKAN di folder admin
-    // 3. BUKAN di folder auth (login)
-    // 4. DAN BUKAN DI HALAMAN UTAMA ("/") <--- INI PENGECUALIANNYA
-    
     if (session && 
         !pathname.startsWith("/admin") && 
         !pathname.startsWith("/auth") && 
-        pathname !== "/" // <-- Admin boleh ada di sini
+        pathname !== "/"
     ) {
       console.log("Admin tersesat ke halaman yang tidak dikenal -> Logout.");
       signOut({ redirect: false });

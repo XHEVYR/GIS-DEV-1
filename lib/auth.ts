@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.username || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({
-          where: { username: credentials.username }
+          where: { username: credentials.username },
         });
 
         // Cek password (Sederhana)
@@ -51,5 +51,5 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-  }
+  },
 };

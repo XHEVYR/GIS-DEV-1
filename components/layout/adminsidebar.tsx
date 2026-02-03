@@ -33,7 +33,13 @@ export default function AdminSidebar({
   setIsMinimized,
 }: AdminSidebarProps) {
   const pathname = usePathname();
-  const isActive = (path: string) => pathname === path;
+  
+  // Helper agar active state mendeteksi sub-path juga (misal /admin/data/edit tetap aktif di Data Lokasi)
+  const isActive = (path: string) => {
+    if (path === "/admin" && pathname === "/admin") return true;
+    if (path !== "/admin" && pathname.startsWith(path)) return true;
+    return false;
+  };
 
   return (
     <aside
@@ -68,7 +74,7 @@ export default function AdminSidebar({
           icon={<HomeIcon size={20} />}
           label="Dashboard"
           isMinimized={isMinimized}
-          active={isActive("/admin")}
+          active={isActive("/admin") && pathname === "/admin"} // Strict check untuk dashboard
         />
         <NavItem
           href="/admin/data"
@@ -85,11 +91,11 @@ export default function AdminSidebar({
           active={isActive("/admin/input")}
         />
         <NavItem
-          href="/"
+          href="/admin/map" 
           icon={<Map size={20} />}
-          label="Lihat Peta"
+          label="Peta Digital"
           isMinimized={isMinimized}
-          active={isActive("/")}
+          active={isActive("/admin/map")}
         />
 
         {/* Divider Simple */}
@@ -97,7 +103,7 @@ export default function AdminSidebar({
 
         {/* Logout Button */}
         <button
-          onClick={() => signOut({ callbackUrl: "/auth/login" })}
+          onClick={() => signOut({ callbackUrl: "/" })}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group hover:bg-zinc-900 text-zinc-500 hover:text-red-400 ${
             isMinimized ? "justify-center" : ""
           }`}
@@ -106,9 +112,7 @@ export default function AdminSidebar({
           <div className="shrink-0">
             <DoorOpenIcon size={20} />
           </div>
-          {!isMinimized && (
-            <span className="text-sm font-medium">Logout</span>
-          )}
+          {!isMinimized && <span className="text-sm font-medium">Logout</span>}
         </button>
       </nav>
 
@@ -133,8 +137,8 @@ function NavItem({ href, icon, label, isMinimized, active }: NavItemProps) {
         flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group
         ${
           active
-            ? "bg-lime-500/10 text-lime-500 border border-lime-500/20" // Aktif: Background transparan halus + Teks Lime
-            : "text-zinc-400 hover:bg-zinc-600 hover:text-zinc-100" // Tidak Aktif: Abu-abu ke Putih
+            ? "bg-lime-500/10 text-lime-500 border border-lime-500/20" // Aktif
+            : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100" // Tidak Aktif (Saya ubah hover jadi zinc-900 agar lebih smooth)
         } 
         ${isMinimized ? "justify-center" : ""}
       `}
@@ -142,17 +146,13 @@ function NavItem({ href, icon, label, isMinimized, active }: NavItemProps) {
     >
       <div
         className={`shrink-0 transition-colors ${
-          active ? "text-lime-500" : "text-zinc-500 group-hover:text-zinc-400"
+          active ? "text-lime-500" : "text-zinc-500 group-hover:text-zinc-300"
         }`}
       >
         {icon}
       </div>
 
-      {!isMinimized && (
-        <span className="text-sm font-medium">
-          {label}
-        </span>
-      )}
+      {!isMinimized && <span className="text-sm font-medium">{label}</span>}
     </Link>
   );
 }

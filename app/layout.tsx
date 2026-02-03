@@ -36,13 +36,11 @@ export default function RootLayout({
           Tanpa ini, error "useSession must be wrapped" akan muncul 
         */}
         <Providers>
-          
           {/* 3. PASANG CCTV AUTO LOGOUT DI SINI */}
           <AutoLogout />
-          
+
           {/* Render Halaman Website */}
           {children}
-          
         </Providers>
       </body>
     </html>

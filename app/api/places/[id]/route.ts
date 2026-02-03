@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// PERBAIKAN: Ubah tipe 'params' menjadi Promise<{ id: string }>
+// PUT
 export async function PUT(
   request: Request, 
   { params }: { params: Promise<{ id: string }> } 
@@ -9,7 +9,6 @@ export async function PUT(
   try {
     const body = await request.json();
     
-    // Karena params adalah Promise, kita harus await (ini sudah benar di kode Anda)
     const { id } = await params; 
     
     console.log("Data UPDATE diterima dari Frontend:", body);
@@ -43,7 +42,7 @@ export async function PUT(
   }
 }
 
-// PERBAIKAN: Lakukan hal yang sama untuk DELETE
+// DELETE
 export async function DELETE(
   request: Request, 
   { params }: { params: Promise<{ id: string }> }

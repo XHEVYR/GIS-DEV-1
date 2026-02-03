@@ -16,7 +16,7 @@ import {
   LayoutDashboard
 } from "lucide-react";
 
-// Import Komponen Tombol Action (Pastikan path import sesuai struktur folder Anda)
+// Import Komponen Tombol Action
 import FormActions from "@/components/places/FormActions";
 
 // Setup Map Dinamis
@@ -33,6 +33,7 @@ const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
 const STYLES = {
   input: "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 text-sm font-medium focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none hover:border-slate-300 shadow-sm",
   label: "block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500",
+  // Style Card Putih ("Canvas")
   card: "bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300",
   headerTitle: "font-bold text-lg text-slate-800 flex items-center gap-3 mb-6 pb-4 border-b border-slate-50",
   iconBox: (color: string) => `p-2 rounded-lg ${color}`,
@@ -62,7 +63,7 @@ export default function InputPage() {
 
   // --- HANDLERS ---
 
-  // 1. Handle Map Click (Update lat/lon saat peta diklik)
+  // 1. Handle Map Click
   const handleMapClick = (lat: number, lon: number) => {
     setError(null);
     setFormData((prev) => ({
@@ -72,7 +73,7 @@ export default function InputPage() {
     }));
   };
 
-  // 2. Handle Submit (Validasi & Buka Dialog)
+  // 2. Handle Submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -87,7 +88,7 @@ export default function InputPage() {
     setIsConfirmOpen(true); // Buka Alert Konfirmasi
   };
 
-  // 3. Eksekusi Simpan (POST ke API)
+  // 3. Eksekusi Simpan
   const executeSave = async () => {
     setLoading(true);
     setIsConfirmOpen(false);
@@ -107,7 +108,6 @@ export default function InputPage() {
 
       if (res.ok) {
         setSuccess(true);
-        // Redirect setelah 1.5 detik
         setTimeout(() => router.push("/admin/data"), 1500);
       } else {
         throw new Error("Gagal menyimpan data ke server.");
@@ -138,11 +138,13 @@ export default function InputPage() {
 
   // --- FORM INPUT UTAMA ---
   return (
-    // Wrapper Utama: Sama persis dengan Edit Page
+    // Wrapper Utama
     <div className="w-full max-w-full transition-all duration-500 ease-in-out">
       
-      {/* HEADER STICKY (Sama persis dengan Edit Page) */}
-      <header className="sticky top-0 z-30 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/60 mb-8 -mx-4 px-4 py-4 md:px-8 md:-mx-8 md:py-6 transition-all">
+      {/* HEADER STICKY 
+          Catatan: Tidak ada margin negatif (-mx) agar header lurus dengan konten di bawahnya.
+      */}
+      <header className="sticky top-0 z-30 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/60 mb-8 py-4 transition-all rounded-xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
@@ -157,15 +159,15 @@ export default function InputPage() {
           </div>
           <button 
             onClick={() => router.back()} 
-            className="group flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all duration-300 shadow-sm hover:shadow-md"
+            className="group flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 transition-all shadow-sm"
           >
-            <XCircle size={22} className="group-hover:rotate-90 transition-transform duration-300" />
+            <XCircle size={22} className="group-hover:scale-110 transition-transform" />
             <span className="hidden md:inline-block ml-2 font-bold text-sm">Batal</span>
           </button>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-0">
+      <div className="max-w-7xl mx-auto">
         
         {/* Error Alert */}
         {error && (
@@ -176,12 +178,12 @@ export default function InputPage() {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* GRID LAYOUT XL (Sama persis dengan Edit Page) */}
+          {/* GRID LAYOUT XL */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             
             {/* === KOLOM KIRI: PETA (Sticky) === */}
             <section className="xl:col-span-5 flex flex-col gap-6 xl:sticky xl:top-28 transition-all duration-300">
-              <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden group hover:shadow-2xl hover:shadow-indigo-100/40 transition-all duration-500">
+              <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden group hover:shadow-2xl hover:shadow-indigo-100/40 transition-all">
                 <div className="px-6 py-4 flex items-center justify-between bg-white border-b border-slate-50">
                   <div className="flex items-center gap-2 text-indigo-900">
                     <MapPin size={18} className="text-indigo-600" />
@@ -199,7 +201,7 @@ export default function InputPage() {
                     inputLat={formData.lat ? parseFloat(formData.lat) : undefined}
                     inputLon={formData.lon ? parseFloat(formData.lon) : undefined}
                   />
-                  <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-xl border border-white/50 shadow-lg text-xs text-slate-600 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-xl border border-white/50 shadow-lg text-xs text-slate-600 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                     Klik peta untuk menentukan lokasi otomatis
                   </div>
                 </div>
@@ -233,7 +235,7 @@ export default function InputPage() {
             {/* === KOLOM KANAN: INPUT FIELDS === */}
             <section className="xl:col-span-7 flex flex-col gap-6">
               
-              {/* CARD 1: INFO UMUM */}
+              {/* CARD 1: INFO UMUM (Canvas Putih Terpisah) */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-indigo-50 text-indigo-600")}><AlignLeft size={20} /></div>
@@ -241,7 +243,7 @@ export default function InputPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className={`md:col-span-2 ${STYLES.inputWrapperClass || ""}`}>
+                  <div className="md:col-span-2">
                     <label className={STYLES.label}>Nama Tempat</label>
                     <input 
                       className={STYLES.input} 
@@ -287,7 +289,7 @@ export default function InputPage() {
                   <div className="md:col-span-2">
                     <label className={STYLES.label}>Deskripsi</label>
                     <textarea 
-                      className={`${STYLES.input} min-h-[120px]`}
+                      className={`${STYLES.input} min-h-[100px]`}
                       placeholder="Jelaskan detail tentang tempat ini..."
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -296,7 +298,7 @@ export default function InputPage() {
                 </div>
               </div>
 
-              {/* CARD 2: VISUALISASI */}
+              {/* CARD 2: VISUALISASI (Canvas Putih Terpisah) */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-purple-50 text-purple-600")}><ImageIcon size={20} /></div>
@@ -305,7 +307,7 @@ export default function InputPage() {
 
                 <div className="space-y-6">
                   <div>
-                    <label className={STYLES.label}>URL Gambar (Link Eksternal)</label>
+                    <label className={STYLES.label}>URL Gambar</label>
                     <div className="relative">
                       <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                       <input 
@@ -318,7 +320,7 @@ export default function InputPage() {
                   </div>
 
                   {formData.image && (
-                    <div className="relative w-full h-64 rounded-2xl overflow-hidden border-2 border-slate-100 bg-slate-50 group shadow-inner">
+                    <div className="relative w-full h-64 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 group shadow-inner">
                       <Image 
                         src={formData.image} 
                         alt="Preview" 
@@ -327,7 +329,7 @@ export default function InputPage() {
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                         onError={() => setFormData({ ...formData, image: "" })} 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                         <p className="text-white text-sm font-medium flex items-center gap-2">
                           <CheckCircle2 size={16} className="text-emerald-400" /> Gambar Valid
                         </p>
@@ -339,7 +341,7 @@ export default function InputPage() {
 
               {/* ACTION BUTTONS (Sticky Mobile) */}
               <div className="sticky bottom-4 z-20 xl:static">
-                <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-slate-200/60 xl:border-none xl:shadow-none xl:bg-transparent xl:p-0">
+                <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-slate-200 xl:border-none xl:shadow-none xl:bg-transparent xl:p-0">
                   <FormActions 
                     loading={loading}
                     onCancel={() => router.back()}

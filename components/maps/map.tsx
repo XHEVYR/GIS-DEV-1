@@ -106,10 +106,6 @@ export default function Map() {
     >
       <LayersControl position="topright">
         {/* Base Maps */}
-<<<<<<< HEAD
-        <LayersControl.BaseLayer checked name="Peta Jalan (OSM)">
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OSM' />
-=======
         <LayersControl.BaseLayer checked name="Peta Satelit">
           <TileLayer
             url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png"
@@ -117,14 +113,7 @@ export default function Map() {
           />
         </LayersControl.BaseLayer>
         <LayersControl.BaseLayer name="Peta Jalan (OSM)">
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OSM"
-          />
->>>>>>> 3a094aea2db82cef435deba65dabd96c24e1a691
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="Peta Satelit">
-          <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; OSM'/>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OSM' />
         </LayersControl.BaseLayer>
 
         {/* Overlays Kategori */}

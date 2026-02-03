@@ -11,9 +11,8 @@ import {
   AlertCircle,
   CheckCircle2,
   XCircle,
-  PlusCircle, // Ikon Plus untuk halaman Tambah
+  PlusCircle, 
   AlignLeft,
-  LayoutDashboard
 } from "lucide-react";
 
 // Import Komponen Tombol Action
@@ -23,7 +22,7 @@ import FormActions from "@/components/places/FormActions";
 const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ssr: false,
   loading: () => (
-    <div className="h-full min-h-[400px] bg-slate-100 flex items-center justify-center rounded-2xl animate-pulse">
+    <div className="h-full min-h-100 bg-slate-100 flex items-center justify-center rounded-2xl animate-pulse">
       <span className="text-slate-400 font-medium">Memuat Peta...</span>
     </div>
   ),
@@ -195,7 +194,7 @@ export default function InputPage() {
                 </div>
                 
                 {/* Map Container */}
-                <div className="relative w-full aspect-square xl:aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100">
+                <div className="relative w-full aspect-square xl:aspect-4/5 rounded-2xl overflow-hidden bg-slate-100">
                   <MapInput
                     onLocationSelect={handleMapClick}
                     inputLat={formData.lat ? parseFloat(formData.lat) : undefined}
@@ -277,7 +276,7 @@ export default function InputPage() {
                   <div>
                      <label className={STYLES.label}>Alamat Singkat</label>
                      <textarea 
-                        className={`${STYLES.input} min-h-[52px] resize-none pt-3`}
+                        className={`${STYLES.input} min-h-13 resize-none pt-3`}
                         rows={1}
                         placeholder="Jl. Raya..."
                         value={formData.address}
@@ -289,7 +288,7 @@ export default function InputPage() {
                   <div className="md:col-span-2">
                     <label className={STYLES.label}>Deskripsi</label>
                     <textarea 
-                      className={`${STYLES.input} min-h-[100px]`}
+                      className={`${STYLES.input} min-h-25`}
                       placeholder="Jelaskan detail tentang tempat ini..."
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -329,7 +328,7 @@ export default function InputPage() {
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                         onError={() => setFormData({ ...formData, image: "" })} 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                         <p className="text-white text-sm font-medium flex items-center gap-2">
                           <CheckCircle2 size={16} className="text-emerald-400" /> Gambar Valid
                         </p>

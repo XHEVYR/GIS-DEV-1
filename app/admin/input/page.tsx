@@ -4,22 +4,19 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-
 import {
   MapPin,
   Image as ImageIcon,
   AlertCircle,
   CheckCircle2,
   XCircle,
-  PlusCircle, // Ikon Plus untuk halaman Tambah
+  PlusCircle, // Ikon khusus Tambah Data
   AlignLeft,
-  LayoutDashboard
 } from "lucide-react";
 
-// Import Komponen Tombol Action
 import FormActions from "@/components/places/FormActions";
 
-// Setup Map Dinamis
+// --- 1. SETUP MAP DINAMIS ---
 const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ssr: false,
   loading: () => (
@@ -29,7 +26,7 @@ const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ),
 });
 
-// --- STYLE CONSTANTS (Sama persis dengan halaman Edit) ---
+// --- 2. STYLE CONSTANTS (Dicopy dari Style Edit Data agar 100% sama) ---
 const STYLES = {
   input: "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 text-sm font-medium focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none hover:border-slate-300 shadow-sm",
   label: "block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500",
@@ -42,7 +39,7 @@ const STYLES = {
 export default function InputPage() {
   const router = useRouter();
 
-  // --- STATE ---
+  // --- 3. STATE (Kosong untuk data baru) ---
   const [formData, setFormData] = useState({
     name: "",
     lat: "",
@@ -58,12 +55,14 @@ export default function InputPage() {
   const [success, setSuccess] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  // Smooth Scroll ke atas saat load
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, []);
+  // Scroll ke atas saat load
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // --- HANDLERS ---
 
-  // 1. Handle Map Click
+  // Handle Map Click
   const handleMapClick = (lat: number, lon: number) => {
     setError(null);
     setFormData((prev) => ({
@@ -73,7 +72,7 @@ export default function InputPage() {
     }));
   };
 
-  // 2. Handle Submit
+  // Handle Submit (Validasi)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -88,7 +87,7 @@ export default function InputPage() {
     setIsConfirmOpen(true); // Buka Alert Konfirmasi
   };
 
-  // 3. Eksekusi Simpan
+  // Eksekusi Simpan (POST ke API - LOGIC TAMBAH DATA)
   const executeSave = async () => {
     setLoading(true);
     setIsConfirmOpen(false);
@@ -136,18 +135,16 @@ export default function InputPage() {
     );
   }
 
-  // --- FORM INPUT UTAMA ---
+  // --- RENDER FORM (Struktur HTML sama persis dengan Edit Data) ---
   return (
-    // Wrapper Utama
     <div className="w-full max-w-full transition-all duration-500 ease-in-out">
       
-      {/* HEADER STICKY 
-          Catatan: Tidak ada margin negatif (-mx) agar header lurus dengan konten di bawahnya.
-      */}
+      {/* HEADER STICKY */}
       <header className="sticky top-0 z-30 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/60 mb-8 py-4 transition-all rounded-xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              {/* Warna Indigo & Ikon Plus (Khas Halaman Tambah) */}
               <span className="bg-indigo-600 text-white p-1.5 rounded-lg shadow-indigo-200 shadow-lg">
                 <PlusCircle size={20} />
               </span>
@@ -178,7 +175,7 @@ export default function InputPage() {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* GRID LAYOUT XL */}
+          {/* GRID LAYOUT XL (Sama seperti halaman Edit) */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             
             {/* === KOLOM KIRI: PETA (Sticky) === */}
@@ -187,7 +184,7 @@ export default function InputPage() {
                 <div className="px-6 py-4 flex items-center justify-between bg-white border-b border-slate-50">
                   <div className="flex items-center gap-2 text-indigo-900">
                     <MapPin size={18} className="text-indigo-600" />
-                    <h3 className="font-bold text-sm tracking-wide uppercase">Plotting Area</h3>
+                    <h3 className="font-bold text-sm tracking-wide uppercase">Lokasi Titik</h3>
                   </div>
                   <span className="text-[10px] font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">
                     Klik Peta
@@ -235,7 +232,7 @@ export default function InputPage() {
             {/* === KOLOM KANAN: INPUT FIELDS === */}
             <section className="xl:col-span-7 flex flex-col gap-6">
               
-              {/* CARD 1: INFO UMUM (Canvas Putih Terpisah) */}
+              {/* CARD 1: INFO UMUM */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-indigo-50 text-indigo-600")}><AlignLeft size={20} /></div>
@@ -275,15 +272,15 @@ export default function InputPage() {
                   </div>
 
                   <div>
-                     <label className={STYLES.label}>Alamat Singkat</label>
-                     <textarea 
+                      <label className={STYLES.label}>Alamat Singkat</label>
+                      <textarea 
                         className={`${STYLES.input} min-h-[52px] resize-none pt-3`}
                         rows={1}
                         placeholder="Jl. Raya..."
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         required
-                     />
+                      />
                   </div>
 
                   <div className="md:col-span-2">
@@ -298,7 +295,7 @@ export default function InputPage() {
                 </div>
               </div>
 
-              {/* CARD 2: VISUALISASI (Canvas Putih Terpisah) */}
+              {/* CARD 2: VISUALISASI */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-purple-50 text-purple-600")}><ImageIcon size={20} /></div>
@@ -339,7 +336,7 @@ export default function InputPage() {
                 </div>
               </div>
 
-              {/* ACTION BUTTONS (Sticky Mobile) */}
+              {/* ACTION BUTTONS */}
               <div className="sticky bottom-4 z-20 xl:static">
                 <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-slate-200 xl:border-none xl:shadow-none xl:bg-transparent xl:p-0">
                   <FormActions 
@@ -348,6 +345,7 @@ export default function InputPage() {
                     isAlertOpen={isConfirmOpen}
                     setIsAlertOpen={setIsConfirmOpen}
                     onConfirmSave={executeSave}
+                    saveLabel="Simpan Data Baru" // Custom Label untuk halaman Input
                   />
                 </div>
               </div>

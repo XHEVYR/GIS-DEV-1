@@ -10,10 +10,11 @@ import {
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import L from "leaflet";
+import { X } from "lucide-react"; 
 
-// --- TIPE DATA & ICON SAMA SEPERTI SEBELUMNYA ---
+// --- TIPE DATA ---
 interface Place {
   id: string;
   name: string;
@@ -26,19 +27,15 @@ interface Place {
 }
 
 const icon = L.icon({
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
 
-// Custom Icon Cluster (Sesuai kode Anda)
 const createClusterCustomIcon = (cluster: any) => {
   const count = cluster.getChildCount();
   let color = "#51aada";
@@ -57,9 +54,9 @@ const createClusterCustomIcon = (cluster: any) => {
 export default function Map() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
-  const [visibleCategories, setVisibleCategories] = useState<Set<string>>(
-    new Set(),
-  );
+  const [visibleCategories, setVisibleCategories] = useState<Set<string>>(new Set());
+  
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -68,8 +65,6 @@ export default function Map() {
         const data = await res.json();
         const validData = Array.isArray(data) ? data : [];
         setPlaces(validData);
-
-        // Default: semua kategori aktif di awal
         const allCats = new Set(validData.map((p: Place) => p.category));
         setVisibleCategories(allCats as Set<string>);
       } catch (err) {
@@ -81,12 +76,10 @@ export default function Map() {
     fetchPlaces();
   }, []);
 
-  // Ambil list kategori unik untuk membuat list di LayersControl
   const categories = useMemo(() => {
     return Array.from(new Set(places.map((p) => p.category)));
   }, [places]);
 
-  // Handler: Menambah/Menghapus kategori dari state visibilitas
   const toggleCategory = (cat: string, isVisible: boolean) => {
     setVisibleCategories((prev) => {
       const newSet = new Set(prev);
@@ -99,77 +92,146 @@ export default function Map() {
   if (loading) return <div>Loading map...</div>;
 
   return (
-    <MapContainer
-      center={[-8.098064989795585, 112.16514038306394]}
-      zoom={13}
-      style={{ height: "100%", width: "100%" }}
-    >
-      <LayersControl position="topright">
-        {/* Base Maps */}
-        <LayersControl.BaseLayer checked name="Peta Satelit">
-          <TileLayer
-            url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png"
-            attribution="&copy; OSM"
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="Peta Jalan (OSM)">
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OSM' />
-        </LayersControl.BaseLayer>
-
-        {/* Overlays Kategori */}
-        {categories.map((category) => (
-          <LayersControl.Overlay checked name={category} key={category}>
-            <LayerGroup
-              eventHandlers={{
-                add: () => toggleCategory(category, true),
-                remove: () => toggleCategory(category, false),
-              }}
-            />
-          </LayersControl.Overlay>
-        ))}
-      </LayersControl>
-
-      {/* --- MARKER ASLI (DI LUAR LAYERS CONTROL) --- */}
-      <MarkerClusterGroup
-        chunkedLoading
-        iconCreateFunction={createClusterCustomIcon}
-        maxClusterRadius={80}
+    <div className="relative w-full h-full">
+      {/* PETA */}
+      <MapContainer
+        center={[-8.098064989795585, 112.16514038306394]}
+        zoom={13}
+        style={{ height: "100%", width: "100%", zIndex: 0 }}
       >
-        {places.map((place) => {
-          // Cek apakah kategori marker ini ada di set visibleCategories
-          const isVisible = visibleCategories.has(place.category);
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer checked name="Peta Jalan (OSM)">
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OSM' />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Peta Satelit">
+            <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; OSM'/>
+          </LayersControl.BaseLayer>
 
-          return (
-            <Marker
-              key={place.id}
-              position={[place.lat, place.lon]}
-              icon={icon}
-              opacity={isVisible ? 1 : 0}
-              interactive={isVisible}
+          {categories.map((category) => (
+            <LayersControl.Overlay checked name={category} key={category}>
+              <LayerGroup
+                eventHandlers={{
+                  add: () => toggleCategory(category, true),
+                  remove: () => toggleCategory(category, false),
+                }}
+              />
+            </LayersControl.Overlay>
+          ))}
+        </LayersControl>
+
+        <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIcon} maxClusterRadius={80}>
+          {places.map((place) => {
+            const isVisible = visibleCategories.has(place.category);
+            return (
+              <Marker
+                key={place.id}
+                position={[place.lat, place.lon]}
+                icon={icon}
+                opacity={isVisible ? 1 : 0}
+                interactive={isVisible}
+              >
+                <Popup>
+                  <div className="w-60">
+                    {place.image && (
+                      <img
+                        src={place.image}
+                        alt={place.name}
+                        className="w-full h-32 object-cover rounded-lg mb-2"
+                      />
+                    )}
+                    <h3 className="font-bold text-lg mb-1">{place.name}</h3>
+                    <p className="text-xs text-gray-500 mb-3">{place.address}</p>
+                    
+                    {/* TOMBOL DETAIL */}
+                    <button
+                      onClick={() => setSelectedPlace(place)}
+                      className="w-full bg-blue-600 text-white py-1.5 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Lihat Detail Lengkap
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MarkerClusterGroup>
+      </MapContainer>
+
+      {/* --- MODAL POPUP DETAIL (Overlay di atas Map) --- */}
+      {selectedPlace && (
+        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
+            
+            {/* Tombol Close */}
+            <button 
+              onClick={() => setSelectedPlace(null)}
+              className="absolute top-4 right-4 bg-white/80 p-2 rounded-full hover:bg-gray-100 transition z-10"
             >
-              <Popup>
-                <div className="w-60">
-                  {place.image && (
-                    <img
-                      src={place.image}
-                      alt={place.name}
-                      className="w-full h-40 object-cover rounded-lg mb-3"
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                    />
-                  )}
-                  <b>Nama:</b> {place.name}
-                  <br />
-                  <b>Kategori:</b> {place.category}
-                  <br />
-                  <b>Alamat:</b> {place.address}
-                  <br />
+              <X size={24} className="text-gray-700" />
+            </button>
+
+            {/* Gambar Besar */}
+            <div className="relative w-full h-64 sm:h-80 flex-shrink-0 bg-gray-100">
+              {selectedPlace.image ? (
+                <img 
+                  src={selectedPlace.image} 
+                  alt={selectedPlace.name} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">Tidak ada gambar</div>
+              )}
+               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                  <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                    {selectedPlace.category}
+                  </span>
+                  <h2 className="text-3xl font-bold text-white mt-2">{selectedPlace.name}</h2>
+               </div>
+            </div>
+
+            {/* Konten Detail */}
+            <div className="p-6 space-y-6">
+              
+              {/* Deskripsi */}
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 border-l-4 border-blue-500 pl-3">Deskripsi</h3>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {selectedPlace.description || "Tidak ada deskripsi tersedia."}
+                </p>
+              </div>
+
+              {/* Grid Info Tambahan */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <div>
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Alamat Lengkap</h4>
+                  <p className="text-sm text-gray-600">{selectedPlace.address}</p>
                 </div>
-              </Popup>
-            </Marker>
-          );
-        })}
-      </MarkerClusterGroup>
-    </MapContainer>
+                
+                {/* --- BAGIAN KOORDINAT YANG DIUBAH (ATAS-BAWAH) --- */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Koordinat</h4>
+                  <div className="flex flex-col gap-1 text-sm text-gray-600 font-mono bg-white px-3 py-2 rounded border">
+                    <span className="text-red-500 font-medium">Lat: {selectedPlace.lat}</span>
+                    <span className="text-blue-500 font-medium">Lon: {selectedPlace.lon}</span>
+                  </div>
+                </div>
+                {/* ----------------------------------------------- */}
+
+              </div>
+            </div>
+            
+            {/* Footer Modal */}
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+              <button 
+                onClick={() => setSelectedPlace(null)}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-medium transition"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

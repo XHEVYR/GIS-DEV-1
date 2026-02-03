@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { BarChart3, Hotel, Coffee, Plane } from "lucide-react";
+import ChartData from "@/components/dashboard/ChartData";
 import { Place } from "@/types";
 
 
@@ -139,7 +140,18 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          
         </div>
+
+        {/* Chart */}
+          <ChartData 
+          data={{
+            hotel: hotelCount,
+            cafe: cafeCount,
+            wisata: wisataCount
+          }} 
+        />
       </div>
     </div>
   );

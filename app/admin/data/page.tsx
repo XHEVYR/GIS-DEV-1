@@ -69,8 +69,8 @@ export default function DataPage() {
     }
   };
 
-  // --- LOGIC DELETE (SUDAH DIPERBAIKI) ---
-  const handleDelete = async (id: string, name: string) => {
+  //  LOGIC DELETE 
+  const handleDelete = async (id: string, ) => {
     
 
     try {

@@ -43,7 +43,6 @@ export default function LandingPage() {
   const handleOpenMap = () => setIsFullScreen(true);
   const handleCloseMap = () => setIsFullScreen(false);
 
-  // Fix error parameter 'any' dengan menambahkan tipe data event
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const element = document.getElementById(id);

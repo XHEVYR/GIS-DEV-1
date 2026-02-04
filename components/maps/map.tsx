@@ -7,12 +7,14 @@ import {
   Popup,
   LayersControl,
   LayerGroup,
+  useMap, // <--- 1. Import useMap
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState, useMemo } from "react";
 import L from "leaflet";
-import { X } from "lucide-react";
+// 2. Import ikon Locate/Navigation
+import { X, Navigation } from "lucide-react"; 
 
 // --- TIPE DATA ---
 interface Place {
@@ -26,9 +28,20 @@ interface Place {
   lon: number;
 }
 
+// Icon Default untuk Tempat Wisata
 const icon = L.icon({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+// Icon Khusus untuk "Lokasi Saya" (Warna Merah/Berbeda)
+const userIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -51,12 +64,64 @@ const createClusterCustomIcon = (cluster: any) => {
   });
 };
 
+// --- 3. KOMPONEN BARU: TOMBOL LOCATE ME ---
+function LocateControl({ onLocationFound }: { onLocationFound: (lat: number, lng: number) => void }) {
+  const map = useMap(); // Hook untuk mengakses instance peta
+
+  const handleLocate = () => {
+    // Cek apakah browser support geolocation
+    if (!navigator.geolocation) {
+      alert("Browser Anda tidak mendukung Geolocation");
+      return;
+    }
+
+    // Minta posisi user
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        // Terbang ke lokasi user
+        map.flyTo([latitude, longitude], 15, {
+          animate: true,
+          duration: 1.5 // durasi animasi terbang (detik)
+        });
+
+        // Kirim data lokasi ke parent state (untuk pasang marker)
+        onLocationFound(latitude, longitude);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        alert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin diberikan.");
+      }, 
+      { enableHighAccuracy: true } // Opsi akurasi tinggi
+    );
+  };
+
+  return (
+    <div className="leaflet-bottom leaflet-right">
+      <div className="leaflet-control leaflet-bar">
+        {/* Tombol CSS leaflet-control agar style konsisten dengan tombol zoom */}
+        <button 
+          onClick={handleLocate}
+          className="bg-white p-2 hover:bg-gray-100 flex items-center justify-center w-10 h-10 shadow-md border-2 border-gray-300 rounded cursor-pointer"
+          title="Lokasi Saya"
+          style={{ pointerEvents: 'auto' }} // Penting agar bisa diklik di atas peta
+        >
+          <Navigation size={20} className="text-gray-700" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Map() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(new Set());
-  
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+
+  // 4. State untuk menyimpan lokasi user (agar muncul marker)
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -65,7 +130,6 @@ export default function Map() {
         const data = await res.json();
         const validData = Array.isArray(data) ? data : [];
         setPlaces(validData);
-        // Default: semua kategori aktif
         const allCats = new Set(validData.map((p: Place) => p.category));
         setVisibleCategories(allCats as Set<string>);
       } catch (err) {
@@ -94,7 +158,6 @@ export default function Map() {
 
   return (
     <div className="relative w-full h-full">
-      {/* PETA */}
       <MapContainer
         center={[-8.098064989795585, 112.16514038306394]}
         zoom={13}
@@ -108,12 +171,8 @@ export default function Map() {
             <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; OSM'/>
           </LayersControl.BaseLayer>
 
-          {/* Kontrol Layer Kategori */}
           {categories.map((category) => (
             <LayersControl.Overlay checked name={category} key={category}>
-              {/* LayerGroup kosong ini hanya trik untuk mentrigger event handler 
-                agar state visibleCategories berubah.
-              */}
               <LayerGroup
                 eventHandlers={{
                   add: () => toggleCategory(category, true),
@@ -124,18 +183,29 @@ export default function Map() {
           ))}
         </LayersControl>
 
-        {/* --- PERBAIKAN DI SINI --- */}
+        {/* 5. Render Marker User Jika Lokasi Ditemukan */}
+        {userLocation && (
+          <Marker 
+            position={[userLocation.lat, userLocation.lng]} 
+            icon={userIcon} // Menggunakan icon merah
+          >
+            <Popup>Lokasi Anda Saat Ini</Popup>
+          </Marker>
+        )}
+
+        {/* 6. Masukkan Komponen Tombol Locate di Sini */}
+        <LocateControl 
+          onLocationFound={(lat, lng) => setUserLocation({ lat, lng })} 
+        />
+
         <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIcon} maxClusterRadius={80}>
           {places
-            // 1. Filter dulu datanya berdasarkan kategori yang aktif
             .filter((place) => visibleCategories.has(place.category))
-            // 2. Baru di-map menjadi Marker
             .map((place) => (
               <Marker
                 key={place.id}
                 position={[place.lat, place.lon]}
                 icon={icon}
-                // Hapus prop opacity dan interactive karena marker yang tidak lolos filter tidak akan dirender sama sekali
               >
                 <Popup>
                   <div className="w-60">
@@ -148,7 +218,6 @@ export default function Map() {
                     )}
                     <h3 className="font-bold text-lg mb-1">{place.name}</h3>
                     <p className="text-xs text-gray-500 mb-3">{place.address}</p>
-                    
                     <button
                       onClick={() => setSelectedPlace(place)}
                       className="w-full bg-blue-600 text-white py-1.5 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -160,15 +229,12 @@ export default function Map() {
               </Marker>
             ))}
         </MarkerClusterGroup>
-        {/* ------------------------- */}
-
       </MapContainer>
 
-      {/* --- MODAL POPUP DETAIL --- */}
+      {/* MODAL DETAIL (Tidak berubah) */}
       {selectedPlace && (
         <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
-            
             <button 
               onClick={() => setSelectedPlace(null)}
               className="absolute top-4 right-4 bg-white/80 p-2 rounded-full hover:bg-gray-100 transition z-10"
@@ -178,18 +244,12 @@ export default function Map() {
 
             <div className="relative w-full h-64 sm:h-80 flex-shrink-0 bg-gray-100">
               {selectedPlace.image ? (
-                <img 
-                  src={selectedPlace.image} 
-                  alt={selectedPlace.name} 
-                  className="w-full h-full object-cover"
-                />
+                <img src={selectedPlace.image} alt={selectedPlace.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">Tidak ada gambar</div>
               )}
                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-                    {selectedPlace.category}
-                  </span>
+                  <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">{selectedPlace.category}</span>
                   <h2 className="text-3xl font-bold text-white mt-2">{selectedPlace.name}</h2>
                </div>
             </div>
@@ -201,13 +261,11 @@ export default function Map() {
                   {selectedPlace.description || "Tidak ada deskripsi tersedia."}
                 </p>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div>
                   <h4 className="font-semibold text-gray-900 text-sm mb-1">Alamat Lengkap</h4>
                   <p className="text-sm text-gray-600">{selectedPlace.address}</p>
                 </div>
-                
                 <div>
                   <h4 className="font-semibold text-gray-900 text-sm mb-1">Koordinat</h4>
                   <div className="flex flex-col gap-1 text-sm text-gray-600 font-mono bg-white px-3 py-2 rounded border">
@@ -219,12 +277,7 @@ export default function Map() {
             </div>
             
             <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
-              <button 
-                onClick={() => setSelectedPlace(null)}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-medium transition"
-              >
-                Tutup
-              </button>
+              <button onClick={() => setSelectedPlace(null)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-medium transition">Tutup</button>
             </div>
           </div>
         </div>

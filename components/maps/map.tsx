@@ -12,7 +12,7 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState, useMemo } from "react";
 import L from "leaflet";
-import { X } from "lucide-react"; 
+import { X } from "lucide-react";
 
 // --- TIPE DATA ---
 interface Place {
@@ -65,6 +65,7 @@ export default function Map() {
         const data = await res.json();
         const validData = Array.isArray(data) ? data : [];
         setPlaces(validData);
+        // Default: semua kategori aktif
         const allCats = new Set(validData.map((p: Place) => p.category));
         setVisibleCategories(allCats as Set<string>);
       } catch (err) {
@@ -107,8 +108,12 @@ export default function Map() {
             <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png" attribution='&copy; OSM'/>
           </LayersControl.BaseLayer>
 
+          {/* Kontrol Layer Kategori */}
           {categories.map((category) => (
             <LayersControl.Overlay checked name={category} key={category}>
+              {/* LayerGroup kosong ini hanya trik untuk mentrigger event handler 
+                agar state visibleCategories berubah.
+              */}
               <LayerGroup
                 eventHandlers={{
                   add: () => toggleCategory(category, true),
@@ -119,16 +124,18 @@ export default function Map() {
           ))}
         </LayersControl>
 
+        {/* --- PERBAIKAN DI SINI --- */}
         <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIcon} maxClusterRadius={80}>
-          {places.map((place) => {
-            const isVisible = visibleCategories.has(place.category);
-            return (
+          {places
+            // 1. Filter dulu datanya berdasarkan kategori yang aktif
+            .filter((place) => visibleCategories.has(place.category))
+            // 2. Baru di-map menjadi Marker
+            .map((place) => (
               <Marker
                 key={place.id}
                 position={[place.lat, place.lon]}
                 icon={icon}
-                opacity={isVisible ? 1 : 0}
-                interactive={isVisible}
+                // Hapus prop opacity dan interactive karena marker yang tidak lolos filter tidak akan dirender sama sekali
               >
                 <Popup>
                   <div className="w-60">
@@ -142,7 +149,6 @@ export default function Map() {
                     <h3 className="font-bold text-lg mb-1">{place.name}</h3>
                     <p className="text-xs text-gray-500 mb-3">{place.address}</p>
                     
-                    {/* TOMBOL DETAIL */}
                     <button
                       onClick={() => setSelectedPlace(place)}
                       className="w-full bg-blue-600 text-white py-1.5 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -152,17 +158,17 @@ export default function Map() {
                   </div>
                 </Popup>
               </Marker>
-            );
-          })}
+            ))}
         </MarkerClusterGroup>
+        {/* ------------------------- */}
+
       </MapContainer>
 
-      {/* --- MODAL POPUP DETAIL (Overlay di atas Map) --- */}
+      {/* --- MODAL POPUP DETAIL --- */}
       {selectedPlace && (
         <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
             
-            {/* Tombol Close */}
             <button 
               onClick={() => setSelectedPlace(null)}
               className="absolute top-4 right-4 bg-white/80 p-2 rounded-full hover:bg-gray-100 transition z-10"
@@ -170,7 +176,6 @@ export default function Map() {
               <X size={24} className="text-gray-700" />
             </button>
 
-            {/* Gambar Besar */}
             <div className="relative w-full h-64 sm:h-80 flex-shrink-0 bg-gray-100">
               {selectedPlace.image ? (
                 <img 
@@ -189,10 +194,7 @@ export default function Map() {
                </div>
             </div>
 
-            {/* Konten Detail */}
             <div className="p-6 space-y-6">
-              
-              {/* Deskripsi */}
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2 border-l-4 border-blue-500 pl-3">Deskripsi</h3>
                 <p className="text-gray-700 leading-relaxed whitespace-pre-line">
@@ -200,14 +202,12 @@ export default function Map() {
                 </p>
               </div>
 
-              {/* Grid Info Tambahan */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div>
                   <h4 className="font-semibold text-gray-900 text-sm mb-1">Alamat Lengkap</h4>
                   <p className="text-sm text-gray-600">{selectedPlace.address}</p>
                 </div>
                 
-                {/* --- BAGIAN KOORDINAT YANG DIUBAH (ATAS-BAWAH) --- */}
                 <div>
                   <h4 className="font-semibold text-gray-900 text-sm mb-1">Koordinat</h4>
                   <div className="flex flex-col gap-1 text-sm text-gray-600 font-mono bg-white px-3 py-2 rounded border">
@@ -215,12 +215,9 @@ export default function Map() {
                     <span className="text-blue-500 font-medium">Lon: {selectedPlace.lon}</span>
                   </div>
                 </div>
-                {/* ----------------------------------------------- */}
-
               </div>
             </div>
             
-            {/* Footer Modal */}
             <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
               <button 
                 onClick={() => setSelectedPlace(null)}

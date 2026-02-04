@@ -5,7 +5,7 @@ Proyek ini adalah aplikasi Sistem Informasi Geografis (GIS) berbasis web yang di
 ## 🌟 Fitur Utama
 
 - **Peta Interaktif**: Visualisasi lokasi menggunakan Leaflet dengan fitur marker clustering untuk performa optimal.
-- **Manajemen Data (CRUD)**: Admin dapat menambah, melihat, memperbarui, dan menghapus data lokasi (Place).
+- **Manajemen Data (CRUD)**: Admin dapat menambah, melihat, memperbarui, dan menghapus data lokasi (*Place*).
 - **Autentikasi Admin**: Sistem login aman untuk mengelola data menggunakan NextAuth.js.
 - **Visualisasi Data**: Dashboard yang menyertakan grafik/chart menggunakan Recharts.
 - **Pencarian & Filtrasi**: Memudahkan pencarian lokasi berdasarkan kategori atau nama.
@@ -29,49 +29,61 @@ Sebelum memulai, pastikan Anda telah menginstal:
 
 ## 🛠️ Instalasi
 
-1. **Clone repository:**
-   ```bash
-   git clone [https://github.com/username/gis-dev.git](https://github.com/username/gis-dev.git)
-   cd GIS-Dev
-Instal dependensi:
+1.  **Clone repository:**
+    ```bash
+    git clone [https://github.com/username/gis-dev.git](https://github.com/username/gis-dev.git)
+    cd GIS-Dev
+    ```
 
-Bash
-npm install
-Konfigurasi Environment Variable: Buat file .env di direktori utama dan tambahkan kredensial database Anda:
+2.  **Instal dependensi:**
+    ```bash
+    npm install
+    ```
 
-Cuplikan kode
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
-NEXTAUTH_SECRET="your-secret-key"
-Setup Database (Prisma):
+3.  **Konfigurasi Environment Variable:**
+    Buat file `.env` di direktori utama dan tambahkan kredensial database Anda:
+    ```text
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+    NEXTAUTH_SECRET="your-secret-key"
+    ```
 
-Bash
-npx prisma generate
-npx prisma migrate dev --name init
-Jalankan aplikasi:
+4.  **Setup Database (Prisma):**
+    ```bash
+    npx prisma generate
+    npx prisma migrate dev --name init
+    ```
 
-Bash
-npm run dev
-Buka http://localhost:3000 di browser Anda.
+5.  **Jalankan aplikasi:**
+    ```bash
+    npm run dev
+    ```
+    Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-📖 Contoh Penggunaan
-Melihat Peta: Akses halaman utama untuk melihat semua titik lokasi yang terdaftar.
+## 📖 Contoh Penggunaan
 
-Login Admin: Masuk ke direktori /auth/login untuk mengakses fitur manajemen data.
+-   **Melihat Peta**: Akses halaman utama untuk melihat semua titik lokasi yang terdaftar.
+-   **Login Admin**: Masuk ke direktori `/auth/login` untuk mengakses fitur manajemen data.
+-   **Input Data**: Gunakan form di halaman admin untuk menambahkan koordinat (Latitude/Longitude) serta informasi tempat seperti kategori dan gambar.
 
-Input Data: Gunakan form di halaman admin untuk menambahkan koordinat (Latitude/Longitude) serta informasi tempat seperti kategori dan gambar.
+## 🤝 Kontribusi
 
-🤝 Kontribusi
 Kontribusi selalu terbuka! Silakan ikuti langkah berikut:
 
-Fork repository ini.
+1.  Fork repository ini.
+2.  Buat branch fitur baru:
+    ```bash
+    git checkout -b fitur/NamaFitur
+    ```
+3.  Commit perubahan Anda:
+    ```bash
+    git commit -m 'Menambah fitur X'
+    ```
+4.  Push ke branch tersebut:
+    ```bash
+    git push origin fitur/NamaFitur
+    ```
+5.  Buat Pull Request.
 
-Buat branch fitur baru (git checkout -b fitur/NamaFitur).
+## 📄 Lisensi
 
-Commit perubahan Anda (git commit -m 'Menambah fitur X').
-
-Push ke branch tersebut (git push origin fitur/NamaFitur).
-
-Buat Pull Request.
-
-📄 Lisensi
-Proyek ini dilisensikan di bawah MIT License.
+Proyek ini dilisensikan di bawah **MIT License**.

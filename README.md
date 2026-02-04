@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WebGIS 1.1
 
-## Getting Started
+Proyek ini adalah aplikasi Sistem Informasi Geografis (GIS) berbasis web yang dibangun menggunakan Next.js. Aplikasi ini memungkinkan pengelolaan data lokasi (Point of Interest) dengan visualisasi peta interaktif dan manajemen admin.
 
-First, run the development server:
+## Fitur Utama
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Peta Interaktif**: Visualisasi lokasi menggunakan Leaflet dengan fitur marker clustering untuk performa optimal.
+- **Manajemen Data (CRUD)**: Admin dapat menambah, melihat, memperbarui, dan menghapus data lokasi (*Place*).
+- **Autentikasi Admin**: Sistem login aman untuk mengelola data menggunakan NextAuth.js.
+- **Visualisasi Data**: Dashboard yang menyertakan grafik/chart menggunakan Recharts.
+- **Pencarian & Filtrasi**: Memudahkan pencarian lokasi berdasarkan kategori atau nama.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Teknologi yang Digunakan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Bahasa Pemrograman**: TypeScript
+- **Database & ORM**: PostgreSQL dengan Prisma ORM
+- **Styling**: Tailwind CSS & Radix UI
+- **Peta**: Leaflet, React-Leaflet, dan React-Leaflet-Cluster
+- **Autentikasi**: NextAuth.js
+- **Grafik**: Recharts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prasyarat Instalasi
 
-## Learn More
+Sebelum memulai, pastikan Anda telah menginstal:
+- Node.js (versi terbaru disarankan)
+- PostgreSQL Database
+- Package Manager (NPM, Yarn, atau PNPM)
 
-To learn more about Next.js, take a look at the following resources:
+## Instalasi
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  **Clone repository:**
+    ```bash
+    git clone [https://github.com/username/gis-dev.git](https://github.com/username/gis-dev.git)
+    cd GIS-Dev
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2.  **Instal dependensi:**
+    ```bash
+    npm install
+    ```
 
-## Deploy on Vercel
+3.  **Konfigurasi Environment Variable:**
+    Buat file `.env` di direktori utama dan tambahkan kredensial database Anda:
+    ```text
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+    NEXTAUTH_SECRET="your-secret-key"
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4.  **Setup Database (Prisma):**
+    ```bash
+    npx prisma generate
+    npx prisma migrate dev --name init
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5.  **Jalankan aplikasi:**
+    ```bash
+    npm run dev
+    ```
+    Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
+
+## Contoh Penggunaan
+
+-   **Melihat Peta**: Akses halaman utama untuk melihat semua titik lokasi yang terdaftar.
+-   **Login Admin**: Masuk ke direktori `/auth/login` untuk mengakses fitur manajemen data.
+-   **Input Data**: Gunakan form di halaman admin untuk menambahkan koordinat (Latitude/Longitude) serta informasi tempat seperti kategori dan gambar.
+

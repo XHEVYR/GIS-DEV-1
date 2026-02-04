@@ -3,8 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import React, { useState, useEffect } from "react";
-// 1. IMPORT DIPERBAIKI: Semua icon dimasukkan di sini
+import { useState, useEffect } from "react";
 import { 
   Building2, 
   Coffee, 
@@ -13,12 +12,16 @@ import {
   LayoutDashboard,
   Maximize2,
   Minimize2,
-  CheckCircle2, // Icon Baru
-  Layers,       // Icon Baru
-  Users,        // Icon Baru
-  Database      // Icon Baru
+  MapPin,
+  CheckCircle2,
+  Mail,       
+  Phone,      
+  Instagram,  
+  Facebook,   
+  Twitter     
 } from "lucide-react";
 
+// --- DYNAMIC MAP IMPORT ---
 const Map = dynamic(() => import("@/components/maps/map"), {
   ssr: false,
   loading: () => (
@@ -52,9 +55,9 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
       
-      {/* NAVBAR */}
+      {/* --- NAVBAR --- */}
       <header className={`fixed w-full bg-white/90 backdrop-blur-md z-40 border-b border-slate-200/60 transition-transform duration-300 ${isFullScreen ? '-translate-y-full' : 'translate-y-0'}`}>
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -101,76 +104,94 @@ export default function LandingPage() {
 
       <main className="flex-1 pt-20">
         
-        {/* HERO SECTION */}
-        <section className="relative px-6 py-12 lg:py-20 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          
-          {/* Text Content */}
-          <div className="space-y-8 order-2 lg:order-1">
-             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-lime-50 text-lime-700 text-[10px] font-black uppercase tracking-widest border border-lime-100">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-lime-500"></span>
-              </span>
-              Sistem Informasi Geografis v1.0
-            </div>
+        {/* --- HERO SECTION --- */}
+        <section className="relative px-6 py-12 lg:py-24 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
             
-            <h1 className="text-4xl lg:text-6xl font-black text-slate-900 leading-[1.15]">
-              Jelajahi Potensi <br />
-              <span className="text-lime-600 decoration-4 underline decoration-lime-200 underline-offset-4">Kota Blitar</span> Secara Real-Time.
-            </h1>
-            
-            <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-lg">
-              Platform pemetaan interaktif untuk memvisualisasikan data Hotel, Kafe, dan Destinasi Wisata di seluruh wilayah Kota Blitar dengan akurat.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <button 
-                onClick={handleOpenMap}
-                className="flex items-center justify-center gap-2 px-8 py-4 text-white bg-slate-900 rounded-2xl font-bold hover:bg-slate-800 hover:scale-105 transition-all shadow-xl shadow-slate-200"
-              >
-                <Maximize2 size={20} /> Mulai Jelajah
-              </button>
-            </div>
-          </div>
+            {/* KOLOM KIRI: TEKS DETAIL */}
+            <div className="space-y-8 order-2 lg:order-1 animate-in slide-in-from-left duration-700">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-lime-50 text-lime-700 text-[10px] font-black uppercase tracking-widest border border-lime-100">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-lime-500"></span>
+                  </span>
+                  Sistem Informasi Geografis Terpadu
+                </div>
 
-          {/* MAP SECTION */}
-          <div 
-            className={`
-              ${isFullScreen 
-                ? "fixed inset-0 z-[9999] h-screen w-screen bg-slate-100" 
-                : "relative group order-1 lg:order-2 h-[450px] lg:h-[600px] w-full" 
-              }
-            `}
-          >
-            {!isFullScreen && (
-              <div className="absolute -inset-2 bg-gradient-to-tr from-lime-400 to-emerald-400 rounded-[40px] blur-xl opacity-20 group-hover:opacity-40 transition duration-700"></div>
-            )}
-            
-            <div className={`relative h-full w-full overflow-hidden bg-slate-100 ${isFullScreen ? '' : 'rounded-[32px] border-[6px] border-white ring-1 ring-slate-100 shadow-2xl'}`}>
-              
-              <Map />
+                <h1 className="text-4xl lg:text-6xl font-black text-slate-900 leading-[1.15]">
+                  Jelajahi Potensi <br />
+                  <span className="text-lime-600 decoration-4 underline decoration-lime-200 underline-offset-4">Kota Blitar</span> Dalam Satu Peta.
+                </h1>
 
-              {isFullScreen && (
-                <button
-                  onClick={handleCloseMap}
-                  className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000] bg-white text-slate-800 px-6 py-2 rounded-full shadow-2xl border border-slate-200 hover:bg-red-50 hover:text-red-600 transition-all duration-300 flex items-center gap-2 font-bold text-sm"
-                >
-                  <Minimize2 size={18} />
-                  Keluar Fullscreen
-                </button>
-              )}
+                <div className="space-y-4 text-slate-500 text-lg leading-relaxed font-medium">
+                    <p>
+                        Selamat datang di portal GIS resmi Kota Blitar. Platform ini dirancang khusus untuk memetakan titik-titik strategis di kota kami, memudahkan warga dan wisatawan menemukan lokasi yang mereka butuhkan.
+                    </p>
+                    <p className="text-base border-l-4 border-lime-500 pl-4 bg-slate-50 p-4 rounded-r-xl">
+                        <strong className="text-slate-700 mb-2 flex items-center gap-2"><CheckCircle2 size={18} className="text-lime-600"/> Akurat & Real-Time</strong>
+                        Data kami diverifikasi secara berkala untuk memastikan Anda mendapatkan informasi lokasi, alamat, dan kategori yang paling mutakhir.
+                    </p>
+                </div>
 
-              {!isFullScreen && (
-                 <button
-                 onClick={handleOpenMap}
-                 className="absolute top-4 right-4 z-[400] bg-white/80 backdrop-blur text-slate-600 p-2 rounded-xl shadow-sm hover:bg-white hover:text-lime-600 transition-all border border-white/50 opacity-0 group-hover:opacity-100"
-                 title="Perbesar Peta"
-               >
-                 <Maximize2 size={20} />
-               </button>
-              )}
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <button 
+                    onClick={handleOpenMap}
+                    className="flex items-center justify-center gap-3 px-8 py-4 text-white bg-slate-900 rounded-2xl font-bold hover:bg-slate-800 hover:scale-105 transition-all shadow-xl shadow-slate-200 group"
+                  >
+                    <Maximize2 size={20} className="group-hover:rotate-90 transition-transform"/> Mulai Menjelajah
+                  </button>
+                </div>
             </div>
-          </div>
+
+            {/* KOLOM KANAN: MAP WIDGET */}
+            <div 
+                className={`
+                order-1 lg:order-2 transition-all duration-0 ease-in-out
+                ${isFullScreen 
+                    ? "fixed inset-0 z-9999 h-screen w-screen bg-slate-100" 
+                    : "relative h-125 lg:h-162.5 w-full group" 
+                }
+                `}
+            >
+                {!isFullScreen && (
+                <div className="absolute -inset-3 bg-linear-to-tr from-lime-300 via-emerald-300 to-teal-300 rounded-[40px] blur-2xl opacity-30 group-hover:opacity-50 transition duration-700 animate-pulse-slow"></div>
+                )}
+                
+                <div className={`relative h-full w-full overflow-hidden bg-slate-100 ${isFullScreen ? '' : 'rounded-[32px] border-[6px] border-white ring-1 ring-slate-100 shadow-2xl'}`}>
+                  <Map />
+                  
+                  {isFullScreen ? (
+                      <button
+                      onClick={handleCloseMap}
+                      className="absolute top-6 left-1/2 -translate-x-1/2 z-1000 bg-white text-slate-800 px-6 py-2 rounded-full shadow-2xl border border-slate-200 hover:bg-red-50 hover:text-red-600 transition-all font-bold text-sm flex items-center gap-2"
+                      >
+                      <Minimize2 size={18} /> Keluar Fullscreen
+                      </button>
+                  ) : (
+                      <button
+                      onClick={handleOpenMap}
+                      className="absolute top-4 right-4 z-400 bg-white/80 backdrop-blur text-slate-600 p-2.5 rounded-xl shadow-sm hover:bg-white hover:text-lime-600 transition-all border border-white/50 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
+                      title="Zoom Peta"
+                      >
+                      <Maximize2 size={20} />
+                      </button>
+                  )}
+
+                  <div className={`absolute bottom-6 left-6 z-400 bg-white/90 backdrop-blur-md px-4 py-3 rounded-2xl shadow-lg border border-white/50 transition-all ${isFullScreen ? 'scale-110 left-8 bottom-8' : ''}`}>
+                      <div className="flex items-center gap-3">
+                      <div className="bg-lime-100 p-2.5 rounded-xl">
+                          <MapPin className="text-lime-600 w-5 h-5 fill-current" />
+                      </div>
+                      <div>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Database</p>
+                          <div className="flex items-center gap-1.5">
+                              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                              <p className="text-sm font-black text-slate-800">Live Updated</p>
+                          </div>
+                      </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
         </section>
 
         {/* SECTION KATEGORI */}
@@ -183,7 +204,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="text-center mb-16 max-w-2xl mx-auto">
               <h2 className="text-3xl font-black text-slate-900 mb-4">Kategori Data Spasial</h2>
-              <p className="text-slate-500 font-medium">Kami mengelompokkan data geografis menjadi tiga kategori utama untuk memudahkan pencarian informasi Anda.</p>
+              <p className="text-slate-500 font-medium text-lg">Data geografis dikelompokkan menjadi tiga kategori utama untuk memudahkan eksplorasi Anda.</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -193,7 +214,7 @@ export default function LandingPage() {
                   <Building2 size={32} strokeWidth={2} />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">Hotel & Penginapan</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">Data lokasi akomodasi lengkap dengan informasi fasilitas untuk kenyamanan wisatawan.</p>
+                <p className="text-slate-500 text-sm leading-relaxed font-medium">Lokasi akomodasi nyaman untuk istirahat Anda selama di Blitar.</p>
               </div>
 
               {/* Cafe */}
@@ -202,7 +223,7 @@ export default function LandingPage() {
                   <Coffee size={32} strokeWidth={2} />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">Cafe & Restoran</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">Tempat kuliner hits dan tongkrongan populer yang tersebar di seluruh penjuru kota.</p>
+                <p className="text-slate-500 text-sm leading-relaxed font-medium">Tempat kuliner hits dan tongkrongan populer di berbagai sudut kota.</p>
               </div>
 
               {/* Wisata */}
@@ -211,7 +232,7 @@ export default function LandingPage() {
                   <Plane size={32} strokeWidth={2} />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">Destinasi Wisata</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">Objek wisata sejarah, alam, dan edukasi yang wajib dikunjungi saat berada di Blitar.</p>
+                <p className="text-slate-500 text-sm leading-relaxed font-medium">Objek wisata sejarah, alam, dan edukasi yang wajib dikunjungi.</p>
               </div>
             </div>
           </div>

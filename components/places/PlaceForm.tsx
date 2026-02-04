@@ -8,9 +8,10 @@ import {
   Image as ImageIcon,
   AlertCircle,
   XCircle,
-  PlusCircle, // Ikon untuk Tambah
-  Edit,       // Ikon untuk Edit
+  PlusCircle,
+  Edit,
   AlignLeft,
+  CheckCircle2, // Tambahkan ini
 } from "lucide-react";
 import FormActions from "@/components/places/FormActions";
 
@@ -24,7 +25,7 @@ const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ),
 });
 
-// --- STYLES (Satu tempat untuk semua halaman) ---
+// --- STYLES ---
 const STYLES = {
   input: "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 text-sm font-medium focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none hover:border-slate-300 shadow-sm",
   label: "block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500",
@@ -34,19 +35,17 @@ const STYLES = {
 };
 
 // --- PROPS ---
-// Komponen ini menerima data awal (opsional) dan fungsi simpan dari parent
 interface PlaceFormProps {
-  initialData?: any; // Jika ada = Mode Edit. Jika null = Mode Tambah.
+  initialData?: any;
   onSave: (data: any) => Promise<void>;
   onCancel: () => void;
   isLoadingParent?: boolean;
 }
 
 export default function PlaceForm({ initialData, onSave, onCancel, isLoadingParent = false }: PlaceFormProps) {
-  // Logic: Kalau ada initialData, berarti kita sedang EDIT
   const isEditMode = !!initialData;
 
-  // --- STATE ---
+  // --- STATE (Single Image) ---
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     lat: initialData?.lat?.toString() || "",
@@ -54,7 +53,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     category: initialData?.category || "",
     description: initialData?.description || "",
     address: initialData?.address || "",
-    image: initialData?.image || "",
+    image: initialData?.image || "", // Pastikan ini String Tunggal
   });
 
   const [loading, setLoading] = useState(false);
@@ -91,27 +90,26 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     setLoading(true);
     setIsConfirmOpen(false);
     try {
-      // Panggil fungsi onSave milik Parent (InputPage atau EditPage)
       await onSave({
         ...formData,
+        // Pastikan dikirim sebagai image (tunggal) bukan images (array)
+        image: formData.image, 
         lat: parseFloat(formData.lat),
         lon: parseFloat(formData.lon),
+        // Sertakan ID jika Edit Mode agar backend tahu data mana yang diupdate
+        id: initialData?.id, 
       });
-      // Loading jangan dimatikan di sini agar user tidak bisa klik 2x saat redirect
     } catch (err: any) {
       setError(err.message || "Gagal menyimpan data.");
       setLoading(false);
     }
   };
 
-  // --- KONFIGURASI TAMPILAN DINAMIS ---
-  // Judul & Ikon berubah otomatis tergantung mode
   const pageTitle = isEditMode ? "Edit Lokasi" : "Tambah Lokasi";
   const pageSubtitle = isEditMode 
     ? "Perbarui informasi data geospasial." 
     : "Input data geospasial baru ke dalam sistem.";
   
-  // Ikon & Warna dinamis
   const PageIcon = isEditMode ? Edit : PlusCircle;
   const iconColorClass = isEditMode 
     ? "bg-amber-500 text-white shadow-amber-200" 
@@ -119,8 +117,6 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
 
   return (
     <div className="w-full max-w-full transition-all duration-500 ease-in-out">
-      
-      {/* HEADER STICKY */}
       <header className="sticky top-0 z-30 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/60 mb-8 py-4 transition-all rounded-xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
@@ -155,7 +151,6 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             
-            {/* === KOLOM KIRI: PETA === */}
             <section className="xl:col-span-5 flex flex-col gap-6 xl:sticky xl:top-28 transition-all duration-300">
               <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden group hover:shadow-2xl hover:shadow-indigo-100/40 transition-all">
                 <div className="px-6 py-4 flex items-center justify-between bg-white border-b border-slate-50">
@@ -165,7 +160,6 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                   </div>
                   <span className="text-[10px] font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Klik Peta</span>
                 </div>
-                
                 <div className="relative w-full aspect-square xl:aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100">
                   <MapInput
                     onLocationSelect={handleMapClick}
@@ -173,7 +167,6 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                     inputLon={formData.lon ? parseFloat(formData.lon) : undefined}
                   />
                 </div>
-
                 <div className="p-4 grid grid-cols-2 gap-3 bg-slate-50/50">
                   <div className="bg-white p-2 rounded-xl border border-slate-200">
                     <label className="text-[10px] font-bold text-slate-400 block mb-0.5">LATITUDE</label>
@@ -187,10 +180,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
               </div>
             </section>
 
-            {/* === KOLOM KANAN: INPUT FIELDS === */}
             <section className="xl:col-span-7 flex flex-col gap-6">
-              
-              {/* Card 1: Informasi Umum */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-indigo-50 text-indigo-600")}><AlignLeft size={20} /></div>
@@ -223,7 +213,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                 </div>
               </div>
 
-              {/* Card 2: Visualisasi */}
+              {/* Card 2: Visualisasi (Single Image) */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-purple-50 text-purple-600")}><ImageIcon size={20} /></div>
@@ -240,12 +230,16 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                   {formData.image && (
                     <div className="relative w-full h-64 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 group shadow-inner">
                       <Image src={formData.image} alt="Preview" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" onError={() => setFormData({ ...formData, image: "" })} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                        <p className="text-white text-sm font-medium flex items-center gap-2">
+                          <CheckCircle2 size={16} className="text-emerald-400" /> Gambar Valid
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="sticky bottom-4 z-20 xl:static">
                 <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-slate-200 xl:border-none xl:shadow-none xl:bg-transparent xl:p-0">
                   <FormActions 

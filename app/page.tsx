@@ -3,18 +3,20 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react"; // 1. Tambah useEffect
+import React, { useState, useEffect } from "react";
+// 1. IMPORT DIPERBAIKI: Semua icon dimasukkan di sini
 import { 
-  MapPin, 
   Building2, 
   Coffee, 
   Plane, 
-  ArrowRight, 
   Globe, 
   LayoutDashboard,
   Maximize2,
-  X, 
-  Minimize2 
+  Minimize2,
+  CheckCircle2, // Icon Baru
+  Layers,       // Icon Baru
+  Users,        // Icon Baru
+  Database      // Icon Baru
 } from "lucide-react";
 
 const Map = dynamic(() => import("@/components/maps/map"), {
@@ -31,21 +33,23 @@ export default function LandingPage() {
   const { data: session } = useSession();
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  // 2. FUNGSI MAGIC: Paksa Peta Refresh Ukuran saat Full Screen
   useEffect(() => {
-    // Kita kasih delay sedikit agar DOM selesai berubah dulu
     const timer = setTimeout(() => {
       window.dispatchEvent(new Event("resize"));
     }, 300);
     return () => clearTimeout(timer);
   }, [isFullScreen]);
 
-  const handleOpenMap = () => {
-    setIsFullScreen(true);
-  };
+  const handleOpenMap = () => setIsFullScreen(true);
+  const handleCloseMap = () => setIsFullScreen(false);
 
-  const handleCloseMap = () => {
-    setIsFullScreen(false);
+  // Fix error parameter 'any' dengan menambahkan tipe data event
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -65,8 +69,20 @@ export default function LandingPage() {
           
           <nav className="hidden md:flex gap-8 text-sm font-bold text-slate-500">
             <button onClick={handleOpenMap} className="hover:text-lime-600 transition">Peta Digital</button>
-            <Link href="#categories" className="hover:text-lime-600 transition">Kategori</Link>
-            <Link href="#about" className="hover:text-lime-600 transition">Tentang</Link>
+            <Link 
+              href="#categories" 
+              onClick={(e) => handleScrollTo(e, "categories")}
+              className="hover:text-lime-600 transition"
+            >
+              Kategori
+            </Link>
+            <Link 
+              href="#about" 
+              onClick={(e) => handleScrollTo(e, "about")}
+              className="hover:text-lime-600 transition"
+            >
+              Tentang
+            </Link>
           </nav>
 
           <div className="flex gap-4">
@@ -91,7 +107,6 @@ export default function LandingPage() {
           
           {/* Text Content */}
           <div className="space-y-8 order-2 lg:order-1">
-             {/* ... (Bagian teks sama seperti sebelumnya) ... */}
              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-lime-50 text-lime-700 text-[10px] font-black uppercase tracking-widest border border-lime-100">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span>
@@ -116,18 +131,10 @@ export default function LandingPage() {
               >
                 <Maximize2 size={20} /> Mulai Jelajah
               </button>
-
-              {/* <Link 
-                href="/admin" 
-                className="flex items-center justify-center gap-2 px-8 py-4 text-slate-700 bg-white border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition"
-              >
-                Data Management <ArrowRight size={20} />
-              </Link> */}
             </div>
           </div>
 
           {/* MAP SECTION */}
-          {/* 3. PERBAIKAN: HAPUS 'transition-all' agar peta snap instant & tidak error render */}
           <div 
             className={`
               ${isFullScreen 
@@ -144,7 +151,6 @@ export default function LandingPage() {
               
               <Map />
 
-              {/* Tombol Close Center */}
               {isFullScreen && (
                 <button
                   onClick={handleCloseMap}
@@ -155,7 +161,6 @@ export default function LandingPage() {
                 </button>
               )}
 
-              {/* Tombol Preview Expand */}
               {!isFullScreen && (
                  <button
                  onClick={handleOpenMap}
@@ -165,30 +170,15 @@ export default function LandingPage() {
                  <Maximize2 size={20} />
                </button>
               )}
-
-              {/* Info Badge
-              <div className={`absolute bottom-6 left-6 z-[400] bg-white/90 backdrop-blur-md px-4 py-3 rounded-2xl shadow-lg border border-white/50 transition-all ${isFullScreen ? 'scale-110 left-8 bottom-8' : ''}`}>
-                <div className="flex items-center gap-3">
-                  <div className="bg-lime-100 p-2.5 rounded-xl">
-                    <MapPin className="text-lime-600 w-5 h-5 fill-current" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Status Data</p>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <p className="text-sm font-black text-slate-800">Live Updated</p>
-                    </div>
-                  </div>
-                </div>
-              </div> */}
-
             </div>
           </div>
         </section>
 
-        {/* ... (Bagian Kategori & Footer Tetap Sama) ... */}
-        {/* Pastikan Anda menyalin sisa kodenya dari file sebelumnya jika tidak ada perubahan */}
-        <section id="categories" className="py-24 bg-slate-50 border-y border-slate-200/60 relative overflow-hidden">
+        {/* SECTION KATEGORI */}
+        <section 
+          id="categories" 
+          className="py-24 bg-slate-50 border-y border-slate-200/60 relative overflow-hidden scroll-mt-24"
+        >
            <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
           <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -228,27 +218,104 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-24 px-6 bg-slate-900 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-lime-500/10 blur-[100px] rounded-full"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full"></div>
+        {/* SECTION TENTANG / ABOUT (BARU) */}
+        <section 
+          id="about" 
+          className="py-24 px-6 bg-slate-900 text-white relative overflow-hidden scroll-mt-24"
+        >
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-lime-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+          
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
             
-            <div className="max-w-4xl mx-auto text-center relative z-10">
-              <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight">Kelola Data Lebih Mudah</h2>
-              <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto font-medium">
-                Sistem ini dirancang untuk membantu pemerintah dan masyarakat mengakses informasi geografis secara transparan dan efisien.
+            {/* Kolom Kiri: Teks & Narasi */}
+            <div className="space-y-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-lime-400 text-xs font-bold tracking-wider uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-500 animate-pulse"></span>
+                Tentang Platform
+              </div>
+
+              <h2 className="text-3xl md:text-5xl font-black leading-tight">
+                Membangun Ekosistem <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">Digital Kota Blitar</span>
+              </h2>
+
+              <p className="text-slate-400 text-lg leading-relaxed">
+                Sistem Informasi Geografis (SIG) ini hadir sebagai jembatan informasi antara pemerintah kota dan masyarakat. Kami mengintegrasikan data spasial lokasi wisata, kuliner, dan akomodasi untuk mendukung smart city dan pertumbuhan ekonomi daerah.
               </p>
-              
-              {/* <Link href="/admin">
-                <button className="bg-lime-500 hover:bg-lime-400 text-slate-900 px-10 py-4 rounded-2xl font-bold text-lg transition shadow-xl shadow-lime-900/20 flex items-center gap-2 mx-auto">
-                   <LayoutDashboard size={20}/>
-                   Akses Dashboard Admin
-                </button>
-              </Link> */}
+
+              {/* List Keunggulan */}
+              <div className="space-y-4 pt-2">
+                {[
+                  "Validasi Data Lapangan Terverifikasi",
+                  "Pembaruan Informasi Secara Real-Time",
+                  "Antarmuka Responsif & Mudah Digunakan"
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center gap-3 group">
+                    <div className="bg-lime-500/10 p-1.5 rounded-full group-hover:bg-lime-500 group-hover:text-slate-900 transition-colors duration-300">
+                      <CheckCircle2 size={18} className="text-lime-500 group-hover:text-slate-900" />
+                    </div>
+                    <span className="font-medium text-slate-300 group-hover:text-white transition-colors">{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Kolom Kanan: Statistik / Visual Dashboard */}
+            <div className="relative">
+              {/* Decorative Border Box */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-lime-500 to-blue-500 rounded-3xl opacity-20 blur-lg"></div>
+              
+              <div className="relative bg-slate-800/50 backdrop-blur-xl border border-slate-700 p-8 rounded-3xl shadow-2xl">
+                <div className="grid grid-cols-2 gap-6">
+                  
+                  {/* Stat 1 */}
+                  <div className="bg-slate-900/80 p-6 rounded-2xl border border-slate-700 hover:border-lime-500/50 transition duration-300">
+                    <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mb-4">
+                      <Database size={20} />
+                    </div>
+                    <h4 className="text-3xl font-black text-white mb-1">30</h4>
+                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider">Total Data Titik</p>
+                  </div>
+
+                  {/* Stat 2 */}
+                  <div className="bg-slate-900/80 p-6 rounded-2xl border border-slate-700 hover:border-lime-500/50 transition duration-300">
+                    <div className="w-10 h-10 bg-lime-500/20 rounded-lg flex items-center justify-center text-lime-400 mb-4">
+                      <Users size={20} />
+                    </div>
+                    <h4 className="text-3xl font-black text-white mb-1">500</h4>
+                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider">Pengunjung Bulanan</p>
+                  </div>
+
+                  {/* Stat 3 (Full Width) */}
+                  <div className="col-span-2 bg-slate-900/80 p-6 rounded-2xl border border-slate-700 hover:border-lime-500/50 transition duration-300 flex items-center justify-between">
+                    <div>
+                      <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 mb-4">
+                        <Layers size={20} />
+                      </div>
+                      <h4 className="text-xl font-bold text-white">3 Kategori Utama</h4>
+                      <p className="text-xs text-slate-500 mt-1">Wisata, Hotel, & Kuliner</p>
+                    </div>
+                    {/* Simple Graph Visual */}
+                    <div className="flex items-end gap-1 h-12">
+                       <div className="w-2 bg-slate-700 h-6 rounded-t-sm"></div>
+                       <div className="w-2 bg-slate-600 h-8 rounded-t-sm"></div>
+                       <div className="w-2 bg-lime-500 h-12 rounded-t-sm animate-pulse"></div>
+                       <div className="w-2 bg-slate-600 h-10 rounded-t-sm"></div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
         </section>
 
-      </main>
-
+      </main> 
+      {/* 2. TAG PENUTUP YANG HILANG SEBELUMNYA */}
+      
       <footer className="bg-slate-950 text-slate-600 py-8 px-6 text-center text-xs font-bold uppercase tracking-widest border-t border-slate-900">
         <p>&copy; {new Date().getFullYear()} GIS Kota Blitar. All Rights Reserved.</p>
       </footer>

@@ -2,7 +2,7 @@
 
 Proyek ini adalah aplikasi Sistem Informasi Geografis (GIS) berbasis web yang dibangun menggunakan Next.js. Aplikasi ini memungkinkan pengelolaan data lokasi (Point of Interest) dengan visualisasi peta interaktif dan manajemen admin.
 
-## 🌟 Fitur Utama
+## Fitur Utama
 
 - **Peta Interaktif**: Visualisasi lokasi menggunakan Leaflet dengan fitur marker clustering untuk performa optimal.
 - **Manajemen Data (CRUD)**: Admin dapat menambah, melihat, memperbarui, dan menghapus data lokasi (*Place*).
@@ -10,7 +10,7 @@ Proyek ini adalah aplikasi Sistem Informasi Geografis (GIS) berbasis web yang di
 - **Visualisasi Data**: Dashboard yang menyertakan grafik/chart menggunakan Recharts.
 - **Pencarian & Filtrasi**: Memudahkan pencarian lokasi berdasarkan kategori atau nama.
 
-## 🚀 Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Bahasa Pemrograman**: TypeScript
@@ -20,14 +20,14 @@ Proyek ini adalah aplikasi Sistem Informasi Geografis (GIS) berbasis web yang di
 - **Autentikasi**: NextAuth.js
 - **Grafik**: Recharts
 
-## 📋 Prasyarat Instalasi
+## Prasyarat Instalasi
 
 Sebelum memulai, pastikan Anda telah menginstal:
 - Node.js (versi terbaru disarankan)
 - PostgreSQL Database
 - Package Manager (NPM, Yarn, atau PNPM)
 
-## 🛠️ Instalasi
+## Instalasi
 
 1.  **Clone repository:**
     ```bash
@@ -59,31 +59,9 @@ Sebelum memulai, pastikan Anda telah menginstal:
     ```
     Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-## 📖 Contoh Penggunaan
+## Contoh Penggunaan
 
 -   **Melihat Peta**: Akses halaman utama untuk melihat semua titik lokasi yang terdaftar.
 -   **Login Admin**: Masuk ke direktori `/auth/login` untuk mengakses fitur manajemen data.
 -   **Input Data**: Gunakan form di halaman admin untuk menambahkan koordinat (Latitude/Longitude) serta informasi tempat seperti kategori dan gambar.
 
-## 🤝 Kontribusi
-
-Kontribusi selalu terbuka! Silakan ikuti langkah berikut:
-
-1.  Fork repository ini.
-2.  Buat branch fitur baru:
-    ```bash
-    git checkout -b fitur/NamaFitur
-    ```
-3.  Commit perubahan Anda:
-    ```bash
-    git commit -m 'Menambah fitur X'
-    ```
-4.  Push ke branch tersebut:
-    ```bash
-    git push origin fitur/NamaFitur
-    ```
-5.  Buat Pull Request.
-
-## 📄 Lisensi
-
-Proyek ini dilisensikan di bawah **MIT License**.

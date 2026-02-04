@@ -53,15 +53,6 @@ Bash
 npm run dev
 Buka http://localhost:3000 di browser Anda.
 
-📁 Struktur Proyek
-Plaintext
-├── app/              # Next.js App Router (Pages & API Routes)
-├── components/       # Komponen UI (Map, Table, Form, Dashboard)
-├── lib/              # Konfigurasi Prisma dan Utility
-├── prisma/           # Skema database dan migrasi
-├── public/           # Aset statis (Gambar, Icon, JSON)
-├── types/            # Definisi tipe TypeScript
-└── package.json      # Dependensi dan script proyek
 📖 Contoh Penggunaan
 Melihat Peta: Akses halaman utama untuk melihat semua titik lokasi yang terdaftar.
 

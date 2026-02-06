@@ -20,7 +20,7 @@ import { Place } from "@/types";
 const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ssr: false,
   loading: () => (
-    <div className="h-full min-h-[500px] bg-slate-100 flex flex-col items-center justify-center rounded-[32px] animate-pulse gap-3">
+    <div className="h-full min-h-125 bg-slate-100 flex flex-col items-center justify-center rounded-[32px] animate-pulse gap-3">
       <div className="w-10 h-10 border-4 border-slate-200 border-t-lime-500 rounded-full animate-spin"></div>
       <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">
         Memuat Peta...
@@ -181,7 +181,7 @@ export default function PlaceForm({
           {/* --- KOLOM KIRI: PETA --- */}
           {/* Tambahkan padding kanan (pr-10) dan border kanan (border-r) */}
           <section className="xl:col-span-5 flex flex-col gap-6 xl:sticky xl:top-8 transition-all xl:pr-10 xl:border-r border-slate-200 min-h-[calc(100vh-200px)]">
-            <div className="relative w-full aspect-[4/5] rounded-[32px] overflow-hidden shadow-xl shadow-slate-200 border border-slate-200">
+            <div className="relative w-full aspect-4/5 rounded-[32px] overflow-hidden shadow-xl shadow-slate-200 border border-slate-200">
               <MapInput
                 onLocationSelect={handleMapClick}
                 inputLat={formData.lat ? parseFloat(formData.lat) : undefined}
@@ -286,7 +286,7 @@ export default function PlaceForm({
                 <div>
                   <label className={STYLES.label}>Deskripsi Lengkap</label>
                   <textarea
-                    className={`${STYLES.input} min-h-[150px] resize-none leading-relaxed`}
+                    className={`${STYLES.input} min-h-37.5 resize-none leading-relaxed`}
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
@@ -408,7 +408,7 @@ export default function PlaceForm({
 
               {/* Konfirmasi Alert */}
               {isConfirmOpen && (
-                <div className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
                   <div className="bg-white rounded-[32px] p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
                     <div className="w-16 h-16 bg-lime-100 text-lime-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-lime-50">
                       <Save size={32} />

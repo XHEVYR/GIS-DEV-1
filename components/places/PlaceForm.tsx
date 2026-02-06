@@ -97,7 +97,7 @@ export default function PlaceForm({
   };
 
   const removeImageField = (index: number) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
+    const newImages = formData.images.filter((_: string, i: number) => i !== index);
     setFormData({ ...formData, images: newImages });
   };
 

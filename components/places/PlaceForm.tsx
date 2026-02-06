@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import FormActions from "@/components/places/FormActions";
 
+// Import MapInput secara Dynamic (Client Side Only)
 const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ssr: false,
   loading: () => (
@@ -33,8 +34,9 @@ const STYLES = {
   iconBox: (color: string) => `p-2 rounded-lg ${color}`,
 };
 
+// --- DEFINISI PROPS (PENTING AGAR TIDAK ERROR DI ADMIN PAGE) ---
 interface PlaceFormProps {
-  initialData?: any;
+  initialData?: any; // Bisa menerima data Place untuk edit
   onSave: (data: any) => Promise<void>;
   onCancel: () => void;
   isLoadingParent?: boolean;
@@ -87,8 +89,9 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     }
   };
 
+  // PERBAIKAN DI SINI: Menambahkan tipe data untuk parameter filter
   const removeImageField = (index: number) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
+    const newImages = formData.images.filter((_: string, i: number) => i !== index);
     setFormData({ ...formData, images: newImages });
   };
 
@@ -101,7 +104,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
       return;
     }
     // Validasi minimal 1 gambar
-    if (formData.images.filter(img => img.trim() !== "").length === 0) {
+    if (formData.images.filter((img: string) => img.trim() !== "").length === 0) {
         setError("Minimal sertakan 1 Link Gambar.");
         return;
     }
@@ -113,7 +116,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     setIsConfirmOpen(false);
 
     // Bersihkan input kosong
-    const cleanImages = formData.images.filter(img => img.trim() !== "");
+    const cleanImages = formData.images.filter((img: string) => img.trim() !== "");
 
     try {
       await onSave({
@@ -130,7 +133,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     }
   };
 
-  // ... (Bagian JSX Render Tampilan)
+  // --- RENDER VISUAL ---
   const pageTitle = isEditMode ? "Edit Lokasi" : "Tambah Lokasi";
   const PageIcon = isEditMode ? Edit : PlusCircle;
   const iconColorClass = isEditMode ? "bg-amber-500 text-white shadow-amber-200" : "bg-indigo-600 text-white shadow-indigo-200";
@@ -166,7 +169,6 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
             {/* KIRI: PETA */}
             <section className="xl:col-span-5 flex flex-col gap-6 xl:sticky xl:top-28 transition-all duration-300">
                <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-                {/* ... (Kode Peta sama seperti sebelumnya) ... */}
                  <div className="relative w-full aspect-square xl:aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100">
                   <MapInput
                     onLocationSelect={handleMapClick}
@@ -216,7 +218,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                 </div>
               </div>
 
-              {/* CARD VISUALISASI (MULTI IMAGE) */}
+              {/* CARD VISUALISASI (MULTI IMAGE - DINAMIS) */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-purple-50 text-purple-600")}><ImageIcon size={20} /></div>
@@ -224,7 +226,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                 </div>
 
                 <div className="space-y-4">
-                  {formData.images.map((url, index) => (
+                  {formData.images.map((url: string, index: number) => (
                     <div key={index} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <label className={STYLES.label}>
                             {index === 0 ? "Foto Utama (Tampil di Popup)" : `Foto Tambahan ${index}`}
@@ -239,6 +241,7 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                                     onChange={(e) => handleImageChange(index, e.target.value)}
                                 />
                             </div>
+                            {/* Tombol Hapus (Hanya jika > 1 input) */}
                             {formData.images.length > 1 && (
                                 <button type="button" onClick={() => removeImageField(index)} className="p-3.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors border border-red-100">
                                     <Trash2 size={18} />

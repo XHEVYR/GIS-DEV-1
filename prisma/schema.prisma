@@ -27,11 +27,25 @@ model Place {
   lat            Float
   lon            Float
   category       String
-  image          String?
+  // image          String?
+  placeImages  PlaceImage[]
   
   // Kolom is_recommended dan updatedAt SAYA HAPUS
   
   createdAt      DateTime @default(now())
 
   @@map("places")
+}
+
+// Tabel Baru Khusus Gambar
+model PlaceImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  placeId   Int
+  place     Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  // Ini penting agar urutan gambar sesuai waktu upload
+  createdAt DateTime @default(now())
+
+  @@map("place_images")
 }

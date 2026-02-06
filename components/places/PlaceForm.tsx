@@ -11,11 +11,11 @@ import {
   PlusCircle,
   Edit,
   AlignLeft,
-  CheckCircle2, // Tambahkan ini
+  Trash2,
+  Plus,
 } from "lucide-react";
 import FormActions from "@/components/places/FormActions";
 
-// --- SETUP MAP ---
 const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ssr: false,
   loading: () => (
@@ -25,7 +25,6 @@ const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ),
 });
 
-// --- STYLES ---
 const STYLES = {
   input: "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 text-sm font-medium focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none hover:border-slate-300 shadow-sm",
   label: "block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500",
@@ -34,7 +33,6 @@ const STYLES = {
   iconBox: (color: string) => `p-2 rounded-lg ${color}`,
 };
 
-// --- PROPS ---
 interface PlaceFormProps {
   initialData?: any;
   onSave: (data: any) => Promise<void>;
@@ -45,7 +43,7 @@ interface PlaceFormProps {
 export default function PlaceForm({ initialData, onSave, onCancel, isLoadingParent = false }: PlaceFormProps) {
   const isEditMode = !!initialData;
 
-  // --- STATE (Single Image) ---
+  // --- STATE ---
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     lat: initialData?.lat?.toString() || "",
@@ -53,16 +51,18 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     category: initialData?.category || "",
     description: initialData?.description || "",
     address: initialData?.address || "",
-    image: initialData?.image || "", // Pastikan ini String Tunggal
+    
+    // --- MAPPING DATA: Dari Array Object (DB) ke Array String (Form) ---
+    images: initialData?.placeImages && initialData.placeImages.length > 0
+      ? initialData.placeImages.map((img: any) => img.url) // Ambil URL-nya saja
+      : [""], // Default 1 input kosong
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, []);
 
   // --- HANDLERS ---
   const handleMapClick = (lat: number, lon: number) => {
@@ -74,14 +74,36 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     }));
   };
 
+  // Logic Multi Image
+  const handleImageChange = (index: number, value: string) => {
+    const newImages = [...formData.images];
+    newImages[index] = value;
+    setFormData({ ...formData, images: newImages });
+  };
+
+  const addImageField = () => {
+    if (formData.images.length < 5) { // Batas 5 gambar
+      setFormData({ ...formData, images: [...formData.images, ""] });
+    }
+  };
+
+  const removeImageField = (index: number) => {
+    const newImages = formData.images.filter((_, i) => i !== index);
+    setFormData({ ...formData, images: newImages });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!formData.lat || !formData.lon) {
       setError("Lokasi belum dipilih! Silakan klik peta atau isi koordinat.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
+    }
+    // Validasi minimal 1 gambar
+    if (formData.images.filter(img => img.trim() !== "").length === 0) {
+        setError("Minimal sertakan 1 Link Gambar.");
+        return;
     }
     setIsConfirmOpen(true);
   };
@@ -89,15 +111,18 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
   const executeSave = async () => {
     setLoading(true);
     setIsConfirmOpen(false);
+
+    // Bersihkan input kosong
+    const cleanImages = formData.images.filter(img => img.trim() !== "");
+
     try {
       await onSave({
         ...formData,
-        // Pastikan dikirim sebagai image (tunggal) bukan images (array)
-        image: formData.image, 
+        // Kirim Array String ke Backend (sesuai API Route baru)
+        images: cleanImages, 
         lat: parseFloat(formData.lat),
         lon: parseFloat(formData.lon),
-        // Sertakan ID jika Edit Mode agar backend tahu data mana yang diupdate
-        id: initialData?.id, 
+        id: initialData?.id, // ID untuk Update
       });
     } catch (err: any) {
       setError(err.message || "Gagal menyimpan data.");
@@ -105,15 +130,10 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     }
   };
 
+  // ... (Bagian JSX Render Tampilan)
   const pageTitle = isEditMode ? "Edit Lokasi" : "Tambah Lokasi";
-  const pageSubtitle = isEditMode 
-    ? "Perbarui informasi data geospasial." 
-    : "Input data geospasial baru ke dalam sistem.";
-  
   const PageIcon = isEditMode ? Edit : PlusCircle;
-  const iconColorClass = isEditMode 
-    ? "bg-amber-500 text-white shadow-amber-200" 
-    : "bg-indigo-600 text-white shadow-indigo-200";
+  const iconColorClass = isEditMode ? "bg-amber-500 text-white shadow-amber-200" : "bg-indigo-600 text-white shadow-indigo-200";
 
   return (
     <div className="w-full max-w-full transition-all duration-500 ease-in-out">
@@ -121,19 +141,11 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <span className={`p-1.5 rounded-lg shadow-lg ${iconColorClass}`}>
-                <PageIcon size={20} />
-              </span>
+              <span className={`p-1.5 rounded-lg shadow-lg ${iconColorClass}`}><PageIcon size={20} /></span>
               {pageTitle}
             </h1>
-            <p className="hidden md:block mt-1 text-sm text-slate-500 font-medium ml-1">
-              {pageSubtitle}
-            </p>
           </div>
-          <button 
-            onClick={onCancel} 
-            className="group flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 transition-all shadow-sm"
-          >
+          <button onClick={onCancel} className="group flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 transition-all shadow-sm">
             <XCircle size={22} className="group-hover:scale-110 transition-transform" />
             <span className="hidden md:inline-block ml-2 font-bold text-sm">Batal</span>
           </button>
@@ -151,16 +163,11 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             
+            {/* KIRI: PETA */}
             <section className="xl:col-span-5 flex flex-col gap-6 xl:sticky xl:top-28 transition-all duration-300">
-              <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden group hover:shadow-2xl hover:shadow-indigo-100/40 transition-all">
-                <div className="px-6 py-4 flex items-center justify-between bg-white border-b border-slate-50">
-                  <div className="flex items-center gap-2 text-indigo-900">
-                    <MapPin size={18} className="text-indigo-600" />
-                    <h3 className="font-bold text-sm tracking-wide uppercase">Lokasi Titik</h3>
-                  </div>
-                  <span className="text-[10px] font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Klik Peta</span>
-                </div>
-                <div className="relative w-full aspect-square xl:aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100">
+               <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                {/* ... (Kode Peta sama seperti sebelumnya) ... */}
+                 <div className="relative w-full aspect-square xl:aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100">
                   <MapInput
                     onLocationSelect={handleMapClick}
                     inputLat={formData.lat ? parseFloat(formData.lat) : undefined}
@@ -169,73 +176,87 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
                 </div>
                 <div className="p-4 grid grid-cols-2 gap-3 bg-slate-50/50">
                   <div className="bg-white p-2 rounded-xl border border-slate-200">
-                    <label className="text-[10px] font-bold text-slate-400 block mb-0.5">LATITUDE</label>
-                    <input type="number" step="any" className="w-full text-xs font-mono font-bold text-slate-700 outline-none bg-transparent" value={formData.lat} onChange={(e) => setFormData({...formData, lat: e.target.value})} placeholder="-8.xxxx" />
+                     <input type="number" step="any" className="w-full text-xs font-mono font-bold text-slate-700 outline-none bg-transparent" value={formData.lat} onChange={(e) => setFormData({...formData, lat: e.target.value})} placeholder="Lat" />
                   </div>
                   <div className="bg-white p-2 rounded-xl border border-slate-200">
-                    <label className="text-[10px] font-bold text-slate-400 block mb-0.5">LONGITUDE</label>
-                    <input type="number" step="any" className="w-full text-xs font-mono font-bold text-slate-700 outline-none bg-transparent" value={formData.lon} onChange={(e) => setFormData({...formData, lon: e.target.value})} placeholder="112.xxxx" />
+                     <input type="number" step="any" className="w-full text-xs font-mono font-bold text-slate-700 outline-none bg-transparent" value={formData.lon} onChange={(e) => setFormData({...formData, lon: e.target.value})} placeholder="Lon" />
                   </div>
                 </div>
               </div>
             </section>
 
+            {/* KANAN: INPUT FIELDS */}
             <section className="xl:col-span-7 flex flex-col gap-6">
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
-                  <div className={STYLES.iconBox("bg-indigo-50 text-indigo-600")}><AlignLeft size={20} /></div>
-                  Informasi Umum
+                  <div className={STYLES.iconBox("bg-indigo-50 text-indigo-600")}><AlignLeft size={20} /></div> Informasi Umum
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
                     <label className={STYLES.label}>Nama Tempat</label>
-                    <input className={STYLES.input} placeholder="Masukkan nama tempat..." value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                    <input className={STYLES.input} placeholder="Nama tempat..." value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                   </div>
                   <div>
                     <label className={STYLES.label}>Kategori</label>
-                    <div className="relative">
-                      <select className={`${STYLES.input} appearance-none cursor-pointer`} value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required>
-                        <option value="">Pilih Kategori...</option>
-                        <option value="hotel">🏨 Hotel & Penginapan</option>
-                        <option value="cafe">☕ Cafe & Resto</option>
-                        <option value="wisata">✈️ Destinasi Wisata</option>
-                      </select>
-                    </div>
+                    <select className={STYLES.input} value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required>
+                      <option value="">Pilih...</option>
+                      <option value="hotel">🏨 Hotel</option>
+                      <option value="cafe">☕ Cafe</option>
+                      <option value="wisata">✈️ Wisata</option>
+                    </select>
                   </div>
                   <div>
                       <label className={STYLES.label}>Alamat Singkat</label>
-                      <textarea className={`${STYLES.input} min-h-[52px] resize-none pt-3`} rows={1} placeholder="Jl. Raya..." value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} required />
+                      <textarea className={`${STYLES.input} min-h-[52px] resize-none pt-3`} rows={1} value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} required />
                   </div>
                   <div className="md:col-span-2">
                     <label className={STYLES.label}>Deskripsi</label>
-                    <textarea className={`${STYLES.input} min-h-[100px]`} placeholder="Jelaskan detail tentang tempat ini..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                    <textarea className={`${STYLES.input} min-h-[100px]`} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
                   </div>
                 </div>
               </div>
 
-              {/* Card 2: Visualisasi (Single Image) */}
+              {/* CARD VISUALISASI (MULTI IMAGE) */}
               <div className={STYLES.card}>
                 <div className={STYLES.headerTitle}>
                   <div className={STYLES.iconBox("bg-purple-50 text-purple-600")}><ImageIcon size={20} /></div>
-                  Visualisasi
+                  Visualisasi (Max. 5 Foto)
                 </div>
-                <div className="space-y-6">
-                  <div>
-                    <label className={STYLES.label}>URL Gambar</label>
-                    <div className="relative">
-                      <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input className={`${STYLES.input} pl-12`} placeholder="https://..." value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} />
+
+                <div className="space-y-4">
+                  {formData.images.map((url, index) => (
+                    <div key={index} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <label className={STYLES.label}>
+                            {index === 0 ? "Foto Utama (Tampil di Popup)" : `Foto Tambahan ${index}`}
+                        </label>
+                        <div className="flex gap-2 items-start">
+                            <div className="relative w-full">
+                                <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <input 
+                                    className={`${STYLES.input} pl-12`}
+                                    placeholder="https://..."
+                                    value={url}
+                                    onChange={(e) => handleImageChange(index, e.target.value)}
+                                />
+                            </div>
+                            {formData.images.length > 1 && (
+                                <button type="button" onClick={() => removeImageField(index)} className="p-3.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors border border-red-100">
+                                    <Trash2 size={18} />
+                                </button>
+                            )}
+                        </div>
+                        {url && (
+                            <div className="relative h-24 w-full rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                                 <Image src={url} alt="Preview" fill className="object-cover" onError={() => {}} />
+                            </div>
+                        )}
                     </div>
-                  </div>
-                  {formData.image && (
-                    <div className="relative w-full h-64 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 group shadow-inner">
-                      <Image src={formData.image} alt="Preview" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" onError={() => setFormData({ ...formData, image: "" })} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                        <p className="text-white text-sm font-medium flex items-center gap-2">
-                          <CheckCircle2 size={16} className="text-emerald-400" /> Gambar Valid
-                        </p>
-                      </div>
-                    </div>
+                  ))}
+
+                  {formData.images.length < 5 && (
+                    <button type="button" onClick={addImageField} className="w-full py-3 border-2 border-dashed border-indigo-200 rounded-xl text-indigo-500 font-bold text-sm flex items-center justify-center gap-2 hover:bg-indigo-50 hover:border-indigo-300 transition-all">
+                        <Plus size={18} /> Tambah Foto Lain
+                    </button>
                   )}
                 </div>
               </div>

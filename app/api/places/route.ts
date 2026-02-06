@@ -1,118 +1,65 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// GET: Ambil semua data + Gambar
 export async function GET() {
   const places = await prisma.place.findMany({
+    include: {
+      // Ambil relasi gambar
+      placeImages: {
+        orderBy: { id: "asc" }, // Gambar pertama (index 0) adalah yang terlama/utama
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
   return NextResponse.json(places);
 }
 
+// POST: Simpan Data Baru + Banyak Gambar
 export async function POST(request: Request) {
-  console.log(request);
   try {
     const body = await request.json();
-
-    console.log("Data diterima dari Frontend:", body);
+    console.log("Data POST diterima:", body);
 
     const lat = parseFloat(body.lat);
     const lon = parseFloat(body.lon);
 
     if (isNaN(lat) || isNaN(lon)) {
-      console.log("Error: Latitude/Longitude bukan angka");
       return NextResponse.json(
         { error: "Lat/Lon harus angka" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    // 3. Coba Simpan
+    // Pastikan body.images adalah array, jika tidak (atau kosong), jadikan array kosong
+    const imagesToSave = Array.isArray(body.images) ? body.images : [];
+
     const newPlace = await prisma.place.create({
       data: {
         name: body.name,
         description: body.description,
         address: body.address,
-        image: body.image,
         lat: lat,
         lon: lon,
         category: body.category,
+        
+        // --- LOGIKA BARU: MULTI IMAGE ---
+        // Kita tidak lagi pakai 'image', tapi 'placeImages'
+        placeImages: {
+          create: imagesToSave.map((imgUrl: string) => ({
+            url: imgUrl,
+          })),
+        },
       },
     });
 
     console.log("Berhasil disimpan:", newPlace);
     return NextResponse.json(newPlace);
   } catch (error) {
-    // 4. MUNCULKAN ERROR DI TERMINAL
     console.error("GAGAL SAVE DATABASE:", error);
-
     return NextResponse.json(
       { error: "Gagal menyimpan data ke database" },
-      { status: 500 },
-    );
-  }
-}
-
-export async function PUT(request: Request) {
-  try {
-    const body = await request.json();
-    const id = body.id;
-
-    console.log("Data UPDATE diterima dari Frontend:", body);
-    console.log("ID yang akan di-update:", id);
-
-    if (!id) {
-      console.log("Error: ID tidak ditemukan");
-      return NextResponse.json({ error: "ID diperlukan" }, { status: 400 });
-    }
-
-    const updatedPlace = await prisma.place.update({
-      where: { id: parseInt(id) },
-      data: {
-        name: body.name,
-        description: body.description,
-        address: body.address,
-        image: body.image,
-        lat: parseFloat(body.lat),
-        lon: parseFloat(body.lon),
-        category: body.category,
-      },
-    });
-
-    console.log("Berhasil di-update:", updatedPlace);
-    return NextResponse.json(updatedPlace);
-  } catch (error) {
-    console.error("GAGAL UPDATE DATA:", error);
-    return NextResponse.json(
-      { error: "Gagal memperbarui data di database" },
-      { status: 500 },
-    );
-  }
-}
-
-export async function DELETE(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-
-    console.log("DELETE request URL:", request.url);
-    console.log("ID yang akan di-delete:", id);
-
-    if (!id) {
-      console.log("Error: ID tidak ditemukan di query parameter");
-      return NextResponse.json({ error: "ID diperlukan" }, { status: 400 });
-    }
-
-    const deletedPlace = await prisma.place.delete({
-      where: { id: parseInt(id) },
-    });
-
-    console.log("Berhasil di-delete:", deletedPlace);
-    return NextResponse.json(deletedPlace);
-  } catch (error) {
-    console.error("GAGAL DELETE DATA:", error);
-    return NextResponse.json(
-      { error: "Gagal menghapus data dari database" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

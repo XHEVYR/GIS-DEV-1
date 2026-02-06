@@ -11,61 +11,54 @@ import {
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import L from "leaflet";
-// Import ReactDOMServer untuk render icon Lucide ke HTML string
-import { renderToString } from "react-dom/server"; 
-// Import Icon Lucide yang dibutuhkan
-import { 
-  X, Navigation, ChevronLeft, ChevronRight, 
-  MapPin, Utensils, Bed, Mountain, Camera 
+import { renderToString } from "react-dom/server";
+import {
+  X, Navigation, ChevronLeft, ChevronRight,
+  MapPin, Utensils, Bed, Camera
 } from "lucide-react";
 
-// --- TIPE DATA ---
+// --- TIPE DATA BARU (ARRAY OBJECT) ---
 interface Place {
   id: string;
   name: string;
   category: string;
-  images: string[];
+  // Perhatikan: ini sekarang Array, bukan String lagi
+  placeImages: { url: string }[]; 
   description: string;
   address: string;
   lat: number;
   lon: number;
 }
 
-// --- FUNGSI GENERATOR ICON CUSTOM ---
+// --- FUNGSI GENERATOR ICON (SAMA SEPERTI SEBELUMNYA) ---
 const createCustomMarker = (category: string) => {
   let IconComponent;
   let bgColor;
 
-  // Tentukan Icon & Warna berdasarkan Kategori
   switch (category.toLowerCase()) {
     case "wisata":
       IconComponent = <Camera size={18} color="white" />;
-      bgColor = "#ec4899"; // Pink
+      bgColor = "#ec4899";
       break;
     case "hotel":
       IconComponent = <Bed size={18} color="white" />;
-      bgColor = "#3b82f6"; // Blue
+      bgColor = "#3b82f6";
       break;
     case "cafe":
       IconComponent = <Utensils size={18} color="white" />;
-      bgColor = "#f59e0b"; // Amber
+      bgColor = "#f59e0b";
       break;
-    // case "alam":
-    //   IconComponent = <Mountain size={18} color="white" />;
-    //   bgColor = "#10b981"; // Emerald
-    //   break;
     default:
       IconComponent = <MapPin size={18} color="white" />;
-      bgColor = "#6366f1"; // Indigo
+      bgColor = "#6366f1";
   }
 
-  // Render Icon React ke String HTML
   const iconHtml = renderToString(IconComponent);
 
   return L.divIcon({
-    className: "custom-marker-pin", // Class untuk CSS (lihat style di bawah)
+    className: "custom-marker-pin",
     html: `
       <div style="
         background-color: ${bgColor};
@@ -85,22 +78,14 @@ const createCustomMarker = (category: string) => {
       </div>
     `,
     iconSize: [32, 42],
-    iconAnchor: [16, 42], // Ujung bawah pin
+    iconAnchor: [16, 42],
     popupAnchor: [0, -40],
   });
 };
 
-// Icon Lokasi User (Merah) - Tetap pakai gambar atau ubah ke divIcon juga bisa
 const userIcon = L.divIcon({
   className: "user-marker",
-  html: `
-    <div style="
-      background-color: #ef4444; 
-      width: 16px; height: 16px; 
-      border-radius: 50%; 
-      border: 3px solid white; 
-      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.4);
-    "></div>`,
+  html: `<div style="background-color: #ef4444; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.4);"></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
 });
@@ -120,7 +105,6 @@ const createClusterCustomIcon = (cluster: any) => {
   });
 };
 
-// --- COMPONENT LOCATE CONTROL ---
 function LocateControl({ onLocationFound }: { onLocationFound: (lat: number, lng: number) => void }) {
   const map = useMap();
   useEffect(() => {
@@ -128,15 +112,8 @@ function LocateControl({ onLocationFound }: { onLocationFound: (lat: number, lng
       options: { position: "bottomright" },
       onAdd: function () {
         const container = L.DomUtil.create("div", "leaflet-bar leaflet-control leaflet-control-custom");
-        container.style.backgroundColor = "white";
-        container.style.width = "34px";
-        container.style.height = "34px";
-        container.style.display = "flex";
-        container.style.alignItems = "center";
-        container.style.justifyContent = "center";
-        container.style.cursor = "pointer";
-        container.innerHTML = renderToString(<Navigation size={20} color="black" />); // Pakai renderToString biar konsisten
-        
+        container.style.backgroundColor = "white"; container.style.width = "34px"; container.style.height = "34px"; container.style.display = "flex"; container.style.alignItems = "center"; container.style.justifyContent = "center"; container.style.cursor = "pointer";
+        container.innerHTML = renderToString(<Navigation size={20} color="black" />);
         container.onclick = (e) => {
           e.preventDefault(); e.stopPropagation();
           if (!navigator.geolocation) { alert("Browser tidak support GPS"); return; }
@@ -168,6 +145,8 @@ export default function Map() {
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(new Set());
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  
+  // State untuk Carousel
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -175,6 +154,7 @@ export default function Map() {
       try {
         const res = await fetch("/api/places");
         const data = await res.json();
+        // Pastikan API mengembalikan placeImages
         const validData = Array.isArray(data) ? data : [];
         setPlaces(validData);
         const allCats = new Set(validData.map((p: Place) => p.category));
@@ -195,17 +175,36 @@ export default function Map() {
     });
   };
 
+  // Reset index carousel saat ganti tempat
   useEffect(() => { if (selectedPlace) setCurrentImageIndex(0); }, [selectedPlace]);
 
-  const nextImage = () => {
-    if (!selectedPlace) return;
-    setCurrentImageIndex((prev) => (prev === selectedPlace.images.length - 1 ? 0 : prev + 1));
-  };
+  // Logic Carousel
+  const nextImage = useCallback (() => {
+    if (!selectedPlace || !selectedPlace.placeImages.length) return;
+    setCurrentImageIndex((prev) => (prev === selectedPlace.placeImages.length - 1 ? 0 : prev + 1));
+  }, [selectedPlace]);
 
   const prevImage = () => {
-    if (!selectedPlace) return;
-    setCurrentImageIndex((prev) => (prev === 0 ? selectedPlace.images.length - 1 : prev - 1));
+    if (!selectedPlace || !selectedPlace.placeImages.length) return;
+    setCurrentImageIndex((prev) => (prev === 0 ? selectedPlace.placeImages.length - 1 : prev - 1));
   };
+
+  // --- 🌟 TAMBAHAN: LOGIKA AUTOPLAY 🌟 ---
+  useEffect(() => {
+    // 1. Cek apakah modal terbuka dan punya lebih dari 1 gambar
+    if (!selectedPlace || !selectedPlace.placeImages || selectedPlace.placeImages.length <= 1) {
+      return;
+    }
+
+    // 2. Jalankan timer setiap 3000ms (3 detik)
+    const timer = setInterval(() => {
+      nextImage();
+    }, 5000); 
+
+    // 3. Bersihkan timer jika user menutup modal atau gambar berubah manual
+    return () => clearInterval(timer);
+  }, [selectedPlace, nextImage, currentImageIndex]); // Dependency ke currentImageIndex biar reset kalau user klik manual
+  
 
   if (loading) return <div>Loading map...</div>;
 
@@ -236,13 +235,21 @@ export default function Map() {
               <Marker 
                 key={place.id} 
                 position={[place.lat, place.lon]} 
-                // GUNAKAN ICON CUSTOM DI SINI
                 icon={createCustomMarker(place.category)} 
               >
                 <Popup>
                   <div className="w-60">
-                    {place.images && place.images.length > 0 && (
-                      <img src={place.images[0]} alt={place.name} className="w-full h-32 object-cover rounded-lg mb-2" />
+                    {/* POPUP: Menampilkan Gambar Pertama (Index 0) */}
+                    {place.placeImages && place.placeImages.length > 0 ? (
+                      <img 
+                        src={place.placeImages[0].url} 
+                        alt={place.name} 
+                        className="w-full h-32 object-cover rounded-lg mb-2" 
+                      />
+                    ) : (
+                      <div className="w-full h-32 bg-slate-100 rounded-lg mb-2 flex items-center justify-center text-xs text-slate-400">
+                        No Image
+                      </div>
                     )}
                     <h3 className="font-bold text-lg mb-1">{place.name}</h3>
                     <p className="text-xs text-gray-500 mb-3">{place.address}</p>
@@ -254,37 +261,53 @@ export default function Map() {
         </MarkerClusterGroup>
       </MapContainer>
 
-      {/* --- MODAL DETAIL CAROUSEL (SAMA SEPERTI SEBELUMNYA) --- */}
+      {/* --- MODAL DETAIL (DENGAN CAROUSEL) --- */}
       {selectedPlace && (
         <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
             <button onClick={() => setSelectedPlace(null)} className="absolute top-4 right-4 bg-white/80 p-2 rounded-full hover:bg-gray-100 transition z-20"><X size={24} className="text-gray-700" /></button>
 
             <div className="relative w-full h-64 sm:h-80 flex-shrink-0 bg-gray-900 group">
-              {selectedPlace.images && selectedPlace.images.length > 0 ? (
+              {/* Cek apakah ada gambar */}
+              {selectedPlace.placeImages && selectedPlace.placeImages.length > 0 ? (
                 <>
-                  <img src={selectedPlace.images[currentImageIndex]} alt={selectedPlace.name} className="w-full h-full object-cover transition-all duration-300" />
-                  {selectedPlace.images.length > 1 && (
+                  {/* GAMBAR UTAMA: Menggunakan index carousel */}
+                  <img 
+                    src={selectedPlace.placeImages[currentImageIndex].url} 
+                    alt={selectedPlace.name} 
+                    className="w-full h-full object-cover transition-all duration-300" 
+                  />
+                  
+                  {/* TOMBOL NAVIGASI: Hanya muncul jika gambar > 1 */}
+                  {selectedPlace.placeImages.length > 1 && (
                     <>
-                      <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full opacity-0 group-hover:opacity-100"><ChevronLeft size={24} /></button>
-                      <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full opacity-0 group-hover:opacity-100"><ChevronRight size={24} /></button>
+                      <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all"><ChevronLeft size={24} /></button>
+                      <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all"><ChevronRight size={24} /></button>
+                      
+                      {/* DOTS INDICATOR */}
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                        {selectedPlace.images.map((_, idx) => (
-                          <div key={idx} className={`h-2 w-2 rounded-full ${idx === currentImageIndex ? "bg-white w-6" : "bg-white/50"}`} />
+                        {selectedPlace.placeImages.map((_, idx) => (
+                          <div key={idx} className={`h-2 w-2 rounded-full transition-all ${idx === currentImageIndex ? "bg-white w-6" : "bg-white/50"}`} />
                         ))}
                       </div>
                     </>
                   )}
                 </>
-              ) : ( <div className="w-full h-full flex items-center justify-center text-gray-400">Tidak ada gambar</div> )}
-               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pointer-events-none">
+              ) : ( 
+                <div className="w-full h-full flex items-center justify-center text-gray-400">Tidak ada gambar</div> 
+              )}
+              
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pointer-events-none">
                   <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">{selectedPlace.category}</span>
                   <h2 className="text-3xl font-bold text-white mt-2">{selectedPlace.name}</h2>
                </div>
             </div>
 
             <div className="p-6 space-y-6">
-              <div><h3 className="text-lg font-bold text-gray-900 mb-2 border-l-4 border-blue-500 pl-3">Deskripsi</h3><p className="text-gray-700 whitespace-pre-line">{selectedPlace.description || "-"}</p></div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 border-l-4 border-blue-500 pl-3">Deskripsi</h3>
+                <p className="text-gray-700 whitespace-pre-line">{selectedPlace.description || "Tidak ada deskripsi."}</p>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div><h4 className="font-semibold text-gray-900 text-sm mb-1">Alamat</h4><p className="text-sm text-gray-600">{selectedPlace.address}</p></div>
                 <div><h4 className="font-semibold text-gray-900 text-sm mb-1">Koordinat</h4><div className="flex flex-col gap-1 text-sm text-gray-600 font-mono bg-white px-3 py-2 rounded border"><span className="text-red-500">Lat: {selectedPlace.lat}</span><span className="text-blue-500">Lon: {selectedPlace.lon}</span></div></div>

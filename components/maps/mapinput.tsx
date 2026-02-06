@@ -1,13 +1,20 @@
 "use client";
 
-import {MapContainer,TileLayer,Marker,useMap,useMapEvents,} from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const iconFix = () => {
-  delete (L.Icon.Default.prototype as any)._getIconUrl;
+  delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: string })
+    ._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl:
       "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -25,7 +32,7 @@ function LocationMarker({
   onSelect,
   position,
 }: {
-  onSelect: any;
+  onSelect: (lat: number, lon: number) => void;
   position: [number, number] | null;
 }) {
   const map = useMap();
@@ -35,7 +42,7 @@ function LocationMarker({
     if (position) {
       map.flyTo(position, map.getZoom(), {
         animate: true,
-        duration: 1.5, 
+        duration: 1.5,
       });
     }
   }, [position, map]);

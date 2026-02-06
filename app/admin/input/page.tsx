@@ -4,14 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 // Import komponen form sakti yang sudah kita buat
-import PlaceForm from "@/components/places/PlaceForm"; 
+import PlaceForm from "@/components/places/PlaceForm";
+
+import { Place } from "@/types";
 
 export default function InputPage() {
   const router = useRouter();
   const [success, setSuccess] = useState(false);
 
   // Function ini akan dipanggil ketika tombol "Simpan" di PlaceForm diklik
-  const handleSave = async (data: any) => {
+  const handleSave = async (data: Place) => {
     // Data yang dikirim dari PlaceForm sudah rapi (termasuk array images)
     // Kita tinggal kirim ke API POST
     const res = await fetch("/api/places", {
@@ -38,9 +40,16 @@ export default function InputPage() {
           <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-emerald-50/50">
             <CheckCircle2 size={48} strokeWidth={2.5} />
           </div>
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Berhasil!</h2>
-          <p className="text-slate-500 mb-8">Data lokasi baru telah ditambahkan.</p>
-          <button disabled className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl opacity-80 cursor-not-allowed">
+          <h2 className="text-3xl font-extrabold text-slate-900 mb-2">
+            Berhasil!
+          </h2>
+          <p className="text-slate-500 mb-8">
+            Data lokasi baru telah ditambahkan.
+          </p>
+          <button
+            disabled
+            className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl opacity-80 cursor-not-allowed"
+          >
             Mengalihkan...
           </button>
         </div>
@@ -55,10 +64,7 @@ export default function InputPage() {
          Otomatis PlaceForm akan tahu ini adalah mode "TAMBAH DATA".
          Fitur 5 gambar, peta, dan validasi sudah otomatis ikut.
       */}
-      <PlaceForm 
-        onSave={handleSave} 
-        onCancel={() => router.back()} 
-      />
+      <PlaceForm onSave={handleSave} onCancel={() => router.back()} />
     </div>
   );
 }

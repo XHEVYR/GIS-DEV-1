@@ -143,13 +143,13 @@ export default function LandingPage() {
           <div 
             className={`
               ${isFullScreen 
-                ? "fixed inset-0 z-[9999] h-screen w-screen bg-slate-100" 
-                : "relative group order-1 lg:order-2 h-[450px] lg:h-[600px] w-full" 
+                ? "fixed inset-0 z-9999 h-screen w-screen bg-slate-100" 
+                : "relative group order-1 lg:order-2 h-112.5 lg:h-150 w-full" 
               }
             `}
           >
             {!isFullScreen && (
-              <div className="absolute -inset-2 bg-gradient-to-tr from-lime-400 to-emerald-400 rounded-[40px] blur-xl opacity-20 group-hover:opacity-40 transition duration-700"></div>
+              <div className="absolute -inset-2 bg-linear-to-tr from-lime-400 to-emerald-400 rounded-[40px] blur-xl opacity-20 group-hover:opacity-40 transition duration-700"></div>
             )}
             
             <div className={`relative h-full w-full overflow-hidden bg-slate-100 ${isFullScreen ? '' : 'rounded-[32px] border-[6px] border-white ring-1 ring-slate-100 shadow-2xl'}`}>
@@ -159,7 +159,7 @@ export default function LandingPage() {
               {isFullScreen && (
                 <button
                   onClick={handleCloseMap}
-                  className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000] bg-white text-slate-800 px-6 py-2 rounded-full shadow-2xl border border-slate-200 hover:bg-red-50 hover:text-red-600 transition-all duration-300 flex items-center gap-2 font-bold text-sm"
+                  className="absolute top-6 left-1/2 -translate-x-1/2 z-1000 bg-white text-slate-800 px-6 py-2 rounded-full shadow-2xl border border-slate-200 hover:bg-red-50 hover:text-red-600 transition-all duration-300 flex items-center gap-2 font-bold text-sm"
                 >
                   <Minimize2 size={18} />
                   Keluar Fullscreen
@@ -169,7 +169,7 @@ export default function LandingPage() {
               {!isFullScreen && (
                  <button
                  onClick={handleOpenMap}
-                 className="absolute top-4 right-4 z-[400] bg-white/80 backdrop-blur text-slate-600 p-2 rounded-xl shadow-sm hover:bg-white hover:text-lime-600 transition-all border border-white/50 opacity-0 group-hover:opacity-100"
+                 className="absolute top-4 right-4 z-400 bg-white/80 backdrop-blur text-slate-600 p-2 rounded-xl shadow-sm hover:bg-white hover:text-lime-600 transition-all border border-white/50 opacity-0 group-hover:opacity-100"
                  title="Perbesar Peta"
                >
                  <Maximize2 size={20} />
@@ -184,7 +184,7 @@ export default function LandingPage() {
           id="categories" 
           className="py-24 bg-slate-50 border-y border-slate-200/60 relative overflow-hidden scroll-mt-24"
         >
-           <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:24px_24px]"></div>
+           <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000000_1px,transparent_1px)] [bg-size-[24px_24px]"></div>
 
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="text-center mb-16 max-w-2xl mx-auto">
@@ -229,8 +229,8 @@ export default function LandingPage() {
           className="py-24 px-6 bg-slate-900 text-white relative overflow-hidden scroll-mt-24"
         >
           {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-lime-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-125 h-125 bg-lime-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-100 h-100 bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
           
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
             
@@ -243,7 +243,7 @@ export default function LandingPage() {
 
               <h2 className="text-3xl md:text-5xl font-black leading-tight">
                 Membangun Ekosistem <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">Digital Kota Blitar</span>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-lime-400 to-emerald-400">Digital Kota Blitar</span>
               </h2>
 
               <p className="text-slate-400 text-lg leading-relaxed">
@@ -253,7 +253,7 @@ export default function LandingPage() {
               {/* List Keunggulan */}
               <div className="space-y-4 pt-2">
                 {[
-                  "Validasi Data Lapangan Terverifikasi",
+                  "Validasi Data Lapangan Ter verifikasi",
                   "Pembaruan Informasi Secara Real-Time",
                   "Antarmuka Responsif & Mudah Digunakan"
                 ].map((item, index) => (
@@ -270,7 +270,7 @@ export default function LandingPage() {
             {/* Kolom Kanan: Statistik / Visual Dashboard */}
             <div className="relative">
               {/* Decorative Border Box */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-lime-500 to-blue-500 rounded-3xl opacity-20 blur-lg"></div>
+              <div className="absolute -inset-2 bg-linear-to-r from-lime-500 to-blue-500 rounded-3xl opacity-20 blur-lg"></div>
               
               <div className="relative bg-slate-800/50 backdrop-blur-xl border border-slate-700 p-8 rounded-3xl shadow-2xl">
                 <div className="grid grid-cols-2 gap-6">

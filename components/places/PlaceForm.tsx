@@ -4,48 +4,56 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
-  MapPin,
   Image as ImageIcon,
   AlertCircle,
-  XCircle,
-  PlusCircle,
-  Edit,
-  AlignLeft,
-  Trash2,
+  X,
   Plus,
+  MapPin,
+  Save,
+  Trash2,
+  Maximize2,
+  AlignLeft
 } from "lucide-react";
 import FormActions from "@/components/places/FormActions";
 
-// Import MapInput secara Dynamic (Client Side Only)
+// --- DYNAMIC MAP ---
 const MapInput = dynamic(() => import("@/components/maps/mapinput"), {
   ssr: false,
   loading: () => (
-    <div className="h-full min-h-[400px] bg-slate-100 flex items-center justify-center rounded-2xl animate-pulse">
-      <span className="text-slate-400 font-medium">Memuat Peta...</span>
+    <div className="h-full min-h-[500px] bg-slate-100 flex flex-col items-center justify-center rounded-[32px] animate-pulse gap-3">
+       <div className="w-10 h-10 border-4 border-slate-200 border-t-lime-500 rounded-full animate-spin"></div>
+       <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Memuat Peta...</span>
     </div>
   ),
 });
 
+// --- STYLES DIPERTEGAS ---
 const STYLES = {
-  input: "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 text-sm font-medium focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none hover:border-slate-300 shadow-sm",
-  label: "block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500",
-  card: "bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300",
-  headerTitle: "font-bold text-lg text-slate-800 flex items-center gap-3 mb-6 pb-4 border-b border-slate-50",
-  iconBox: (color: string) => `p-2 rounded-lg ${color}`,
+  // Input: Border diperjelas (border-slate-200) agar kotak terlihat nyata
+  input:
+    "w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-sm font-semibold focus:bg-white focus:border-lime-500 focus:ring-4 focus:ring-lime-500/10 transition-all outline-none placeholder:text-slate-400 hover:border-slate-300",
+  
+  label: "block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide ml-1",
+  
+  // Judul Seksi dengan Garis Bawah Tebal
+  sectionTitle: "text-xl font-black text-slate-800 mb-6 flex items-center gap-3 pb-4 border-b-2 border-slate-100",
 };
 
-// --- DEFINISI PROPS (PENTING AGAR TIDAK ERROR DI ADMIN PAGE) ---
 interface PlaceFormProps {
-  initialData?: any; // Bisa menerima data Place untuk edit
+  initialData?: any; 
   onSave: (data: any) => Promise<void>;
   onCancel: () => void;
   isLoadingParent?: boolean;
 }
 
-export default function PlaceForm({ initialData, onSave, onCancel, isLoadingParent = false }: PlaceFormProps) {
+export default function PlaceForm({
+  initialData,
+  onSave,
+  onCancel,
+  isLoadingParent = false,
+}: PlaceFormProps) {
   const isEditMode = !!initialData;
 
-  // --- STATE ---
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     lat: initialData?.lat?.toString() || "",
@@ -53,20 +61,20 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     category: initialData?.category || "",
     description: initialData?.description || "",
     address: initialData?.address || "",
-    
-    // --- MAPPING DATA: Dari Array Object (DB) ke Array String (Form) ---
-    images: initialData?.placeImages && initialData.placeImages.length > 0
-      ? initialData.placeImages.map((img: any) => img.url) // Ambil URL-nya saja
-      : [""], // Default 1 input kosong
+    images:
+      initialData?.placeImages && initialData.placeImages.length > 0
+        ? initialData.placeImages.map((img: any) => img.url)
+        : [""], 
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, []);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
-  // --- HANDLERS ---
   const handleMapClick = (lat: number, lon: number) => {
     setError(null);
     setFormData((prev) => ({
@@ -76,7 +84,6 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     }));
   };
 
-  // Logic Multi Image
   const handleImageChange = (index: number, value: string) => {
     const newImages = [...formData.images];
     newImages[index] = value;
@@ -84,14 +91,13 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
   };
 
   const addImageField = () => {
-    if (formData.images.length < 5) { // Batas 5 gambar
+    if (formData.images.length < 5) {
       setFormData({ ...formData, images: [...formData.images, ""] });
     }
   };
 
-  // PERBAIKAN DI SINI: Menambahkan tipe data untuk parameter filter
   const removeImageField = (index: number) => {
-    const newImages = formData.images.filter((_: string, i: number) => i !== index);
+    const newImages = formData.images.filter((_, i) => i !== index);
     setFormData({ ...formData, images: newImages });
   };
 
@@ -103,10 +109,9 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
       setError("Lokasi belum dipilih! Silakan klik peta atau isi koordinat.");
       return;
     }
-    // Validasi minimal 1 gambar
     if (formData.images.filter((img: string) => img.trim() !== "").length === 0) {
-        setError("Minimal sertakan 1 Link Gambar.");
-        return;
+      setError("Minimal sertakan 1 Link Gambar.");
+      return;
     }
     setIsConfirmOpen(true);
   };
@@ -114,18 +119,15 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
   const executeSave = async () => {
     setLoading(true);
     setIsConfirmOpen(false);
-
-    // Bersihkan input kosong
     const cleanImages = formData.images.filter((img: string) => img.trim() !== "");
 
     try {
       await onSave({
         ...formData,
-        // Kirim Array String ke Backend (sesuai API Route baru)
-        images: cleanImages, 
+        images: cleanImages,
         lat: parseFloat(formData.lat),
         lon: parseFloat(formData.lon),
-        id: initialData?.id, // ID untuk Update
+        id: initialData?.id,
       });
     } catch (err: any) {
       setError(err.message || "Gagal menyimpan data.");
@@ -133,153 +135,271 @@ export default function PlaceForm({ initialData, onSave, onCancel, isLoadingPare
     }
   };
 
-  // --- RENDER VISUAL ---
-  const pageTitle = isEditMode ? "Edit Lokasi" : "Tambah Lokasi";
-  const PageIcon = isEditMode ? Edit : PlusCircle;
-  const iconColorClass = isEditMode ? "bg-amber-500 text-white shadow-amber-200" : "bg-indigo-600 text-white shadow-indigo-200";
-
   return (
-    <div className="w-full max-w-full transition-all duration-500 ease-in-out">
-      <header className="sticky top-0 z-30 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/60 mb-8 py-4 transition-all rounded-xl">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <span className={`p-1.5 rounded-lg shadow-lg ${iconColorClass}`}><PageIcon size={20} /></span>
-              {pageTitle}
-            </h1>
-          </div>
-          <button onClick={onCancel} className="group flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 transition-all shadow-sm">
-            <XCircle size={22} className="group-hover:scale-110 transition-transform" />
-            <span className="hidden md:inline-block ml-2 font-bold text-sm">Batal</span>
-          </button>
+    <div className="w-full pb-32">
+      
+      {/* HEADER */}
+      <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-b border-slate-200 pb-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+            {isEditMode ? "Edit Lokasi" : "Input Lokasi Baru"}
+          </h1>
+          <p className="text-slate-500 font-medium mt-1">
+            Lengkapi detail informasi geospasial di bawah ini.
+          </p>
         </div>
+        
+        <button
+            onClick={onCancel}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-full hover:bg-slate-100 hover:text-red-600 transition-all font-bold text-sm shadow-sm"
+          >
+            <X size={18} />
+            Batal
+        </button>
       </header>
 
-      <div className="max-w-7xl mx-auto">
-        {error && (
-          <div className="mb-8 bg-red-50 border border-red-100 text-red-600 p-4 rounded-2xl flex items-center gap-3 animate-in slide-in-from-top-2">
-            <AlertCircle size={20} className="shrink-0" />
-            <span className="text-sm font-bold">{error}</span>
-          </div>
-        )}
+      {error && (
+        <div className="mb-8 bg-red-50 border-l-4 border-red-500 text-red-600 p-4 rounded-r-xl flex items-center gap-3 animate-in slide-in-from-top-2">
+          <AlertCircle size={20} />
+          <span className="font-bold text-sm">{error}</span>
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-            
-            {/* KIRI: PETA */}
-            <section className="xl:col-span-5 flex flex-col gap-6 xl:sticky xl:top-28 transition-all duration-300">
-               <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-                 <div className="relative w-full aspect-square xl:aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100">
-                  <MapInput
-                    onLocationSelect={handleMapClick}
-                    inputLat={formData.lat ? parseFloat(formData.lat) : undefined}
-                    inputLon={formData.lon ? parseFloat(formData.lon) : undefined}
-                  />
-                </div>
-                <div className="p-4 grid grid-cols-2 gap-3 bg-slate-50/50">
-                  <div className="bg-white p-2 rounded-xl border border-slate-200">
-                     <input type="number" step="any" className="w-full text-xs font-mono font-bold text-slate-700 outline-none bg-transparent" value={formData.lat} onChange={(e) => setFormData({...formData, lat: e.target.value})} placeholder="Lat" />
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-200">
-                     <input type="number" step="any" className="w-full text-xs font-mono font-bold text-slate-700 outline-none bg-transparent" value={formData.lon} onChange={(e) => setFormData({...formData, lon: e.target.value})} placeholder="Lon" />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* KANAN: INPUT FIELDS */}
-            <section className="xl:col-span-7 flex flex-col gap-6">
-              <div className={STYLES.card}>
-                <div className={STYLES.headerTitle}>
-                  <div className={STYLES.iconBox("bg-indigo-50 text-indigo-600")}><AlignLeft size={20} /></div> Informasi Umum
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label className={STYLES.label}>Nama Tempat</label>
-                    <input className={STYLES.input} placeholder="Nama tempat..." value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
-                  </div>
-                  <div>
-                    <label className={STYLES.label}>Kategori</label>
-                    <select className={STYLES.input} value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required>
-                      <option value="">Pilih...</option>
-                      <option value="hotel">🏨 Hotel</option>
-                      <option value="cafe">☕ Cafe</option>
-                      <option value="wisata">✈️ Wisata</option>
-                    </select>
-                  </div>
-                  <div>
-                      <label className={STYLES.label}>Alamat Singkat</label>
-                      <textarea className={`${STYLES.input} min-h-[52px] resize-none pt-3`} rows={1} value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} required />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className={STYLES.label}>Deskripsi</label>
-                    <textarea className={`${STYLES.input} min-h-[100px]`} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD VISUALISASI (MULTI IMAGE - DINAMIS) */}
-              <div className={STYLES.card}>
-                <div className={STYLES.headerTitle}>
-                  <div className={STYLES.iconBox("bg-purple-50 text-purple-600")}><ImageIcon size={20} /></div>
-                  Visualisasi (Max. 5 Foto)
-                </div>
-
-                <div className="space-y-4">
-                  {formData.images.map((url: string, index: number) => (
-                    <div key={index} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <label className={STYLES.label}>
-                            {index === 0 ? "Foto Utama (Tampil di Popup)" : `Foto Tambahan ${index}`}
-                        </label>
-                        <div className="flex gap-2 items-start">
-                            <div className="relative w-full">
-                                <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input 
-                                    className={`${STYLES.input} pl-12`}
-                                    placeholder="https://..."
-                                    value={url}
-                                    onChange={(e) => handleImageChange(index, e.target.value)}
-                                />
-                            </div>
-                            {/* Tombol Hapus (Hanya jika > 1 input) */}
-                            {formData.images.length > 1 && (
-                                <button type="button" onClick={() => removeImageField(index)} className="p-3.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors border border-red-100">
-                                    <Trash2 size={18} />
-                                </button>
-                            )}
-                        </div>
-                        {url && (
-                            <div className="relative h-24 w-full rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
-                                 <Image src={url} alt="Preview" fill className="object-cover" onError={() => {}} />
-                            </div>
-                        )}
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-0 items-start">
+          
+          {/* --- KOLOM KIRI: PETA --- */}
+          {/* Tambahkan padding kanan (pr-10) dan border kanan (border-r) */}
+          <section className="xl:col-span-5 flex flex-col gap-6 xl:sticky xl:top-8 transition-all xl:pr-10 xl:border-r border-slate-200 min-h-[calc(100vh-200px)]">
+            <div className="relative w-full aspect-[4/5] rounded-[32px] overflow-hidden shadow-xl shadow-slate-200 border border-slate-200">
+              <MapInput
+                onLocationSelect={handleMapClick}
+                inputLat={formData.lat ? parseFloat(formData.lat) : undefined}
+                inputLon={formData.lon ? parseFloat(formData.lon) : undefined}
+              />
+              
+              {/* Koordinat Badge */}
+              <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-slate-200 flex gap-4">
+                 <div className="flex-1">
+                    <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Latitude</label>
+                    <div className="bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                        <p className="font-mono font-bold text-slate-800 text-sm truncate">{formData.lat || "-"}</p>
                     </div>
-                  ))}
+                 </div>
+                 <div className="flex-1">
+                    <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Longitude</label>
+                    <div className="bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                        <p className="font-mono font-bold text-slate-800 text-sm truncate">{formData.lon || "-"}</p>
+                    </div>
+                 </div>
+              </div>
+            </div>
+            <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex gap-3 items-start">
+               <MapPin className="text-blue-500 shrink-0 mt-0.5" size={18} />
+               <p className="text-xs text-blue-700 font-medium leading-relaxed">
+                  Geser pin pada peta untuk mendapatkan titik koordinat yang akurat, atau masukkan angka manual jika Anda memilikinya.
+               </p>
+            </div>
+          </section>
 
-                  {formData.images.length < 5 && (
-                    <button type="button" onClick={addImageField} className="w-full py-3 border-2 border-dashed border-indigo-200 rounded-xl text-indigo-500 font-bold text-sm flex items-center justify-center gap-2 hover:bg-indigo-50 hover:border-indigo-300 transition-all">
-                        <Plus size={18} /> Tambah Foto Lain
+          {/* --- KOLOM KANAN: FORM INPUT --- */}
+          {/* Tambahkan padding kiri (pl-10) */}
+          <section className="xl:col-span-7 flex flex-col gap-10 xl:pl-10 pt-10 xl:pt-0">
+            
+            {/* BAGIAN 1: DETAIL UTAMA */}
+            <div>
+              <h3 className={STYLES.sectionTitle}>
+                 <span className="p-2 bg-lime-100 text-lime-600 rounded-lg"><AlignLeft size={20}/></span>
+                 Informasi Utama
+              </h3>
+              
+              <div className="space-y-8">
+                 <div>
+                    <label className={STYLES.label}>Nama Tempat</label>
+                    <input
+                      className={STYLES.input}
+                      placeholder="Contoh: Hotel Tugu Blitar"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                    />
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label className={STYLES.label}>Kategori</label>
+                        <div className="relative">
+                            <select
+                                className={`${STYLES.input} appearance-none cursor-pointer`}
+                                value={formData.category}
+                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                required
+                            >
+                                <option value="">Pilih Kategori</option>
+                                <option value="hotel">🏨 Hotel & Penginapan</option>
+                                <option value="cafe">☕ Cafe & Resto</option>
+                                <option value="wisata">✈️ Destinasi Wisata</option>
+                            </select>
+                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                <Maximize2 size={16} className="rotate-45" />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label className={STYLES.label}>Alamat Singkat</label>
+                        <input
+                            className={STYLES.input}
+                            value={formData.address}
+                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                            required
+                            placeholder="Jalan, Kelurahan"
+                        />
+                    </div>
+                 </div>
+
+                 <div>
+                    <label className={STYLES.label}>Deskripsi Lengkap</label>
+                    <textarea
+                      className={`${STYLES.input} min-h-[150px] resize-none leading-relaxed`}
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Ceritakan tentang fasilitas, sejarah, atau daya tarik tempat ini..."
+                    />
+                 </div>
+              </div>
+            </div>
+
+            {/* GARIS PEMISAH ANTAR SEKSI (DASHED) */}
+            <div className="border-t-2 border-dashed border-slate-200 my-2"></div>
+
+            {/* BAGIAN 2: VISUALISASI */}
+            <div>
+              <h3 className={STYLES.sectionTitle}>
+                 <span className="p-2 bg-purple-100 text-purple-600 rounded-lg"><ImageIcon size={20}/></span>
+                 Visualisasi
+              </h3>
+
+              <div className="space-y-8">
+                 {formData.images.map((url: string, index: number) => (
+                    <div key={index} className="animate-in fade-in slide-in-from-bottom-4 duration-500 group">
+                       <label className={STYLES.label}>
+                          {index === 0 ? "Foto Utama (Cover)" : `Foto Galeri ${index}`}
+                       </label>
+                       
+                       <div className="flex gap-3">
+                          <div className="flex-1 relative">
+                             <input
+                                className={`${STYLES.input} pl-12`}
+                                placeholder="https://..."
+                                value={url}
+                                onChange={(e) => handleImageChange(index, e.target.value)}
+                             />
+                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                <ImageIcon size={18} />
+                             </div>
+                          </div>
+                          {formData.images.length > 1 && (
+                             <button
+                                type="button"
+                                onClick={() => removeImageField(index)}
+                                className="px-5 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all shadow-sm"
+                             >
+                                <Trash2 size={20} />
+                             </button>
+                          )}
+                       </div>
+
+                       {/* Preview Image dengan Border Jelas */}
+                       {url && (
+                          <div className="mt-4 relative h-48 w-full rounded-2xl overflow-hidden bg-slate-50 border-2 border-slate-200 group-hover:border-lime-400 transition-colors">
+                             <Image
+                                src={url}
+                                alt="Preview"
+                                fill
+                                className="object-cover"
+                                onError={() => {}} 
+                             />
+                          </div>
+                       )}
+                    </div>
+                 ))}
+
+                 {formData.images.length < 5 && (
+                    <button
+                      type="button"
+                      onClick={addImageField}
+                      className="w-full py-5 rounded-2xl border-2 border-dashed border-slate-300 text-slate-400 font-bold hover:border-lime-500 hover:text-lime-600 hover:bg-lime-50 transition-all flex items-center justify-center gap-2 mt-4"
+                    >
+                      <Plus size={20} /> Tambah Slot Foto
                     </button>
-                  )}
-                </div>
+                 )}
               </div>
+            </div>
 
-              <div className="sticky bottom-4 z-20 xl:static">
-                <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-slate-200 xl:border-none xl:shadow-none xl:bg-transparent xl:p-0">
-                  <FormActions 
-                    loading={loading || isLoadingParent} 
-                    onCancel={onCancel} 
-                    isAlertOpen={isConfirmOpen} 
-                    setIsAlertOpen={setIsConfirmOpen} 
-                    onConfirmSave={executeSave} 
-                    saveLabel={isEditMode ? "Simpan Perubahan" : "Simpan Data Baru"} 
-                  />
-                </div>
-              </div>
-            </section>
-          </div>
-        </form>
-      </div>
+            {/* ACTION BAR (Floating) */}
+            <div className="sticky bottom-6 z-20">
+               <div className="bg-slate-900 p-2 pl-6 pr-2 rounded-full shadow-2xl flex items-center justify-between border border-slate-700">
+                  <span className="text-slate-300 text-sm font-bold hidden sm:block">
+                     {isEditMode ? "Simpan perubahan data?" : "Simpan lokasi baru?"}
+                  </span>
+                  
+                  <div className="flex gap-2 w-full sm:w-auto">
+                     <button
+                        type="button"
+                        onClick={onCancel}
+                        className="flex-1 sm:flex-none px-6 py-3 rounded-full text-slate-400 font-bold text-sm hover:text-white hover:bg-white/10 transition-colors"
+                     >
+                        Batal
+                     </button>
+                     <button
+                        type="submit"
+                        disabled={loading || isLoadingParent}
+                        className="flex-1 sm:flex-none px-8 py-3 bg-lime-500 hover:bg-lime-400 text-slate-900 rounded-full font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(132,204,22,0.4)]"
+                     >
+                        {loading ? (
+                           <span className="w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></span>
+                        ) : (
+                           <>
+                              <Save size={18} /> Simpan
+                           </>
+                        )}
+                     </button>
+                  </div>
+               </div>
+               
+               {/* Konfirmasi Alert */}
+               {isConfirmOpen && (
+                  <div className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+                     <div className="bg-white rounded-[32px] p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="w-16 h-16 bg-lime-100 text-lime-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-lime-50">
+                           <Save size={32} />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 mb-2">Konfirmasi Simpan</h3>
+                        <p className="text-slate-500 mb-8 font-medium">Pastikan data lokasi yang Anda masukkan sudah benar.</p>
+                        <div className="grid grid-cols-2 gap-3">
+                           <button
+                              type="button"
+                              onClick={() => setIsConfirmOpen(false)}
+                              className="py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-colors border border-slate-200"
+                           >
+                              Cek Lagi
+                           </button>
+                           <button
+                              type="button"
+                              onClick={executeSave}
+                              className="py-3 rounded-xl bg-lime-500 text-slate-900 font-bold hover:bg-lime-400 transition-colors shadow-lg shadow-lime-200"
+                           >
+                              Ya, Simpan
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               )}
+            </div>
+
+          </section>
+        </div>
+      </form>
     </div>
   );
 }

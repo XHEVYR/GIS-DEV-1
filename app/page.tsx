@@ -71,8 +71,8 @@ export default function LandingPage() {
             <div className="bg-gradient-to-br from-lime-500 to-emerald-600 p-2 rounded-xl shadow-lg shadow-lime-500/20 text-white">
               <Globe size={20} strokeWidth={3} />
             </div>
-            <span className="font-black text-xl text-slate-900 tracking-tight">
-              GIS <span className="text-lime-600">BLITAR</span>
+            <span className="text-xl font-bold tracking-tight text-black">
+              GIS<span className="text-lime-500">App</span>
             </span>
           </div>
 
@@ -132,7 +132,7 @@ export default function LandingPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-lime-500"></span>
               </span>
-              GIS Blitar Raya v1.0
+              GIS App
             </div>
 
             <h1 className="text-4xl lg:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight">
@@ -208,7 +208,7 @@ export default function LandingPage() {
             
             <h2 className="text-3xl md:text-4xl font-black leading-tight text-slate-900">
               Kenapa Menggunakan <br />
-              <span className="text-lime-600">GIS Blitar Raya?</span>
+              <span className="text-lime-600">GIS App?</span>
             </h2>
 
             <p className="text-slate-500 text-lg leading-relaxed max-w-2xl mx-auto">

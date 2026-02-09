@@ -42,7 +42,10 @@ export default function DataPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // 1. STATE UNTUK SORTING
-  const [sortConfig, setSortConfig] = useState<{ key: keyof Place; direction: 'asc' | 'desc' } | null>(null);
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Place;
+    direction: "asc" | "desc";
+  } | null>(null);
 
   const isEditingRef = useRef(false);
   isEditingRef.current = !!editingPlace;
@@ -77,7 +80,7 @@ export default function DataPage() {
         (p) =>
           p.name.toLowerCase().includes(lowerQuery) ||
           p.address?.toLowerCase().includes(lowerQuery) ||
-          p.category.includes(lowerQuery)
+          p.category.includes(lowerQuery),
       );
     }
 
@@ -89,10 +92,10 @@ export default function DataPage() {
         const bValue = b[sortConfig.key] ?? "";
 
         if (aValue < bValue) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+          return sortConfig.direction === "asc" ? -1 : 1;
         }
         if (aValue > bValue) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
+          return sortConfig.direction === "asc" ? 1 : -1;
         }
         return 0;
       });
@@ -103,20 +106,26 @@ export default function DataPage() {
 
   // 3. HANDLER SAAT HEADER DIKLIK
   const handleSort = (key: keyof Place) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    
+    let direction: "asc" | "desc" = "asc";
+
     // Jika diklik kolom yang sama, balik arahnya (toggle)
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "asc"
+    ) {
+      direction = "desc";
     }
     setSortConfig({ key, direction });
   };
 
-
   // 4. Update Pagination Logic (Gunakan processedPlaces)
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPlaces = processedPlaces.slice(indexOfFirstItem, indexOfLastItem);
+  const currentPlaces = processedPlaces.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
   const totalPages = Math.ceil(processedPlaces.length / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
@@ -138,7 +147,9 @@ export default function DataPage() {
       // Fetch simulasi
       setEditingPlace(null);
       fetchPlaces();
-    } catch (e) { console.log(e) }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -163,7 +174,7 @@ export default function DataPage() {
       {/* HEADER */}
       <header className="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200 py-5 px-6 md:px-12 transition-all">
         {/* ... (Header content tetap sama) ... */}
-         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div>
             <h1 className={STYLES.pageTitle}>
               <span className={STYLES.headerIcon}>
@@ -172,15 +183,35 @@ export default function DataPage() {
               Data <span className="text-lime-600">Lokasi</span>
             </h1>
             <p className={STYLES.subTitle}>
-              Kelola total {processedPlaces.length} data geospasial kawasan Blitar.
+              Kelola total {processedPlaces.length} data geospasial kawasan
+              Blitar.
             </p>
           </div>
           {/* ... Sisa header search bar dll ... */}
           <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-             <div className="flex-1 min-w-50 lg:w-72">
-                <SearchBar onSearch={handleSearch} placeholder="Cari..." />
-             </div>
-             {/* ... Tombol settings & tambah ... */}
+            <div className="flex-1 min-w-50 lg:w-72 flex gap-3">
+              <div className="bg-white border border-slate-200 rounded-xl px-3 flex items-center gap-2 shadow-sm min-w-24">
+                <span className="text-xs font-bold text-slate-400">Show</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="bg-transparent font-bold text-slate-700 text-sm outline-none cursor-pointer w-full py-2.5 appearance-none text-center"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+              <SearchBar onSearch={handleSearch} placeholder="Cari..." />
+            </div>
+            <Link href="/admin/input" className={STYLES.actionButton}>
+              <Plus size={18} strokeWidth={3} />
+              <span className="hidden md:inline">Tambah Data</span>
+            </Link>
           </div>
         </div>
       </header>
@@ -191,35 +222,40 @@ export default function DataPage() {
           data={currentPlaces}
           onEdit={(place) => setEditingPlace(place)}
           onDelete={handleDelete}
-          onSort={handleSort}         // Prop Baru
-          sortConfig={sortConfig}     // Prop Baru
+          onSort={handleSort} // Prop Baru
+          sortConfig={sortConfig} // Prop Baru
         />
       </div>
 
       {/* PAGINATION */}
       <div className={STYLES.paginationWrapper}>
         <div className="text-center md:text-left pl-2">
-           <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">
-            Menampilkan {processedPlaces.length === 0 ? 0 : indexOfFirstItem + 1}{" "}
-            - {Math.min(indexOfLastItem, processedPlaces.length)} dari{" "}
+          <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Menampilkan{" "}
+            {processedPlaces.length === 0 ? 0 : indexOfFirstItem + 1} -{" "}
+            {Math.min(indexOfLastItem, processedPlaces.length)} dari{" "}
             {processedPlaces.length} Lokasi
           </p>
         </div>
 
         {processedPlaces.length > 0 && totalPages > 1 && (
           <div className={STYLES.paginationCanvas}>
-             {/* ... Component Pagination Tetap Sama ... */}
-             <Pagination>
-               <PaginationContent>
-                 <PaginationItem>
-                   <PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} />
-                 </PaginationItem>
-                  {/* Logic Pagination loop */}
-                 <PaginationItem>
-                   <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
-                 </PaginationItem>
-               </PaginationContent>
-             </Pagination>
+            {/* ... Component Pagination Tetap Sama ... */}
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  />
+                </PaginationItem>
+                {/* Logic Pagination loop */}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </div>

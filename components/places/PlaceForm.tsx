@@ -189,7 +189,7 @@ export default function PlaceForm({
               />
 
             </div>
-            
+
             {/* Koordinat Inputs (Moved below map) */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-4 shadow-sm">
               <div className="flex-1">
@@ -227,6 +227,7 @@ export default function PlaceForm({
                 </div>
               </div>
             </div>
+
             <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex gap-3 items-start">
               <MapPin className="text-blue-500 shrink-0 mt-0.5" size={18} />
               <p className="text-xs text-blue-700 font-medium leading-relaxed">

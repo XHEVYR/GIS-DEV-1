@@ -12,10 +12,6 @@ import {
   LayoutDashboard,
   Maximize2,
   Minimize2,
-  CheckCircle2,
-  Layers,
-  Users,
-  Database,
   MapPin,
   Mail,
   Phone,
@@ -23,6 +19,7 @@ import {
   Facebook,
   Twitter,
   ArrowRight,
+  CheckCircle2
 } from "lucide-react";
 
 // --- MAP COMPONENT (DYNAMIC IMPORT) ---
@@ -39,7 +36,6 @@ const Map = dynamic(() => import("@/components/maps/map"), {
 export default function LandingPage() {
   const { data: session } = useSession();
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State untuk menu mobile
 
   // Fix Leaflet Resize Bug saat Fullscreen toggle
   useEffect(() => {
@@ -49,11 +45,7 @@ export default function LandingPage() {
     return () => clearTimeout(timer);
   }, [isFullScreen]);
 
-  const handleOpenMap = () => {
-    setIsFullScreen(true);
-    setIsMobileMenuOpen(false); // Tutup menu jika map dibuka dari mobile
-  };
-  
+  const handleOpenMap = () => setIsFullScreen(true);
   const handleCloseMap = () => setIsFullScreen(false);
 
   const handleScrollTo = (
@@ -61,7 +53,6 @@ export default function LandingPage() {
     id: string,
   ) => {
     e.preventDefault();
-    setIsMobileMenuOpen(false); // Tutup menu mobile saat link diklik
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -69,7 +60,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 font-sans selection:bg-lime-200 selection:text-lime-900 font-sans text-slate-900 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-slate-50 font-sans selection:bg-lime-200 selection:text-lime-900">
       
       {/* --- NAVBAR --- */}
       <header
@@ -108,8 +99,7 @@ export default function LandingPage() {
             </Link>
           </nav>
 
-          {/* Desktop Auth Button */}
-          <div className="hidden md:flex gap-4">
+          <div className="flex gap-4">
             {session ? (
               <Link
                 href="/admin"
@@ -136,7 +126,7 @@ export default function LandingPage() {
         <section className="relative px-6 py-12 lg:py-20 max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
           
           {/* Text Content */}
-          <div className="space-y-6 md:space-y-8 order-2 lg:order-1 animate-in slide-in-from-left duration-700 fade-in text-center lg:text-left">
+          <div className="space-y-8 order-2 lg:order-1 animate-in slide-in-from-left duration-700 fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-lime-200 text-lime-700 text-[10px] font-black uppercase tracking-widest shadow-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span>
@@ -156,10 +146,10 @@ export default function LandingPage() {
               Eksplorasi potensi <strong>Kota & Kabupaten Blitar</strong>. Temukan lokasi Hotel, Kafe, dan Wisata dengan data yang akurat dan real-time.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-2 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <button
                 onClick={handleOpenMap}
-                className="flex items-center justify-center gap-3 px-8 py-4 text-white bg-slate-900 rounded-2xl font-bold hover:bg-slate-800 hover:scale-105 transition-all shadow-xl shadow-slate-200 group w-full sm:w-auto"
+                className="flex items-center justify-center gap-3 px-8 py-4 text-white bg-slate-900 rounded-2xl font-bold hover:bg-slate-800 hover:scale-105 transition-all shadow-xl shadow-slate-200 group"
               >
                 <Maximize2 size={20} className="group-hover:rotate-45 transition-transform duration-300"/> 
                 Mulai Jelajah
@@ -269,13 +259,13 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               {/* Hotel */}
-              <div className="bg-white p-6 md:p-8 rounded-[32px] shadow-sm hover:shadow-xl hover:shadow-blue-100/50 transition duration-300 border border-slate-100 group cursor-default">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                  <Building2 size={28} className="md:w-8 md:h-8" strokeWidth={2} />
+              <div className="bg-white p-8 rounded-[32px] shadow-sm hover:shadow-xl hover:shadow-blue-100/50 transition duration-300 border border-slate-100 group cursor-default">
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <Building2 size={32} strokeWidth={2} />
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Hotel & Penginapan
                 </h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
@@ -284,9 +274,9 @@ export default function LandingPage() {
               </div>
 
               {/* Cafe */}
-              <div className="bg-white p-6 md:p-8 rounded-[32px] shadow-sm hover:shadow-xl hover:shadow-orange-100/50 transition duration-300 border border-slate-100 group cursor-default">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-6 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
-                  <Coffee size={28} className="md:w-8 md:h-8" strokeWidth={2} />
+              <div className="bg-white p-8 rounded-[32px] shadow-sm hover:shadow-xl hover:shadow-orange-100/50 transition duration-300 border border-slate-100 group cursor-default">
+                <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-6 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+                  <Coffee size={32} strokeWidth={2} />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Cafe & Restoran
@@ -297,11 +287,11 @@ export default function LandingPage() {
               </div>
 
               {/* Wisata */}
-              <div className="bg-white p-6 md:p-8 rounded-[32px] shadow-sm hover:shadow-xl hover:shadow-purple-100/50 transition duration-300 border border-slate-100 group cursor-default">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
-                  <Plane size={28} className="md:w-8 md:h-8" strokeWidth={2} />
+              <div className="bg-white p-8 rounded-[32px] shadow-sm hover:shadow-xl hover:shadow-purple-100/50 transition duration-300 border border-slate-100 group cursor-default">
+                <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                  <Plane size={32} strokeWidth={2} />
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Destinasi Wisata
                 </h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
@@ -309,101 +299,6 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* SECTION TENTANG / ABOUT */}
-        <section 
-          id="about" 
-          className="py-16 md:py-24 px-6 bg-slate-900 text-white relative overflow-hidden scroll-mt-24"
-        >
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-lime-500/10 blur-[80px] md:blur-[120px] rounded-full pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-blue-500/10 blur-[80px] md:blur-[100px] rounded-full pointer-events-none"></div>
-          
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
-            
-            {/* Kolom Kiri: Teks & Narasi */}
-            <div className="space-y-8 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-lime-400 text-xs font-bold tracking-wider uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-lime-500 animate-pulse"></span>
-                Tentang Platform
-              </div>
-
-              <h2 className="text-3xl md:text-5xl font-black leading-tight">
-                Membangun Ekosistem <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">Digital Blitar</span>
-              </h2>
-
-              <p className="text-slate-400 text-base md:text-lg leading-relaxed">
-                Sistem Informasi Geografis (SIG) ini hadir sebagai jembatan informasi antara pemerintah dan masyarakat luas. Kami mengintegrasikan data spasial lokasi wisata, kuliner, dan akomodasi untuk mendukung pertumbuhan ekonomi daerah.
-              </p>
-
-              {/* List Keunggulan */}
-              <div className="space-y-4 pt-2 inline-block text-left">
-                {[
-                  "Validasi Data Lapangan Terverifikasi",
-                  "Pembaruan Informasi Secara Real-Time",
-                  "Antarmuka Responsif & Mudah Digunakan"
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 group">
-                    <div className="bg-lime-500/10 p-1.5 rounded-full group-hover:bg-lime-500 group-hover:text-slate-900 transition-colors duration-300">
-                      <CheckCircle2 size={18} className="text-lime-500 group-hover:text-slate-900" />
-                    </div>
-                    <span className="font-medium text-slate-300 group-hover:text-white transition-colors text-sm md:text-base">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Kolom Kanan: Statistik / Visual Dashboard */}
-            <div className="relative">
-              {/* Decorative Border Box */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-lime-500 to-blue-500 rounded-3xl opacity-20 blur-lg"></div>
-              
-              <div className="relative bg-slate-800/50 backdrop-blur-xl border border-slate-700 p-6 md:p-8 rounded-3xl shadow-2xl">
-                <div className="grid grid-cols-2 gap-4 md:gap-6">
-                  
-                  {/* Stat 1 */}
-                  <div className="bg-slate-900/80 p-4 md:p-6 rounded-2xl border border-slate-700 hover:border-lime-500/50 transition duration-300">
-                    <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mb-4">
-                      <Database size={18} className="md:w-5 md:h-5" />
-                    </div>
-                    <h4 className="text-2xl md:text-3xl font-black text-white mb-1">30+</h4>
-                    <p className="text-[10px] md:text-xs text-slate-500 uppercase font-bold tracking-wider">Total Data Titik</p>
-                  </div>
-
-                  {/* Stat 2 */}
-                  <div className="bg-slate-900/80 p-4 md:p-6 rounded-2xl border border-slate-700 hover:border-lime-500/50 transition duration-300">
-                    <div className="w-8 h-8 md:w-10 md:h-10 bg-lime-500/20 rounded-lg flex items-center justify-center text-lime-400 mb-4">
-                      <Users size={18} className="md:w-5 md:h-5" />
-                    </div>
-                    <h4 className="text-2xl md:text-3xl font-black text-white mb-1">1K</h4>
-                    <p className="text-[10px] md:text-xs text-slate-500 uppercase font-bold tracking-wider">Pengunjung Bulanan</p>
-                  </div>
-
-                  {/* Stat 3 (Full Width) */}
-                  <div className="col-span-2 bg-slate-900/80 p-4 md:p-6 rounded-2xl border border-slate-700 hover:border-lime-500/50 transition duration-300 flex items-center justify-between">
-                    <div>
-                      <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 mb-4">
-                        <Layers size={18} className="md:w-5 md:h-5" />
-                      </div>
-                      <h4 className="text-lg md:text-xl font-bold text-white">3 Kategori</h4>
-                      <p className="text-[10px] md:text-xs text-slate-500 mt-1">Wisata, Hotel, & Kuliner</p>
-                    </div>
-                    {/* Simple Graph Visual */}
-                    <div className="flex items-end gap-1 h-8 md:h-12">
-                       <div className="w-1.5 md:w-2 bg-slate-700 h-4 md:h-6 rounded-t-sm"></div>
-                       <div className="w-1.5 md:w-2 bg-slate-600 h-6 md:h-8 rounded-t-sm"></div>
-                       <div className="w-1.5 md:w-2 bg-lime-500 h-8 md:h-12 rounded-t-sm animate-pulse"></div>
-                       <div className="w-1.5 md:w-2 bg-slate-600 h-6 md:h-10 rounded-t-sm"></div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
           </div>
         </section>
 

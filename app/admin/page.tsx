@@ -63,7 +63,7 @@ export default function Dashboard() {
             Dashboard <span className="text-lime-600">Overview</span>
           </h1>
           <p className="text-slate-500 mt-2 font-medium">
-            Pantau perkembangan data geospasial Kota Blitar secara real-time.
+            Pantau perkembangan data geospasial kawasan Blitar secara real-time.
           </p>
         </div>
 

@@ -23,7 +23,6 @@ import {
   Facebook,
   Twitter,
   ArrowRight,
-  CheckCircle2
 } from "lucide-react";
 
 // --- MAP COMPONENT (DYNAMIC IMPORT) ---

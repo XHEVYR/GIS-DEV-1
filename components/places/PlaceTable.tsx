@@ -1,6 +1,6 @@
 "use client";
 
-import { Info } from "lucide-react";
+import { Info, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Place } from "@/types";
 import ActionButtons from "./ActionButtons";
 
@@ -8,13 +8,33 @@ interface PlaceTableProps {
   data: Place[];
   onEdit: (place: Place) => void;
   onDelete: (id: string, name: string) => void;
+  // --- TAMBAHAN PROPS SORTING ---
+  onSort: (key: keyof Place) => void;
+  sortConfig: { key: keyof Place; direction: "asc" | "desc" } | null;
 }
 
 export default function PlaceTable({
   data,
   onEdit,
   onDelete,
+  onSort,
+  sortConfig,
 }: PlaceTableProps) {
+  
+  // --- HELPER: Menentukan Ikon Panah ---
+  const getSortIcon = (columnName: keyof Place) => {
+    if (!sortConfig || sortConfig.key !== columnName) {
+      // Icon default (belum di-sort)
+      return <ArrowUpDown size={14} className="text-slate-300 opacity-50 group-hover:opacity-100" />;
+    }
+    // Icon aktif (Ascending / Descending)
+    return sortConfig.direction === "asc" ? (
+      <ArrowUp size={14} className="text-lime-600" />
+    ) : (
+      <ArrowDown size={14} className="text-lime-600" />
+    );
+  };
+
   // 1. TAMPILAN JIKA DATA KOSONG
   if (data.length === 0) {
     return (
@@ -37,17 +57,34 @@ export default function PlaceTable({
   // 2. TABEL DATA UTAMA
   return (
     <div className="w-full overflow-x-auto">
-      {/* table-fixed: Mengunci lebar kolom */}
       <table className="w-full text-left table-fixed min-w-[1000px] border-collapse">
         {/* HEADER TABEL */}
         <thead>
           <tr className="bg-slate-50 border-b border-slate-200">
-            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[25%]">
-              Nama Tempat
+            
+            {/* --- HEADER NAMA TEMPAT (SORTABLE) --- */}
+            <th 
+              className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[25%] cursor-pointer hover:bg-slate-100 transition-colors group select-none"
+              onClick={() => onSort("name")}
+            >
+              <div className="flex items-center gap-2">
+                Nama Tempat
+                {getSortIcon("name")}
+              </div>
             </th>
-            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%]">
-              Kategori
+
+            {/* --- HEADER KATEGORI (SORTABLE) --- */}
+            <th 
+              className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%] cursor-pointer hover:bg-slate-100 transition-colors group select-none"
+              onClick={() => onSort("category")}
+            >
+              <div className="flex items-center gap-2">
+                Kategori
+                {getSortIcon("category")}
+              </div>
             </th>
+
+            {/* Header Biasa (Tidak Sortable) */}
             <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%]">
               Koordinat
             </th>
@@ -65,10 +102,6 @@ export default function PlaceTable({
           {data.map((place, index) => (
             <tr
               key={place.id || index}
-              // --- PERUBAHAN DISINI (HOVER EFFECT) ---
-              // 1. bg-lime-500/5 -> Lime murni 5% (Bening, tidak butek)
-              // 2. border-l-transparent -> Border kiri default transparan
-              // 3. hover:border-l-lime-500 -> Saat hover, muncul garis hijau di kiri
               className="group border-l-4 border-l-transparent hover:bg-lime-500/10 hover:border-l-lime-500 transition-all duration-200 ease-in-out cursor-default"
             >
               {/* KOLOM 1: NAMA & BADGE IMG */}

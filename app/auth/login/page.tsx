@@ -68,10 +68,10 @@ export default function LoginPage() {
            </div>
 
           <h1 className="text-4xl font-black tracking-tight">
-            GIS Ko<span className="text-lime-400">ta Blitar</span>
+            GIS Kawa<span className="text-lime-400">san Blitar</span>
           </h1>
           <p className="text-lg text-slate-300 font-medium leading-relaxed">
-            Selamat datang di portal administrasi. Kelola data spasial dan pemetaan digital Kota Blitar dengan mudah dan cepat.
+            Selamat datang di portal administrasi. Kelola data spasial dan pemetaan digital kawasan Blitar dengan mudah dan cepat.
           </p>
         </div>
 

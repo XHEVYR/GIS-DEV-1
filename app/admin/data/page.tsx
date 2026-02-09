@@ -44,6 +44,10 @@ export default function DataPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Place;
+    direction: "asc" | "desc";
+  } | null>(null);
 
   // Refs untuk interval agar tidak recreate saat render
   const isEditingRef = useRef(false);
@@ -74,21 +78,35 @@ export default function DataPage() {
     return () => clearInterval(intervalId); // Cleanup saat unmount
   }, [fetchPlaces]);
 
-  // Reactive Filtering: Jalan setiap kali `places` atau `searchQuery` berubah
+  // Reactive Filtering & Sorting
   useEffect(() => {
-    if (!searchQuery) {
-      setFilteredPlaces(places);
-    } else {
+    let result = [...places];
+
+    // 1. Filter
+    if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      const results = places.filter(
+      result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(lowerQuery) ||
           p.address?.toLowerCase().includes(lowerQuery) ||
           p.category.includes(lowerQuery),
       );
-      setFilteredPlaces(results);
     }
-  }, [places, searchQuery]);
+
+    // 2. Sort
+    if (sortConfig) {
+      result.sort((a, b) => {
+        const aValue = a[sortConfig.key] || "";
+        const bValue = b[sortConfig.key] || "";
+
+        if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    setFilteredPlaces(result);
+  }, [places, searchQuery, sortConfig]);
 
   // Reset page jika hasil filter berubah drastis (opsional, tapi logic default biasanya reset ke p1)
   // DISINI KITA HAPUS reset page otomatis agar UX lebih smooth saat polling update,
@@ -109,6 +127,18 @@ export default function DataPage() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1); // Reset page hanya saat user mencari manual
+  };
+
+  const handleSort = (key: keyof Place) => {
+    setSortConfig((current) => {
+      if (!current || current.key !== key) {
+        return { key, direction: "asc" };
+      }
+      if (current.direction === "asc") {
+        return { key, direction: "desc" };
+      }
+      return null; // Reset sort on 3rd click
+    });
   };
 
   const handleSave = async (updatedData: Place) => {
@@ -236,6 +266,8 @@ export default function DataPage() {
           data={currentPlaces}
           onEdit={(place) => setEditingPlace(place)}
           onDelete={handleDelete}
+          onSort={handleSort}
+          sortConfig={sortConfig}
         />
       </div>
 

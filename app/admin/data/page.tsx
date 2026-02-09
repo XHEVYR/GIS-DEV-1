@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Database, Search, Settings2 } from "lucide-react";
+import { Plus, Database, Settings2 } from "lucide-react";
 import {
   Pagination,
   PaginationContent,

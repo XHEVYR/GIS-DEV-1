@@ -189,29 +189,10 @@ export default function DataPage() {
           </div>
           {/* ... Sisa header search bar dll ... */}
           <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-            <div className="flex-1 min-w-50 lg:w-72 flex gap-3">
-              <div className="bg-white border border-slate-200 rounded-xl px-3 flex items-center gap-2 shadow-sm min-w-24">
-                <span className="text-xs font-bold text-slate-400">Show</span>
-                <select
-                  value={itemsPerPage}
-                  onChange={(e) => {
-                    setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                  className="bg-transparent font-bold text-slate-700 text-sm outline-none cursor-pointer w-full py-2.5 appearance-none text-center"
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={50}>50</option>
-                </select>
-              </div>
+            <div className="flex-1 min-w-50 lg:w-72">
               <SearchBar onSearch={handleSearch} placeholder="Cari..." />
             </div>
-            <Link href="/admin/input" className={STYLES.actionButton}>
-              <Plus size={18} strokeWidth={3} />
-              <span className="hidden md:inline">Tambah Data</span>
-            </Link>
+            {/* ... Tombol settings & tambah ... */}
           </div>
         </div>
       </header>

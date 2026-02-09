@@ -188,27 +188,42 @@ export default function PlaceForm({
                 inputLon={formData.lon ? parseFloat(formData.lon) : undefined}
               />
 
-              {/* Koordinat Badge */}
-              <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-slate-200 flex gap-4">
-                <div className="flex-1">
-                  <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">
-                    Latitude
-                  </label>
-                  <div className="bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
-                    <p className="font-mono font-bold text-slate-800 text-sm truncate">
-                      {formData.lat || "-"}
-                    </p>
-                  </div>
+            </div>
+            
+            {/* Koordinat Inputs (Moved below map) */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-4 shadow-sm">
+              <div className="flex-1">
+                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">
+                  Latitude
+                </label>
+                <div className="bg-slate-100 px-2 py-1 rounded-md border border-slate-200 focus-within:border-lime-500 focus-within:ring-2 focus-within:ring-lime-500/20 transition-all">
+                  <input
+                    type="number"
+                    step="any"
+                    className="w-full bg-transparent font-mono font-bold text-slate-800 text-sm focus:outline-none placeholder:text-slate-400"
+                    placeholder="-8.xxxxx"
+                    value={formData.lat}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lat: e.target.value })
+                    }
+                  />
                 </div>
-                <div className="flex-1">
-                  <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">
-                    Longitude
-                  </label>
-                  <div className="bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
-                    <p className="font-mono font-bold text-slate-800 text-sm truncate">
-                      {formData.lon || "-"}
-                    </p>
-                  </div>
+              </div>
+              <div className="flex-1">
+                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">
+                  Longitude
+                </label>
+                <div className="bg-slate-100 px-2 py-1 rounded-md border border-slate-200 focus-within:border-lime-500 focus-within:ring-2 focus-within:ring-lime-500/20 transition-all">
+                  <input
+                    type="number"
+                    step="any"
+                    className="w-full bg-transparent font-mono font-bold text-slate-800 text-sm focus:outline-none placeholder:text-slate-400"
+                    placeholder="112.xxxxx"
+                    value={formData.lon}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lon: e.target.value })
+                    }
+                  />
                 </div>
               </div>
             </div>
@@ -356,6 +371,20 @@ export default function PlaceForm({
                           className="object-cover"
                           onError={() => {}}
                         />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (formData.images.length > 1) {
+                              removeImageField(index);
+                            } else {
+                              handleImageChange(index, "");
+                            }
+                          }}
+                          className="absolute top-3 right-3 bg-red-500/80 hover:bg-red-600 text-white p-2 rounded-full backdrop-blur-sm transition-all scale-90 hover:scale-100 shadow-lg z-10"
+                          title="Hapus gambar"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     )}
                   </div>

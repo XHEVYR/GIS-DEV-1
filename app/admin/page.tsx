@@ -19,19 +19,29 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [time, setTime] = useState(new Date());
 
+  const fetchPlaces = async () => {
+    try {
+      const res = await fetch("/api/places");
+      const data = await res.json();
+      setPlaces(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching places:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetch("/api/places")
-      .then((res) => res.json())
-      .then((data) => {
-        setPlaces(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error:", err);
-        setLoading(false);
-      });
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    fetchPlaces(); // Initial fetch
+
+    // Auto refresh setiap 5 detik
+    const refreshInterval = setInterval(fetchPlaces, 5000);
+    const clockInterval = setInterval(() => setTime(new Date()), 1000);
+
+    return () => {
+      clearInterval(refreshInterval);
+      clearInterval(clockInterval);
+    };
   }, []);
 
   // --- HITUNG STATISTIK ---
@@ -63,7 +73,7 @@ export default function Dashboard() {
             Dashboard <span className="text-lime-600">Overview</span>
           </h1>
           <p className="text-slate-500 mt-2 font-medium">
-            Pantau perkembangan data geospasial kawasan Blitar secara real-time.
+            Pantau perkembangan data geospasial Kota Blitar secara real-time.
           </p>
         </div>
 

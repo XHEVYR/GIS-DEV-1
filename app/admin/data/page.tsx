@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Plus, Database, Search, Settings2 } from "lucide-react";
+import { Plus, Database, Search, Settings2, CheckCircle } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -38,6 +39,7 @@ const STYLES = {
 };
 
 export default function DataPage() {
+  const searchParams = useSearchParams();
   const [places, setPlaces] = useState<Place[]>([]);
   const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,6 +50,11 @@ export default function DataPage() {
     key: keyof Place;
     direction: "asc" | "desc";
   } | null>(null);
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+  }>({ show: false, title: "", message: "" });
 
   // Refs untuk interval agar tidak recreate saat render
   const isEditingRef = useRef(false);
@@ -161,6 +168,7 @@ export default function DataPage() {
       setEditingPlace(null);
       // Fetch ulang untuk memastikan data sinkron
       fetchPlaces();
+      showNotification("Berhasil Diperbarui", "Perubahan data lokasi telah disimpan.");
     } catch (error) {
       console.error(error);
       alert("Gagal menyimpan perubahan.");
@@ -185,6 +193,7 @@ export default function DataPage() {
 
       // Fetch ulang
       fetchPlaces();
+      showNotification("Berhasil Dihapus", "Data lokasi telah dihapus dari sistem.");
     } catch (err) {
       console.error(err);
       alert("Gagal menghapus data.");
@@ -197,6 +206,22 @@ export default function DataPage() {
       setCurrentPage(totalPages);
     }
   }, [totalPages, currentPage]);
+
+  const showNotification = useCallback((title: string, message: string) => {
+    setNotification({ show: true, title, message });
+    setTimeout(() => {
+      setNotification((prev) => ({ ...prev, show: false }));
+    }, 5000);
+  }, []);
+
+  // Success notification handler (from URL param)
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      showNotification("Berhasil Disimpan", "Data lokasi baru telah ditambahkan.");
+      // Optional: Clear URL param to prevent showing again on refresh
+      // router.replace("/admin/data"); 
+    }
+  }, [searchParams, showNotification]);
 
   if (editingPlace) {
     return (
@@ -212,7 +237,30 @@ export default function DataPage() {
 
   // --- MAIN LAYOUT ---
   return (
-    // HAPUS padding horizontal (px-0) agar full width
+    <>
+      {/* Success Notification Topbar (Card Style) */}
+      {/* Success Notification Topbar (Card Style) */}
+      {notification.show && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 min-w-[320px] flex flex-col gap-3">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                <CheckCircle size={20} className="text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-slate-800 text-sm mb-0.5">{notification.title}</h3>
+                <p className="text-xs text-slate-500">{notification.message}</p>
+              </div>
+            </div>
+            {/* Progress Bar */}
+            <div className="h-1 bg-slate-100 rounded-full overflow-hidden w-full">
+              <div className="h-full bg-emerald-500 w-full origin-left animate-[shrinkBar_5s_linear_forwards]"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HAPUS padding horizontal (px-0) agar full width */}
     <div className="w-full transition-all duration-500 ease-in-out">
       {/* HEADER: Tetap ada padding agar konten header tidak mepet layar */}
       <header className="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200 py-5 px-6 md:px-12 transition-all">
@@ -337,5 +385,7 @@ export default function DataPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
+  

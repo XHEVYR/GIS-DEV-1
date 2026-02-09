@@ -79,7 +79,8 @@ export default function PlaceTable({
                   </span>
 
                   {/* BADGE IMG */}
-                  {place.image && (
+                  {(place.image ||
+                    (place.placeImages && place.placeImages.length > 0)) && (
                     <span className="inline-flex items-center justify-center rounded-[4px] bg-lime-100 border border-lime-300 px-1.5 py-[2px] text-[10px] font-black text-lime-800 tracking-tight shadow-sm">
                       IMG
                     </span>

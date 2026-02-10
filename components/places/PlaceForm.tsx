@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Place } from "@/types";
 import { usePlaceForm } from "@/hooks/usePlaceForm";
 import MapSection from "@/components/places/form/MapSection";

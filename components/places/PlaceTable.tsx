@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Place } from "@/types";
 import ActionButtons from "./ActionButtons";
 
@@ -44,7 +44,7 @@ export default function PlaceTable({
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full text-left table-fixed min-w-[1000px] border-collapse">
+      <table className="w-full text-left table-fixed min-w-250 border-collapse">
         <thead>
           <tr className="bg-slate-50 border-b border-slate-200">
             {/* Header Nama (Sortable jika onSort ada) */}
@@ -90,7 +90,7 @@ export default function PlaceTable({
 
                   {/* PERBAIKAN: Cek Array placeImages, bukan place.image */}
                   {place.placeImages && place.placeImages.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-[4px] bg-lime-100 border border-lime-300 px-1.5 py-[2px] text-[10px] font-black text-lime-800 tracking-tight shadow-sm">
+                    <span className="inline-flex items-center justify-center rounded-lg bg-lime-100 border border-lime-300 px-1.5 py-1 text-[10px] font-black text-lime-800 tracking-tight shadow-sm">
                       {place.placeImages.length} IMG
                     </span>
                   )}

@@ -51,7 +51,7 @@ model PlaceImage {
   @@map("place_images")
 }
 
-// Model Detail Tambahan (One-to-One dengan Place)
+// Model Detail Tambahan
 model PlaceDetail {
   id           Int     @id @default(autoincrement())
   placeId      Int     @unique

@@ -128,7 +128,7 @@ export default function AdminSidebar({
   );
 }
 
-// --- NAV ITEM COMPONENT (Clean Lime Style) ---
+// NAV ITEM COMPONENT
 function NavItem({ href, icon, label, isMinimized, active }: NavItemProps) {
   return (
     <Link
@@ -138,7 +138,7 @@ function NavItem({ href, icon, label, isMinimized, active }: NavItemProps) {
         ${
           active
             ? "bg-lime-500/10 text-lime-500 border border-lime-500/20" // Aktif
-            : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100" // Tidak Aktif (Saya ubah hover jadi zinc-900 agar lebih smooth)
+            : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100" // Tidak Aktif 
         } 
         ${isMinimized ? "justify-center" : ""}
       `}

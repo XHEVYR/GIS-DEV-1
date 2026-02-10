@@ -1,4 +1,4 @@
-import { Save, X } from "lucide-react";
+import { Save } from "lucide-react";
 
 interface ActionButtonsProps {
   isEditMode: boolean;
@@ -8,7 +8,7 @@ interface ActionButtonsProps {
 }
 
 export default function ActionButtons({
-  isEditMode,
+  isEditMode,   
   loading,
   isLoadingParent = false,
   onCancel,

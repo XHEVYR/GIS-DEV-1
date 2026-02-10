@@ -16,7 +16,7 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
     category: initialData?.category || "",
     description: initialData?.description || "",
     address: initialData?.address || "",
-    // Pastikan images/placeImages terhandle dengan baik
+
     images:
       initialData?.placeImages && initialData.placeImages.length > 0
         ? initialData.placeImages.map((img) => img.url)
@@ -58,7 +58,7 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
     }));
   };
 
-  // Handler: Menangkap koordinat saat peta diklik
+  // Handler: Menangkap koordinat saat peta di klik
   const handleMapClick = (lat: number, lon: number) => {
     setError(null);
     setFormData((prev) => ({

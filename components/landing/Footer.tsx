@@ -24,7 +24,7 @@ export default function Footer({ onOpenMap, onScrollTo }: FooterProps) {
           {/* Kolom 1: Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5 text-white">
-              <div className="bg-gradient-to-br from-lime-500 to-emerald-600 p-1.5 rounded-lg text-white">
+              <div className="bg-linear-to-br from-lime-500 to-emerald-600 p-1.5 rounded-lg text-white">
                 <Globe size={18} strokeWidth={3} />
               </div>
               <span className="font-black text-lg tracking-tight">

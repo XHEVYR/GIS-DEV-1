@@ -1,4 +1,27 @@
+import React, { useState, useEffect } from "react";
+
 export default function AboutSection() {
+  const [stats, setStats] = useState({ totalPlaces: 0, totalCategories: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/stats");
+        const data = await res.json();
+        setStats({
+          totalPlaces: data.totalPlaces || 0,
+          totalCategories: data.totalCategories || 0,
+        });
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
   return (
     <section
       id="about"
@@ -18,7 +41,7 @@ export default function AboutSection() {
         <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 hover:border-lime-200 transition-colors group">
             <div className="text-4xl font-black text-slate-900 mb-2 group-hover:text-lime-600 transition-colors">
-              30+
+              {loading ? "..." : `${stats.totalPlaces}+`}
             </div>
             <div className="text-xs text-slate-400 uppercase font-bold tracking-wider">
               Titik Lokasi Terdata
@@ -26,7 +49,7 @@ export default function AboutSection() {
           </div>
           <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 hover:border-lime-200 transition-colors group">
             <div className="text-4xl font-black text-slate-900 mb-2 group-hover:text-lime-600 transition-colors">
-              3
+              {loading ? "..." : stats.totalCategories}
             </div>
             <div className="text-xs text-slate-400 uppercase font-bold tracking-wider">
               Kategori Utama

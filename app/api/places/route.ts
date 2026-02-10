@@ -11,9 +11,10 @@ export async function GET() {
             url: true,
           },
           orderBy: {
-            id: 'asc', 
+            id: "asc",
           },
         },
+        detail: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -25,7 +26,7 @@ export async function GET() {
     console.error("Error fetching places:", error);
     return NextResponse.json(
       { error: "Gagal mengambil data places" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     if (isNaN(lat) || isNaN(lon)) {
       return NextResponse.json(
         { error: "Lat/Lon harus angka" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
         lat: lat,
         lon: lon,
         category: body.category,
-        
+
         // --- LOGIKA BARU: MULTI IMAGE ---
         // Kita tidak lagi pakai 'image', tapi 'placeImages'
         placeImages: {
@@ -65,6 +66,19 @@ export async function POST(request: Request) {
             url: imgUrl,
           })),
         },
+
+        // --- LOGIKA BARU: DETAIL (By Category) ---
+        detail: body.detail
+          ? {
+              create: {
+                accessInfo: body.detail.accessInfo,
+                priceInfo: body.detail.priceInfo,
+                facilities: body.detail.facilities,
+                contactInfo: body.detail.contactInfo,
+                webUrl: body.detail.webUrl,
+              },
+            }
+          : undefined,
       },
     });
 
@@ -74,7 +88,7 @@ export async function POST(request: Request) {
     console.error("GAGAL SAVE DATABASE:", error);
     return NextResponse.json(
       { error: "Gagal menyimpan data ke database" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

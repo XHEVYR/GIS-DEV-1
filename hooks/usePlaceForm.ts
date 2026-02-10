@@ -19,6 +19,13 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
       initialData?.placeImages && initialData.placeImages.length > 0
         ? initialData.placeImages.map((img) => img.url)
         : [""],
+    detail: initialData?.detail || {
+      accessInfo: "",
+      priceInfo: "",
+      facilities: "",
+      contactInfo: "",
+      webUrl: "",
+    },
   });
 
   const [loading, setLoading] = useState(false);
@@ -31,6 +38,19 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
 
   const handleChange = (field: keyof Place, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleDetailChange = (
+    field: keyof import("@/types").PlaceDetail,
+    value: string,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      detail: {
+        ...prev.detail,
+        [field]: value,
+      },
+    }));
   };
 
   const handleMapClick = (lat: number, lon: number) => {
@@ -109,6 +129,7 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
     isConfirmOpen,
     setIsConfirmOpen,
     handleChange,
+    handleDetailChange,
     handleMapClick,
     handleImageChange,
     addImageField,

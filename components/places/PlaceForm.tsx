@@ -5,6 +5,7 @@ import { Place } from "@/types";
 import { usePlaceForm } from "@/hooks/usePlaceForm";
 import MapSection from "@/components/places/form/MapSection";
 import MainInfoSection from "@/components/places/form/MainInfoSection";
+import AdditionalInfoSection from "@/components/places/form/AdditionalInfoSection";
 import ImageSection from "@/components/places/form/ImageSection";
 import ActionButtons from "@/components/places/form/ActionButtons";
 import ConfirmationModal from "@/components/places/form/ConfirmationModal";
@@ -31,6 +32,7 @@ export default function PlaceForm({
     isConfirmOpen,
     setIsConfirmOpen,
     handleChange,
+    handleDetailChange,
     handleMapClick,
     handleImageChange,
     addImageField,
@@ -77,6 +79,17 @@ export default function PlaceForm({
             <MainInfoSection formData={formData} handleChange={handleChange} />
 
             {/* GARIS PEMISAH ANTAR SEKSI (DASHED) */}
+            <div className="border-t-2 border-dashed border-slate-200 my-2"></div>
+
+            {/* DETAIL TAMBAHAN (Sesuai Kategori) */}
+            {formData.detail && (
+              <AdditionalInfoSection
+                category={formData.category || ""}
+                detail={formData.detail}
+                onChange={handleDetailChange}
+              />
+            )}
+
             <div className="border-t-2 border-dashed border-slate-200 my-2"></div>
 
             {/* BAGIAN 2: VISUALISASI */}

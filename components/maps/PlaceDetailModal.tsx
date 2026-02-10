@@ -1,6 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Tag,
+  Phone,
+  Globe,
+  CheckSquare,
+} from "lucide-react";
 import { Place } from "@/types";
 
 interface PlaceDetailModalProps {
@@ -128,6 +137,119 @@ export default function PlaceDetailModal({
               </div>
             </div>
           </div>
+
+          {/* --- DETAIL SECTION (NEW) --- */}
+          {place.detail && (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+              <h4 className="font-bold text-slate-800 text-sm border-b pb-2 mb-2">
+                Info Tambahan
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                {place.detail.accessInfo && (
+                  <div className="flex items-start gap-2 text-sm text-slate-600">
+                    <Clock
+                      size={16}
+                      className="mt-0.5 text-blue-500 shrink-0"
+                    />
+                    <div>
+                      <span className="block text-xs font-bold text-slate-400 uppercase">
+                        {place.category === "Hotel"
+                          ? "Check-in/Out"
+                          : place.category === "Cafe"
+                            ? "Jam Buka"
+                            : place.category === "Wisata"
+                              ? "Jam Operasional"
+                              : "Waktu Akses"}
+                      </span>
+                      {place.detail.accessInfo}
+                    </div>
+                  </div>
+                )}
+
+                {place.detail.priceInfo && (
+                  <div className="flex items-start gap-2 text-sm text-slate-600">
+                    <Tag size={16} className="mt-0.5 text-green-500 shrink-0" />
+                    <div>
+                      <span className="block text-xs font-bold text-slate-400 uppercase">
+                        {place.category === "Hotel"
+                          ? "Range Harga"
+                          : place.category === "Cafe"
+                            ? "Range Harga"
+                            : place.category === "Wisata"
+                              ? "Tiket Masuk"
+                              : "Harga"}
+                      </span>
+                      {place.detail.priceInfo}
+                    </div>
+                  </div>
+                )}
+
+                {place.detail.contactInfo && (
+                  <div className="flex items-start gap-2 text-sm text-slate-600">
+                    <Phone
+                      size={16}
+                      className="mt-0.5 text-orange-500 shrink-0"
+                    />
+                    <div>
+                      <span className="block text-xs font-bold text-slate-400 uppercase">
+                        Kontak
+                      </span>
+                      {place.detail.contactInfo}
+                    </div>
+                  </div>
+                )}
+
+                {place.detail.webUrl && (
+                  <div className="flex items-start gap-2 text-sm text-slate-600">
+                    <Globe
+                      size={16}
+                      className="mt-0.5 text-blue-400 shrink-0"
+                    />
+                    <div>
+                      <span className="block text-xs font-bold text-slate-400 uppercase">
+                        Website / Sosmed
+                      </span>
+                      <a
+                        href={place.detail.webUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 hover:underline truncate block max-w-[200px]"
+                      >
+                        Kunjungi URL
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {place.detail.facilities && (
+                <div className="mt-3 pt-3 border-t border-slate-200">
+                  <div className="flex items-start gap-2 text-sm text-slate-600">
+                    <CheckSquare
+                      size={16}
+                      className="mt-0.5 text-purple-500 shrink-0"
+                    />
+                    <div className="w-full">
+                      <span className="block text-xs font-bold text-slate-400 uppercase mb-1">
+                        Fasilitas
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {place.detail.facilities.split(",").map((f, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-600"
+                          >
+                            {f.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">

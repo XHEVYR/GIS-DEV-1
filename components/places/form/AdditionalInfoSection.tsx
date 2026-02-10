@@ -74,9 +74,11 @@ export default function AdditionalInfoSection({
                   },
                 ]
             ).map((item: ScheduleItem, index: number) => {
-              const isHoliday = ["Libur Nasional", "Tanggal Merah"].includes(
-                item.startDay,
-              );
+              const isRowClosed =
+                item.isClosed ||
+                ["Libur Nasional", "Tanggal Merah"].includes(
+                  item.startDay || "",
+                );
 
               return (
                 <div
@@ -122,8 +124,6 @@ export default function AdditionalInfoSection({
                             "Sabtu",
                             "Minggu",
                             "Setiap Hari",
-                            "Libur Nasional",
-                            "Tanggal Merah",
                           ].map((day) => (
                             <option key={day} value={day}>
                               {day}
@@ -135,7 +135,7 @@ export default function AdditionalInfoSection({
 
                         <select
                           value={item.endDay || ""}
-                          disabled={isHoliday}
+                          disabled={isRowClosed}
                           onChange={(e) => {
                             const current: ScheduleItem[] =
                               detail.accessInfo?.startsWith("[")
@@ -152,7 +152,7 @@ export default function AdditionalInfoSection({
                             onChange("accessInfo", JSON.stringify(current));
                           }}
                           className={`w-full p-2 border border-slate-300 rounded-lg text-sm outline-none transition-colors ${
-                            isHoliday
+                            isRowClosed
                               ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                               : "bg-white cursor-pointer hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
                           }`}
@@ -175,21 +175,16 @@ export default function AdditionalInfoSection({
                       </div>
                     </div>
 
-                    {/* LABEL: JAM */}
+                    {/* LABEL: JAM & STATUS */}
                     <div className="col-span-12 lg:col-span-5">
                       <span className="text-[10px] font-bold text-slate-400 uppercase mb-1 block lg:hidden">
                         Jam Operasional
                       </span>
-                      {isHoliday ? (
-                        <div className="w-full p-2 border border-red-200 bg-red-50 text-red-600 rounded-lg text-sm font-bold text-center flex items-center justify-center gap-2">
-                          <span>⛔ TUTUP</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time"
-                            value={item.open}
-                            className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                      <div className="grid grid-cols-12 gap-2">
+                        {/* Status Toggle */}
+                        <div className="col-span-4">
+                          <select
+                            value={isRowClosed ? "tutup" : "buka"}
                             onChange={(e) => {
                               const current: ScheduleItem[] =
                                 detail.accessInfo?.startsWith("[")
@@ -202,33 +197,83 @@ export default function AdditionalInfoSection({
                                         close: "",
                                       },
                                     ];
-                              current[index].open = e.target.value;
+
+                              const val = e.target.value;
+                              current[index].isClosed = val === "tutup";
+                              if (val === "tutup") {
+                                current[index].open = "";
+                                current[index].close = "";
+                              }
                               onChange("accessInfo", JSON.stringify(current));
                             }}
-                          />
-                          <span className="text-slate-400 font-bold">-</span>
-                          <input
-                            type="time"
-                            value={item.close}
-                            className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
-                            onChange={(e) => {
-                              const current: ScheduleItem[] =
-                                detail.accessInfo?.startsWith("[")
-                                  ? JSON.parse(detail.accessInfo)
-                                  : [
-                                      {
-                                        startDay: "Senin",
-                                        endDay: "Jumat",
-                                        open: "",
-                                        close: "",
-                                      },
-                                    ];
-                              current[index].close = e.target.value;
-                              onChange("accessInfo", JSON.stringify(current));
-                            }}
-                          />
+                            className={`w-full p-2 border rounded-lg text-sm outline-none font-bold ${item.isClosed ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
+                          >
+                            <option value="buka">BUKA</option>
+                            <option value="tutup">TUTUP</option>
+                          </select>
                         </div>
-                      )}
+
+                        {/* Time Inputs */}
+                        <div className="col-span-8 flex items-center gap-2">
+                          {isRowClosed ? (
+                            <div className="w-full p-2 bg-slate-100 text-slate-400 text-sm font-bold text-center border border-slate-200 rounded-lg">
+                              LIBUR
+                            </div>
+                          ) : (
+                            <>
+                              <input
+                                type="time"
+                                value={item.open}
+                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                                onChange={(e) => {
+                                  const current: ScheduleItem[] =
+                                    detail.accessInfo?.startsWith("[")
+                                      ? JSON.parse(detail.accessInfo)
+                                      : [
+                                          {
+                                            startDay: "Senin",
+                                            endDay: "Jumat",
+                                            open: "",
+                                            close: "",
+                                          },
+                                        ];
+                                  current[index].open = e.target.value;
+                                  onChange(
+                                    "accessInfo",
+                                    JSON.stringify(current),
+                                  );
+                                }}
+                              />
+                              <span className="text-slate-400 font-bold">
+                                -
+                              </span>
+                              <input
+                                type="time"
+                                value={item.close}
+                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                                onChange={(e) => {
+                                  const current: ScheduleItem[] =
+                                    detail.accessInfo?.startsWith("[")
+                                      ? JSON.parse(detail.accessInfo)
+                                      : [
+                                          {
+                                            startDay: "Senin",
+                                            endDay: "Jumat",
+                                            open: "",
+                                            close: "",
+                                          },
+                                        ];
+                                  current[index].close = e.target.value;
+                                  onChange(
+                                    "accessInfo",
+                                    JSON.stringify(current),
+                                  );
+                                }}
+                              />
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* ACTION: DELETE */}

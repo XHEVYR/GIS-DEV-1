@@ -172,10 +172,14 @@ export default function PlaceDetailModal({
                               <div className="mt-1 space-y-1">
                                 {schedule.map(
                                   (item: ScheduleItem, idx: number) => {
-                                    const isHoliday = [
-                                      "Libur Nasional",
-                                      "Tanggal Merah",
-                                    ].includes(item.startDay || item.day || "");
+                                    const isHoliday =
+                                      item.isClosed ||
+                                      [
+                                        "Libur Nasional",
+                                        "Tanggal Merah",
+                                      ].includes(
+                                        item.startDay || item.day || "",
+                                      );
                                     return (
                                       <div
                                         key={idx}

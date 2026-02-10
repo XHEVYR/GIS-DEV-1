@@ -28,5 +28,6 @@ export interface ScheduleItem {
   endDay: string;
   open: string;
   close: string;
+  isClosed?: boolean;
   day?: string;
 }

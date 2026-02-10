@@ -33,7 +33,7 @@ export default function AdminSidebar({
   setIsMinimized,
 }: AdminSidebarProps) {
   const pathname = usePathname();
-  
+
   // Helper agar active state mendeteksi sub-path juga (misal /admin/data/edit tetap aktif di Data Lokasi)
   const isActive = (path: string) => {
     if (path === "/admin" && pathname === "/admin") return true;
@@ -91,11 +91,11 @@ export default function AdminSidebar({
           active={isActive("/admin/input")}
         />
         <NavItem
-          href="/admin/map" 
+          href="/map"
           icon={<Map size={20} />}
           label="Peta Digital"
           isMinimized={isMinimized}
-          active={isActive("/admin/map")}
+          active={isActive("/map")}
         />
 
         {/* Divider Simple */}

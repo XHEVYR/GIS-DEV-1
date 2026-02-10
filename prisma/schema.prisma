@@ -27,6 +27,7 @@ model Place {
   lat            Float
   lon            Float
   category       String
+  detail         PlaceDetail? // Relasi ke tabel detail
   // image          String?
   placeImages  PlaceImage[]
   
@@ -48,4 +49,20 @@ model PlaceImage {
   createdAt DateTime @default(now())
 
   @@map("place_images")
+}
+
+// Model Detail Tambahan (One-to-One dengan Place)
+model PlaceDetail {
+  id           Int     @id @default(autoincrement())
+  placeId      Int     @unique
+  place        Place   @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  // Field Fleksibel (Nullable)
+  accessInfo   String? // Jam Buka / Akses 24 Jam
+  priceInfo    String? // Range Harga / Harga Tiket
+  facilities   String? // Fasilitas
+  contactInfo  String? // No HP / Email
+  webUrl       String? // Social Media / Website
+
+  @@map("place_details")
 }

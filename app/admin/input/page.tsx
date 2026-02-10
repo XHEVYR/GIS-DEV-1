@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
 // Import komponen form sakti yang sudah kita buat
 import PlaceForm from "@/components/places/PlaceForm";
 
@@ -29,29 +28,30 @@ export default function InputPage() {
 
     // Jika sukses, aktifkan mode sukses
     setSuccess(true);
-    setTimeout(() => router.push("/admin/data"), 1500);
+    setTimeout(() => router.push("/admin/data?success=true"), 1500);
   };
 
   // --- TAMPILAN SUKSES (ANIMASI) ---
   if (success) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white border border-slate-100 shadow-2xl rounded-3xl p-10 text-center animate-in fade-in zoom-in duration-500">
-          <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-emerald-50/50">
-            <CheckCircle2 size={48} strokeWidth={2.5} />
-          </div>
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-2">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm animate-in fade-in duration-300">
+        
+        {/* Card Minimal */}
+        <div className="relative max-w-sm w-full bg-white border border-slate-200 shadow-xl rounded-3xl p-10 text-center animate-in zoom-in-95 slide-in-from-bottom-4 duration-500">
+          
+          <h2 className="text-3xl font-bold text-slate-800 mb-3">
             Berhasil!
           </h2>
           <p className="text-slate-500 mb-8">
-            Data lokasi baru telah ditambahkan.
+            Data lokasi baru telah tersimpan.
           </p>
-          <button
-            disabled
-            className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl opacity-80 cursor-not-allowed"
-          >
-            Mengalihkan...
-          </button>
+
+          {/* Loading Indicator */}
+          <div className="flex items-center justify-center gap-2 text-slate-400">
+            <span className="w-5 h-5 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></span>
+            <span className="text-sm font-medium">Mengalihkan...</span>
+          </div>
+
         </div>
       </div>
     );

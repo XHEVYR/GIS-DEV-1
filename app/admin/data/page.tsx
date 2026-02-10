@@ -68,7 +68,11 @@ export default function DataPage() {
   if (editingPlace) {
     return (
       <div className="w-full transition-all duration-500">
-        <PlaceForm initialData={editingPlace} onSave={handleSave} onCancel={() => setEditingPlace(null)} />
+        <PlaceForm
+          initialData={editingPlace}
+          onSave={handleSave}
+          onCancel={() => setEditingPlace(null)}
+        />
       </div>
     );
   }
@@ -234,18 +238,5 @@ export default function DataPage() {
         </div>
       </div>
     </>
-  );
-}
-
-// --- MAIN PAGE (SUSPENSE WRAPPER) ---
-export default function DataPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-600"></div>
-      </div>
-    }>
-      <DataPageContent />
-    </Suspense>
   );
 }

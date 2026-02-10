@@ -86,7 +86,7 @@ export default function Dashboard() {
       {/* --- 2. STATS CARDS --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* CARD 1: TOTAL DATA (Tidak ada Link) */}
+        {/* CARD 1: TOTAL DATA */}
         <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-[24px] p-6 shadow-xl shadow-slate-900/20 text-white overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <BarChart3 size={100} />
@@ -109,7 +109,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* CARD 2: HOTEL (Link ke ?q=hotel) */}
+        {/* CARD 2: HOTEL */}
         <Link href="/admin/data?q=hotel" className="block group">
           <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-blue-100/50 hover:border-blue-200 transition-all duration-300 cursor-pointer h-full">
             <div className="flex justify-between items-start mb-4">
@@ -131,7 +131,7 @@ export default function Dashboard() {
           </div>
         </Link>
 
-        {/* CARD 3: CAFE (Link ke ?q=cafe) */}
+        {/* CARD 3: CAFE */}
         <Link href="/admin/data?q=cafe" className="block group">
           <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-orange-100/50 hover:border-orange-200 transition-all duration-300 cursor-pointer h-full">
             <div className="flex justify-between items-start mb-4">
@@ -153,7 +153,7 @@ export default function Dashboard() {
           </div>
         </Link>
 
-        {/* CARD 4: WISATA (Link ke ?q=wisata) */}
+        {/* CARD 4: WISATA */}
         <Link href="/admin/data?q=wisata" className="block group">
           <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-purple-100/50 hover:border-purple-200 transition-all duration-300 cursor-pointer h-full">
             <div className="flex justify-between items-start mb-4">

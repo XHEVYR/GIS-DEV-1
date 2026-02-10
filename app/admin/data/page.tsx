@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-// 1. Tambahkan import HelpCircle
 import { Plus, Database, Settings2, CheckCircle, HelpCircle } from "lucide-react";
 import {
   Pagination,
@@ -95,7 +94,7 @@ export default function DataPage() {
           }
         },
         {
-          element: '#tour-action-buttons', // Pastikan ID ini ada di PlaceTable row pertama
+          element: '#tour-action-buttons',
           popover: {
             title: 'Edit & Hapus Data',
             description: 'Gunakan tombol di kolom aksi ini untuk mengedit atau menghapus data lokasi yang spesifik.',

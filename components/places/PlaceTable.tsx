@@ -40,8 +40,7 @@ export default function PlaceTable({
   }
 
   return (
-    <div className="w-full"> {/* Hapus overflow-x-auto agar tidak memicu scroll container */}
-      {/* HAPUS min-w-[800px] agar tabel pas dengan layar */}
+    <div className="w-full">
       <table className="w-full text-left table-fixed border-collapse">
         <thead>
           <tr className="bg-slate-50 border-b border-slate-200">

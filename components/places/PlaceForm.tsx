@@ -187,7 +187,6 @@ export default function PlaceForm({
                 inputLat={formData.lat ? parseFloat(formData.lat) : undefined}
                 inputLon={formData.lon ? parseFloat(formData.lon) : undefined}
               />
-
             </div>
 
             {/* Koordinat Inputs (Moved below map) */}

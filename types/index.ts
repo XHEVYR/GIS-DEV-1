@@ -22,3 +22,11 @@ export interface PlaceDetail {
   contactInfo?: string | null;
   webUrl?: string | null;
 }
+
+export interface ScheduleItem {
+  startDay: string;
+  endDay: string;
+  open: string;
+  close: string;
+  day?: string;
+}

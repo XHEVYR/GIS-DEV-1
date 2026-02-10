@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Place } from "@/types";
 
+// Custom hook untuk mengelola data admin (list, filter, sort, pagination)
 export function useAdminData() {
+  // State Utama
   const [places, setPlaces] = useState<Place[]>([]);
   const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,9 +20,11 @@ export function useAdminData() {
     message: string;
   }>({ show: false, title: "", message: "" });
 
+  // Ref: Untuk melacak apakah sedang dalam mode edit
   const isEditingRef = useRef(false);
   isEditingRef.current = !!editingPlace;
 
+  // Fungsi: Mengambil data tempat dari API
   const fetchPlaces = useCallback(async () => {
     if (isEditingRef.current) return;
     try {
@@ -34,14 +38,14 @@ export function useAdminData() {
     }
   }, []);
 
-  // Initial fetch & Polling
+  // Effect: Fetch awal & auto-refresh (polling)
   useEffect(() => {
     fetchPlaces();
     const intervalId = setInterval(fetchPlaces, 15000);
     return () => clearInterval(intervalId);
   }, [fetchPlaces]);
 
-  // Filtering & Sorting
+  // Effect: Filter & Sort data berdasarkan input user
   useEffect(() => {
     let result = [...places];
 
@@ -68,7 +72,7 @@ export function useAdminData() {
     setFilteredPlaces(result);
   }, [places, searchQuery, sortConfig]);
 
-  // Pagination Logic
+  // Logika Pagination
   const totalPages = Math.ceil(filteredPlaces.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -87,6 +91,7 @@ export function useAdminData() {
     }
   };
 
+  // Fungsi Notifikasi (Toast)
   const showNotification = useCallback((title: string, message: string) => {
     setNotification({ show: true, title, message });
     setTimeout(() => {
@@ -94,6 +99,7 @@ export function useAdminData() {
     }, 5000);
   }, []);
 
+  // Handler: Update Data (PUT)
   const handleSave = async (updatedData: Place) => {
     try {
       if (!updatedData.id) throw new Error("ID tidak ditemukan");
@@ -124,6 +130,7 @@ export function useAdminData() {
     }
   };
 
+  // Handler: Hapus Data (DELETE)
   const handleDelete = async (id: string) => {
     try {
       const res = await fetch(`/api/places/${id}`, { method: "DELETE" });
@@ -141,6 +148,7 @@ export function useAdminData() {
     }
   };
 
+  // Handler: Sorting kolom tabel
   const handleSort = (key: keyof Place) => {
     setSortConfig((current) => {
       if (!current || current.key !== key) {
@@ -153,6 +161,7 @@ export function useAdminData() {
     });
   };
 
+  // Handler: Pencarian (Search)
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);

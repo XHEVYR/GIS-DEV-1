@@ -6,7 +6,9 @@ interface UsePlaceFormProps {
   onSave: (data: Place) => Promise<void>;
 }
 
+// Custom hook untuk mengelola state form input tempat
 export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
+  // State Form Data (Inisialisasi)
   const [formData, setFormData] = useState<Place>({
     name: initialData?.name || "",
     lat: initialData?.lat?.toString() || "",
@@ -32,14 +34,17 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
+  // Auto-scroll ke atas saat form dibuka
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  // Handler: Update input field biasa
   const handleChange = (field: keyof Place, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Handler: Update field di dalam detail (accessInfo, priceInfo, dll)
   const handleDetailChange = (
     field: keyof import("@/types").PlaceDetail,
     value: string,
@@ -53,6 +58,7 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
     }));
   };
 
+  // Handler: Menangkap koordinat saat peta diklik
   const handleMapClick = (lat: number, lon: number) => {
     setError(null);
     setFormData((prev) => ({
@@ -62,6 +68,7 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
     }));
   };
 
+  // Handler: Mengelola input link gambar
   const handleImageChange = (index: number, value: string) => {
     const newImages = [...(formData.images || [])];
     newImages[index] = value;
@@ -81,6 +88,7 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
     setFormData({ ...formData, images: newImages });
   };
 
+  // Handler: Validasi sebelum simpan (Trigger konfirmasi)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -99,6 +107,7 @@ export function usePlaceForm({ initialData, onSave }: UsePlaceFormProps) {
     setIsConfirmOpen(true);
   };
 
+  // Fungsi Utama: Kirim data ke API (Save/Update)
   const executeSave = async () => {
     setLoading(true);
     setIsConfirmOpen(false);

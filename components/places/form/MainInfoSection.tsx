@@ -33,7 +33,7 @@ export default function MainInfoSection({
           <label className={STYLES.label}>Nama Tempat</label>
           <input
             className={STYLES.input}
-            placeholder="Contoh: Hotel Tugu Blitar"
+            placeholder="Masukkan Nama Tempat"
             value={formData.name}
             onChange={(e) => handleChange("name", e.target.value)}
             required
@@ -78,7 +78,7 @@ export default function MainInfoSection({
             className={`${STYLES.input} min-h-37.5 resize-none leading-relaxed`}
             value={formData.description || ""}
             onChange={(e) => handleChange("description", e.target.value)}
-            placeholder="Ceritakan tentang fasilitas, sejarah, atau daya tarik tempat ini..."
+            placeholder="Masukkan Deskripsi Tempat"
           />
         </div>
       </div>

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-// 1. Import Komponen Wajib untuk Login & Keamanan
+// Auth components
 import Providers from "@/components/auth/providers";
 import AutoLogout from "@/components/auth/autoLogout";
 
+// Font configuration
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -16,9 +17,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Ubah Metadata sesuai Project PKL
+// SEO metadata
 export const metadata: Metadata = {
-  title: "GIS Kota Blitar",
+  title: "GIS Kawasan Blitar",
   description: "Aplikasi WebGIS Data Lokasi",
 };
 
@@ -32,14 +33,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* 2. BUNGKUS DENGAN PROVIDERS 
-          Tanpa ini, error "useSession must be wrapped" akan muncul 
-        */}
+        {/* Session provider & auto logout */}
         <Providers>
-          {/* 3. PASANG CCTV AUTO LOGOUT DI SINI */}
           <AutoLogout />
-
-          {/* Render Halaman Website */}
           {children}
         </Providers>
       </body>

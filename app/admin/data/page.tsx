@@ -19,7 +19,7 @@ import PlaceForm from "@/components/places/PlaceForm";
 import { generatePagination } from "@/lib/utils";
 import { useAdminData } from "@/hooks/useAdminData";
 
-// --- STYLES ---
+// Styles
 const STYLES = {
   headerIcon:
     "bg-black text-lime-400 p-2.5 rounded-xl shadow-xl shadow-slate-900/10",
@@ -36,6 +36,8 @@ const STYLES = {
 
 export default function DataPage() {
   const searchParams = useSearchParams();
+
+  // Hook untuk state management
   const {
     currentPlaces,
     filteredPlaces,
@@ -55,7 +57,7 @@ export default function DataPage() {
     showNotification,
   } = useAdminData();
 
-  // Success notification handler (from URL param)
+  // Success notification handler
   useEffect(() => {
     if (searchParams.get("success") === "true") {
       showNotification(
@@ -65,6 +67,7 @@ export default function DataPage() {
     }
   }, [searchParams, showNotification]);
 
+  // Edit form handler
   if (editingPlace) {
     return (
       <div className="w-full transition-all duration-500">
@@ -79,6 +82,7 @@ export default function DataPage() {
 
   return (
     <>
+      {/* Notification toast */}
       {notification.show && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500">
           <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 min-w-[320px] flex flex-col gap-3">
@@ -93,6 +97,7 @@ export default function DataPage() {
                 <p className="text-xs text-slate-500">{notification.message}</p>
               </div>
             </div>
+            {/* Progress bar */}
             <div className="h-1 bg-slate-100 rounded-full overflow-hidden w-full">
               <div className="h-full bg-emerald-500 w-full origin-left animate-[shrinkBar_5s_linear_forwards]"></div>
             </div>
@@ -101,6 +106,7 @@ export default function DataPage() {
       )}
 
       <div className="w-full transition-all duration-500 ease-in-out">
+        {/* Header */}
         <header className="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200 py-5 px-6 md:px-12 transition-all">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div>
@@ -116,6 +122,7 @@ export default function DataPage() {
               </p>
             </div>
 
+            {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
               <div className="flex-1 min-w-50 lg:w-72">
                 <SearchBar
@@ -123,6 +130,7 @@ export default function DataPage() {
                   placeholder="Cari nama atau kategori..."
                 />
               </div>
+              {/* Rows per page */}
               <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm hover:border-lime-300 transition-colors">
                 <Settings2 size={14} className="text-slate-400" />
                 <select
@@ -147,6 +155,7 @@ export default function DataPage() {
           </div>
         </header>
 
+        {/* Table */}
         <div className="w-full overflow-hidden border-t border-b border-slate-200 bg-white">
           <PlaceTable
             data={currentPlaces}
@@ -157,6 +166,7 @@ export default function DataPage() {
           />
         </div>
 
+        {/* Pagination */}
         <div className={STYLES.paginationWrapper}>
           <div className="text-center md:text-left pl-2">
             <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">

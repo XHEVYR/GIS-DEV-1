@@ -103,7 +103,7 @@ export default function PlaceDetailModal({
             </div>
           )}
 
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 pointer-events-none">
             <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
               {place.category}
             </span>
@@ -208,7 +208,7 @@ export default function PlaceDetailModal({
                     />
                     <div>
                       <span className="block text-xs font-bold text-slate-400 uppercase">
-                        Website / Sosmed
+                        Website / Sosial Media
                       </span>
                       <a
                         href={place.detail.webUrl}

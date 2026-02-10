@@ -53,7 +53,7 @@ export default function LoginPage() {
       {/* --- BAGIAN KIRI (BRANDING & ILUSTRASI) --- */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-center justify-center text-white p-12 overflow-hidden">
         {/* Background Gradient & Partikel */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-lime-900/40 via-slate-900 to-slate-900"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,var(--tw-gradient-stops))] from-lime-900/40 via-slate-900 to-slate-900"></div>
         <div className="absolute top-10 left-10 w-20 h-20 bg-lime-500/20 rounded-full blur-xl animate-pulse"></div>
         <div className="absolute bottom-20 right-20 w-32 h-32 bg-lime-400/10 rounded-full blur-2xl"></div>
 

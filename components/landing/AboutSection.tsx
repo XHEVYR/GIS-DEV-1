@@ -23,7 +23,7 @@ export default function AboutSection() {
 
     fetchStats();
 
-    // Auto-refresh setiap 15 detik
+    // Auto-refresh setiap 5 detik
     const intervalId = setInterval(fetchStats, 5000);
     return () => clearInterval(intervalId);
   }, []);

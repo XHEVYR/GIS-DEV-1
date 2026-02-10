@@ -8,6 +8,7 @@ export default function AboutSection() {
     async function fetchStats() {
       try {
         const res = await fetch("/api/stats");
+        if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         setStats({
           totalPlaces: data.totalPlaces || 0,
@@ -19,7 +20,12 @@ export default function AboutSection() {
         setLoading(false);
       }
     }
+
     fetchStats();
+
+    // Auto-refresh setiap 15 detik
+    const intervalId = setInterval(fetchStats, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (

@@ -9,7 +9,7 @@ import {
   Globe,
   CheckSquare,
 } from "lucide-react";
-import { Place } from "@/types";
+import { Place, ScheduleItem } from "@/types";
 
 interface PlaceDetailModalProps {
   place: Place;
@@ -161,7 +161,69 @@ export default function PlaceDetailModal({
                               ? "Jam Operasional"
                               : "Waktu Akses"}
                       </span>
-                      {place.detail.accessInfo}
+                      {(() => {
+                        try {
+                          // Coba parse jika string JSON
+                          if (place.detail.accessInfo?.startsWith("[")) {
+                            const schedule = JSON.parse(
+                              place.detail.accessInfo,
+                            );
+                            return (
+                              <div className="mt-1 space-y-1">
+                                {schedule.map(
+                                  (item: ScheduleItem, idx: number) => {
+                                    const isHoliday =
+                                      item.isClosed ||
+                                      [
+                                        "Libur Nasional",
+                                        "Tanggal Merah",
+                                      ].includes(
+                                        item.startDay || item.day || "",
+                                      );
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className="flex justify-between gap-4 text-xs"
+                                      >
+                                        <span className="font-medium text-slate-700 w-24">
+                                          {item.startDay || item.day}
+                                          {item.endDay &&
+                                          item.endDay !== item.startDay
+                                            ? ` - ${item.endDay}`
+                                            : ""}
+                                        </span>
+                                        <span
+                                          className={
+                                            isHoliday
+                                              ? "text-red-500 font-bold"
+                                              : "text-slate-600"
+                                          }
+                                        >
+                                          {isHoliday
+                                            ? "TUTUP"
+                                            : `${item.open} - ${item.close}`}
+                                        </span>
+                                      </div>
+                                    );
+                                  },
+                                )}
+                              </div>
+                            );
+                          }
+                          // Fallback untuk data lama (string biasa)
+                          return (
+                            <div className="mt-1 font-medium">
+                              {place.detail.accessInfo}
+                            </div>
+                          );
+                        } catch {
+                          return (
+                            <div className="mt-1 font-medium">
+                              {place.detail.accessInfo}
+                            </div>
+                          );
+                        }
+                      })()}
                     </div>
                   </div>
                 )}

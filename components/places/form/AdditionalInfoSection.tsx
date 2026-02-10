@@ -1,4 +1,4 @@
-import { PlaceDetail } from "@/types";
+import { PlaceDetail, ScheduleItem } from "@/types";
 import { Info, Tag, Clock, Phone, Globe, CheckSquare } from "lucide-react";
 
 interface AdditionalInfoSectionProps {
@@ -12,6 +12,7 @@ export default function AdditionalInfoSection({
   detail,
   onChange,
 }: AdditionalInfoSectionProps) {
+  // ... (keep existing getLabels)
   const getLabels = () => {
     switch (category.toLowerCase()) {
       case "hotel":
@@ -56,17 +57,306 @@ export default function AdditionalInfoSection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Access Info (Jam Buka / Check-in) */}
-        <div className="space-y-1">
+        <div className="space-y-2 col-span-1 md:col-span-2">
           <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
             <Clock size={12} /> {labels.accessInfo}
           </label>
-          <input
-            type="text"
-            value={detail.accessInfo || ""}
-            onChange={(e) => onChange("accessInfo", e.target.value)}
-            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm"
-            placeholder={`Contoh: 08.00 - 22.00`}
-          />
+
+          <div className="space-y-3 bg-white p-4 rounded-xl border border-dashed border-slate-300">
+            {(detail.accessInfo?.startsWith("[")
+              ? JSON.parse(detail.accessInfo)
+              : [
+                  {
+                    startDay: "Senin",
+                    endDay: "Jumat",
+                    open: "08:00",
+                    close: "17:00",
+                  },
+                ]
+            ).map((item: ScheduleItem, index: number) => {
+              const isRowClosed =
+                item.isClosed ||
+                ["Libur Nasional", "Tanggal Merah"].includes(
+                  item.startDay || "",
+                );
+
+              return (
+                <div
+                  key={index}
+                  className="relative bg-slate-50 p-3 rounded-lg border border-slate-200 shadow-sm transition-all hover:shadow-md hover:border-blue-200 group"
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
+                    {/* LABEL: HARI */}
+                    <div className="col-span-12 lg:col-span-5">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase mb-1 block lg:hidden">
+                        Hari Operasional
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={item.startDay || item.day || ""}
+                          onChange={(e) => {
+                            const current: ScheduleItem[] =
+                              detail.accessInfo?.startsWith("[")
+                                ? JSON.parse(detail.accessInfo)
+                                : [
+                                    {
+                                      startDay: "Senin",
+                                      endDay: "Jumat",
+                                      open: "",
+                                      close: "",
+                                    },
+                                  ];
+                            current[index].startDay = e.target.value;
+                            delete current[index].day;
+                            onChange("accessInfo", JSON.stringify(current));
+                          }}
+                          className="w-full p-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-slate-50 transition-colors"
+                        >
+                          <option value="" disabled>
+                            Hari Mulai
+                          </option>
+                          {[
+                            "Senin",
+                            "Selasa",
+                            "Rabu",
+                            "Kamis",
+                            "Jumat",
+                            "Sabtu",
+                            "Minggu",
+                            "Setiap Hari",
+                          ].map((day) => (
+                            <option key={day} value={day}>
+                              {day}
+                            </option>
+                          ))}
+                        </select>
+
+                        <span className="text-slate-400 font-bold">-</span>
+
+                        <select
+                          value={item.endDay || ""}
+                          disabled={isRowClosed}
+                          onChange={(e) => {
+                            const current: ScheduleItem[] =
+                              detail.accessInfo?.startsWith("[")
+                                ? JSON.parse(detail.accessInfo)
+                                : [
+                                    {
+                                      startDay: "Senin",
+                                      endDay: "Jumat",
+                                      open: "",
+                                      close: "",
+                                    },
+                                  ];
+                            current[index].endDay = e.target.value;
+                            onChange("accessInfo", JSON.stringify(current));
+                          }}
+                          className={`w-full p-2 border border-slate-300 rounded-lg text-sm outline-none transition-colors ${
+                            isRowClosed
+                              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                              : "bg-white cursor-pointer hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
+                          }`}
+                        >
+                          <option value="">Sampai Hari (Opsional)</option>
+                          {[
+                            "Senin",
+                            "Selasa",
+                            "Rabu",
+                            "Kamis",
+                            "Jumat",
+                            "Sabtu",
+                            "Minggu",
+                          ].map((day) => (
+                            <option key={day} value={day}>
+                              {day}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* LABEL: JAM & STATUS */}
+                    <div className="col-span-12 lg:col-span-5">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase mb-1 block lg:hidden">
+                        Jam Operasional
+                      </span>
+                      <div className="grid grid-cols-12 gap-2">
+                        {/* Status Toggle */}
+                        <div className="col-span-4">
+                          <select
+                            value={isRowClosed ? "tutup" : "buka"}
+                            onChange={(e) => {
+                              const current: ScheduleItem[] =
+                                detail.accessInfo?.startsWith("[")
+                                  ? JSON.parse(detail.accessInfo)
+                                  : [
+                                      {
+                                        startDay: "Senin",
+                                        endDay: "Jumat",
+                                        open: "",
+                                        close: "",
+                                      },
+                                    ];
+
+                              const val = e.target.value;
+                              current[index].isClosed = val === "tutup";
+                              if (val === "tutup") {
+                                current[index].open = "";
+                                current[index].close = "";
+                              }
+                              onChange("accessInfo", JSON.stringify(current));
+                            }}
+                            className={`w-full p-2 border rounded-lg text-sm outline-none font-bold ${item.isClosed ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
+                          >
+                            <option value="buka">BUKA</option>
+                            <option value="tutup">TUTUP</option>
+                          </select>
+                        </div>
+
+                        {/* Time Inputs */}
+                        <div className="col-span-8 flex items-center gap-2">
+                          {isRowClosed ? (
+                            <div className="w-full p-2 bg-slate-100 text-slate-400 text-sm font-bold text-center border border-slate-200 rounded-lg">
+                              LIBUR
+                            </div>
+                          ) : (
+                            <>
+                              <input
+                                type="time"
+                                value={item.open}
+                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                                onChange={(e) => {
+                                  const current: ScheduleItem[] =
+                                    detail.accessInfo?.startsWith("[")
+                                      ? JSON.parse(detail.accessInfo)
+                                      : [
+                                          {
+                                            startDay: "Senin",
+                                            endDay: "Jumat",
+                                            open: "",
+                                            close: "",
+                                          },
+                                        ];
+                                  current[index].open = e.target.value;
+                                  onChange(
+                                    "accessInfo",
+                                    JSON.stringify(current),
+                                  );
+                                }}
+                              />
+                              <span className="text-slate-400 font-bold">
+                                -
+                              </span>
+                              <input
+                                type="time"
+                                value={item.close}
+                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                                onChange={(e) => {
+                                  const current: ScheduleItem[] =
+                                    detail.accessInfo?.startsWith("[")
+                                      ? JSON.parse(detail.accessInfo)
+                                      : [
+                                          {
+                                            startDay: "Senin",
+                                            endDay: "Jumat",
+                                            open: "",
+                                            close: "",
+                                          },
+                                        ];
+                                  current[index].close = e.target.value;
+                                  onChange(
+                                    "accessInfo",
+                                    JSON.stringify(current),
+                                  );
+                                }}
+                              />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ACTION: DELETE */}
+                    <div className="col-span-12 lg:col-span-2 flex justify-end lg:justify-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const current: ScheduleItem[] =
+                            detail.accessInfo?.startsWith("[")
+                              ? JSON.parse(detail.accessInfo)
+                              : [
+                                  {
+                                    startDay: "Senin",
+                                    endDay: "Jumat",
+                                    open: "",
+                                    close: "",
+                                  },
+                                ];
+                          const newItems = current.filter(
+                            (_, i) => i !== index,
+                          );
+                          onChange("accessInfo", JSON.stringify(newItems));
+                        }}
+                        className="w-full lg:w-auto p-2 text-red-500 bg-white border border-red-100 rounded-lg hover:bg-red-50 hover:border-red-200 transition-all flex items-center justify-center gap-2"
+                        title="Hapus Jadwal Ini"
+                      >
+                        <span className="lg:hidden text-sm font-medium">
+                          Hapus Baris
+                        </span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M18 6 6 18" />
+                          <path d="m6 6 12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => {
+                const current = detail.accessInfo?.startsWith("[")
+                  ? JSON.parse(detail.accessInfo)
+                  : [];
+                current.push({
+                  startDay: "Senin",
+                  endDay: "",
+                  open: "08:00",
+                  close: "17:00",
+                });
+                onChange("accessInfo", JSON.stringify(current));
+              }}
+              className="w-full py-3 bg-blue-50 text-blue-600 text-sm font-bold rounded-xl hover:bg-blue-100 transition-colors border-2 border-blue-100 border-dashed flex items-center justify-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+              </svg>
+              Tambah Jadwal Baru
+            </button>
+          </div>
         </div>
 
         {/* Price Info */}
@@ -74,13 +364,49 @@ export default function AdditionalInfoSection({
           <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
             <Tag size={12} /> {labels.priceInfo}
           </label>
-          <input
-            type="text"
-            value={detail.priceInfo || ""}
-            onChange={(e) => onChange("priceInfo", e.target.value)}
-            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm"
-            placeholder="Contoh: Rp 20.000 - Rp 50.000"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={detail.priceInfo?.split(" - ")[0] || ""}
+              onChange={(e) => {
+                const start = e.target.value;
+                const end = detail.priceInfo?.split(" - ")[1] || "";
+                onChange(
+                  "priceInfo",
+                  start && end
+                    ? `${start} - ${end}`
+                    : start
+                      ? start
+                      : end
+                        ? ` - ${end}`
+                        : "",
+                );
+              }}
+              className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm"
+              placeholder="Rp Min"
+            />
+            <span className="text-slate-400 font-bold">-</span>
+            <input
+              type="text"
+              value={detail.priceInfo?.split(" - ")[1] || ""}
+              onChange={(e) => {
+                const start = detail.priceInfo?.split(" - ")[0] || "";
+                const end = e.target.value;
+                onChange(
+                  "priceInfo",
+                  start && end
+                    ? `${start} - ${end}`
+                    : start
+                      ? start
+                      : end
+                        ? ` - ${end}`
+                        : "",
+                );
+              }}
+              className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm"
+              placeholder="Rp Max"
+            />
+          </div>
         </div>
 
         {/* Contact Info */}
@@ -98,7 +424,7 @@ export default function AdditionalInfoSection({
         </div>
 
         {/* Website / Social Media */}
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-1 md:col-span-2">
           <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
             <Globe size={12} /> Website / Social Media
           </label>
@@ -110,20 +436,20 @@ export default function AdditionalInfoSection({
             placeholder="Contoh: https://instagram.com/..."
           />
         </div>
-      </div>
 
-      {/* Facilities (Full Width) */}
-      <div className="space-y-1">
-        <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-          <CheckSquare size={12} /> {labels.facilities}
-        </label>
-        <textarea
-          rows={2}
-          value={detail.facilities || ""}
-          onChange={(e) => onChange("facilities", e.target.value)}
-          className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm resize-none"
-          placeholder="Tulis fasilitas yang tersedia, pisahkan dengan koma..."
-        />
+        {/* Facilities (Full Width) */}
+        <div className="space-y-1 col-span-1 md:col-span-2">
+          <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
+            <CheckSquare size={12} /> {labels.facilities}
+          </label>
+          <textarea
+            rows={2}
+            value={detail.facilities || ""}
+            onChange={(e) => onChange("facilities", e.target.value)}
+            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm resize-none"
+            placeholder="Tulis fasilitas yang tersedia, pisahkan dengan koma..."
+          />
+        </div>
       </div>
     </div>
   );

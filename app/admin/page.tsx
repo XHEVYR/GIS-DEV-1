@@ -122,12 +122,12 @@ export default function Dashboard() {
         </div>
 
         {/* CARD 2: HOTEL */}
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-blue-100/50 hover:border-blue-200 transition-all duration-300 group">
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-[#65a30d]/20 hover:border-[#65a30d]/30 transition-all duration-300 group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <div className="p-3 bg-[#65a30d]/10 rounded-2xl text-[#65a30d] group-hover:bg-[#65a30d] group-hover:text-white transition-colors">
               <Hotel size={24} strokeWidth={2.5} />
             </div>
-            <span className="text-xs font-bold bg-slate-50 text-slate-400 px-2 py-1 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+            <span className="text-xs font-bold bg-slate-50 text-slate-400 px-2 py-1 rounded-lg group-hover:bg-[#65a30d]/10 group-hover:text-[#65a30d] transition-colors">
               {totalData > 0 ? ((hotelCount / totalData) * 100).toFixed(0) : 0}%
             </span>
           </div>
@@ -142,12 +142,12 @@ export default function Dashboard() {
         </div>
 
         {/* CARD 3: CAFE */}
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-orange-100/50 hover:border-orange-200 transition-all duration-300 group">
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-[#16a34a]/20 hover:border-[#16a34a]/30 transition-all duration-300 group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-orange-50 rounded-2xl text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+            <div className="p-3 bg-[#16a34a]/10 rounded-2xl text-[#16a34a] group-hover:bg-[#16a34a] group-hover:text-white transition-colors">
               <Coffee size={24} strokeWidth={2.5} />
             </div>
-            <span className="text-xs font-bold bg-slate-50 text-slate-400 px-2 py-1 rounded-lg group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors">
+            <span className="text-xs font-bold bg-slate-50 text-slate-400 px-2 py-1 rounded-lg group-hover:bg-[#16a34a]/10 group-hover:text-[#16a34a] transition-colors">
               {totalData > 0 ? ((cafeCount / totalData) * 100).toFixed(0) : 0}%
             </span>
           </div>
@@ -162,12 +162,12 @@ export default function Dashboard() {
         </div>
 
         {/* CARD 4: WISATA */}
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-purple-100/50 hover:border-purple-200 transition-all duration-300 group">
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-[#0d9488]/20 hover:border-[#0d9488]/30 transition-all duration-300 group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-purple-50 rounded-2xl text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+            <div className="p-3 bg-[#0d9488]/10 rounded-2xl text-[#0d9488] group-hover:bg-[#0d9488] group-hover:text-white transition-colors">
               <Plane size={24} strokeWidth={2.5} />
             </div>
-            <span className="text-xs font-bold bg-slate-50 text-slate-400 px-2 py-1 rounded-lg group-hover:bg-purple-50 group-hover:text-purple-600 transition-colors">
+            <span className="text-xs font-bold bg-slate-50 text-slate-400 px-2 py-1 rounded-lg group-hover:bg-[#0d9488]/10 group-hover:text-[#0d9488] transition-colors">
               {totalData > 0 ? ((wisataCount / totalData) * 100).toFixed(0) : 0}
               %
             </span>
@@ -194,15 +194,18 @@ export default function Dashboard() {
               </h3>
               <div className="flex gap-2">
                 <span
-                  className="h-3 w-3 rounded-full bg-blue-500 block"
+                  className="h-3 w-3 rounded-full block"
+                  style={{ backgroundColor: "#65a30d" }}
                   title="Hotel"
                 ></span>
                 <span
-                  className="h-3 w-3 rounded-full bg-orange-500 block"
+                  className="h-3 w-3 rounded-full block"
+                  style={{ backgroundColor: "#16a34a" }}
                   title="Cafe"
                 ></span>
                 <span
-                  className="h-3 w-3 rounded-full bg-purple-500 block"
+                  className="h-3 w-3 rounded-full block"
+                  style={{ backgroundColor: "#0d9488" }}
                   title="Wisata"
                 ></span>
               </div>

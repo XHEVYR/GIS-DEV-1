@@ -222,10 +222,22 @@ export default function AdditionalInfoSection({
                           ) : (
                             <>
                               <input
-                                type="time"
+                                type="text"
                                 value={item.open}
-                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                                placeholder="00:00"
+                                maxLength={5}
+                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-mono"
                                 onChange={(e) => {
+                                  let val = e.target.value.replace(
+                                    /[^0-9:]/g,
+                                    "",
+                                  );
+
+                                  // Auto-insert colon after 2 digits
+                                  if (val.length === 2 && !val.includes(":")) {
+                                    val = val + ":";
+                                  }
+
                                   const current: ScheduleItem[] =
                                     detail.accessInfo?.startsWith("[")
                                       ? JSON.parse(detail.accessInfo)
@@ -237,21 +249,46 @@ export default function AdditionalInfoSection({
                                             close: "",
                                           },
                                         ];
-                                  current[index].open = e.target.value;
+                                  current[index].open = val;
                                   onChange(
                                     "accessInfo",
                                     JSON.stringify(current),
                                   );
+                                }}
+                                onBlur={(e) => {
+                                  const val = e.target.value;
+                                  if (
+                                    val &&
+                                    !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(
+                                      val,
+                                    )
+                                  ) {
+                                    alert(
+                                      "Format jam harus HH:mm (contoh: 08:00, 14:30)",
+                                    );
+                                  }
                                 }}
                               />
                               <span className="text-slate-400 font-bold">
                                 -
                               </span>
                               <input
-                                type="time"
+                                type="text"
                                 value={item.close}
-                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                                placeholder="00:00"
+                                maxLength={5}
+                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-mono"
                                 onChange={(e) => {
+                                  let val = e.target.value.replace(
+                                    /[^0-9:]/g,
+                                    "",
+                                  );
+
+                                  // Auto-insert colon after 2 digits
+                                  if (val.length === 2 && !val.includes(":")) {
+                                    val = val + ":";
+                                  }
+
                                   const current: ScheduleItem[] =
                                     detail.accessInfo?.startsWith("[")
                                       ? JSON.parse(detail.accessInfo)
@@ -263,11 +300,24 @@ export default function AdditionalInfoSection({
                                             close: "",
                                           },
                                         ];
-                                  current[index].close = e.target.value;
+                                  current[index].close = val;
                                   onChange(
                                     "accessInfo",
                                     JSON.stringify(current),
                                   );
+                                }}
+                                onBlur={(e) => {
+                                  const val = e.target.value;
+                                  if (
+                                    val &&
+                                    !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(
+                                      val,
+                                    )
+                                  ) {
+                                    alert(
+                                      "Format jam harus HH:mm (contoh: 08:00, 14:30)",
+                                    );
+                                  }
                                 }}
                               />
                             </>

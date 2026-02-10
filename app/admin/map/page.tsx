@@ -48,7 +48,7 @@ export default function AdminMapPage() {
          <Map />
          
          {/* 4. OVERLAY BADGE (Sama persis dengan Landing Page) */}
-         <div className="absolute bottom-6 left-6 z-[400] bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-lg border border-white/50 transition-transform group-hover:scale-105">
+         {/* <div className="absolute bottom-6 left-6 z-[400] bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-lg border border-white/50 transition-transform group-hover:scale-105">
             <div className="flex items-center gap-3">
               <div className="bg-lime-100 p-2.5 rounded-xl">
                 <MapPin className="text-lime-600 w-5 h-5 fill-current" />
@@ -61,7 +61,7 @@ export default function AdminMapPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
       </div>
     </div>

@@ -34,7 +34,7 @@ Aplikasi Web GIS yang lengkap dan interaktif, dibangun menggunakan Next.js. Apli
 1.  **Clone Repository**
 
     ```bash
-    git clone <url-repository-anda>
+    git clone https://github.com/RafliF1/GIS-Dev.git
     cd <direktori-project>
     ```
 

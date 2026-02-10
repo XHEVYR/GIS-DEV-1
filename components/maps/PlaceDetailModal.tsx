@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
-  X,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -52,9 +51,9 @@ export default function PlaceDetailModal({
   }, [images.length, nextImage]);
 
   return (
-    <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+    <div className="absolute inset-0 z-1000 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
-        <div className="relative w-full h-64 sm:h-80 flex-shrink-0 bg-gray-900 group">
+        <div className="relative w-full h-64 sm:h-80 shrink-0 bg-gray-900 group">
           {hasImages ? (
             <>
               {/* GAMBAR UTAMA */}
@@ -103,7 +102,7 @@ export default function PlaceDetailModal({
             </div>
           )}
 
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 pointer-events-none">
             <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
               {place.category}
             </span>
@@ -208,13 +207,13 @@ export default function PlaceDetailModal({
                     />
                     <div>
                       <span className="block text-xs font-bold text-slate-400 uppercase">
-                        Website / Sosmed
+                        Website / Sosial Media
                       </span>
                       <a
                         href={place.detail.webUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-blue-600 hover:underline truncate block max-w-[200px]"
+                        className="text-blue-600 hover:underline truncate block max-w-50"
                       >
                         Kunjungi URL
                       </a>

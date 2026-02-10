@@ -39,7 +39,7 @@ export default function HeroSection({
 
         <h1 className="text-4xl lg:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight">
           Satu Peta <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-500 to-emerald-600 decoration-4 underline decoration-lime-200 underline-offset-4">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-lime-500 to-emerald-600 decoration-4 underline decoration-lime-200 underline-offset-4">
             Terintegrasi.
           </span>
         </h1>
@@ -68,13 +68,13 @@ export default function HeroSection({
         className={`
           ${
             isFullScreen
-              ? "fixed inset-0 z-[9999] h-screen w-screen bg-slate-100"
-              : "relative group order-1 lg:order-2 h-[450px] lg:h-[600px] w-full"
+              ? "fixed inset-0 z-9999 h-screen w-screen bg-slate-100"
+              : "relative group order-1 lg:order-2 h-112.5 lg:h-150 w-full"
           }
         `}
       >
         {!isFullScreen && (
-          <div className="absolute -inset-3 bg-gradient-to-tr from-lime-300 to-emerald-300 rounded-[40px] blur-2xl opacity-40 group-hover:opacity-60 transition duration-700"></div>
+          <div className="absolute -inset-3 bg-linear-to-tr from-lime-300 to-emerald-300 rounded-[40px] blur-2xl opacity-40 group-hover:opacity-60 transition duration-700"></div>
         )}
 
         <div
@@ -89,7 +89,7 @@ export default function HeroSection({
           {isFullScreen && (
             <button
               onClick={onCloseMap}
-              className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000] bg-white text-slate-800 px-6 py-2 rounded-full shadow-2xl border border-slate-200 hover:bg-red-50 hover:text-red-600 transition-all duration-300 flex items-center gap-2 font-bold text-sm"
+              className="absolute top-6 left-1/2 -translate-x-1/2 z-1000 bg-white text-slate-800 px-6 py-2 rounded-full shadow-2xl border border-slate-200 hover:bg-red-50 hover:text-red-600 transition-all duration-300 flex items-center gap-2 font-bold text-sm"
             >
               <Minimize2 size={18} />
               Keluar Fullscreen
@@ -99,7 +99,7 @@ export default function HeroSection({
           {!isFullScreen && (
             <button
               onClick={onOpenMap}
-              className="absolute top-4 right-4 z-[400] bg-white/90 backdrop-blur text-slate-600 p-2.5 rounded-xl shadow-sm hover:bg-white hover:text-lime-600 transition-all border border-white/50 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
+              className="absolute top-4 right-4 z-400 bg-white/90 backdrop-blur text-slate-600 p-2.5 rounded-xl shadow-sm hover:bg-white hover:text-lime-600 transition-all border border-white/50 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
               title="Perbesar Peta"
             >
               <Maximize2 size={20} />

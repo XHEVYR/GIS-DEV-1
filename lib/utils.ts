@@ -1,40 +1,42 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
-  if (totalPages <= 10) {
+  // Jika total halaman 7 atau kurang, tampilkan semua tanpa titik-titik
+  if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
-  const current = currentPage;
-  const last = totalPages;
-  const delta = 1;
-  const left = current - delta;
-  const right = current + delta + 1;
-  const range: number[] = [];
-  const rangeWithDots: (number | string)[] = [];
-  let l: number | null = null;
 
-  for (let i = 1; i <= last; i++) {
-    if (i === 1 || i === last || (i >= left && i < right)) {
-      range.push(i);
-    }
+  // Jika di awal-awal halaman (dekat halaman 1)
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, "...", totalPages];
   }
 
-  for (const i of range) {
-    if (l) {
-      if (i - l === 2) {
-        rangeWithDots.push(l + 1);
-      } else if (i - l !== 1) {
-        rangeWithDots.push("...");
-      }
-    }
-    rangeWithDots.push(i);
-    l = i;
+  // Jika di akhir-akhir halaman (dekat halaman terakhir)
+  if (currentPage >= totalPages - 3) {
+    return [
+      1,
+      "...",
+      totalPages - 4,
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
   }
 
-  return rangeWithDots;
+  // Jika di tengah-tengah, tampilkan satu angka di kiri dan kanan current
+  return [
+    1,
+    "...",
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    "...",
+    totalPages,
+  ];
 };

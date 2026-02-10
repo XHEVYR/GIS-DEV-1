@@ -36,6 +36,7 @@ export default function Dashboard() {
 
     // Auto refresh setiap 5 detik
     const refreshInterval = setInterval(fetchPlaces, 5000);
+    // Auto update waktu setiap detik
     const clockInterval = setInterval(() => setTime(new Date()), 1000);
 
     return () => {
@@ -66,7 +67,7 @@ export default function Dashboard() {
 
   return (
     <div className="w-full space-y-8">
-      {/* --- 1. HEADER SECTION --- */}
+      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">
@@ -77,7 +78,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Tanggal Hari Ini (Opsional, pemanis) */}
+        {/* Tanggal Hari Ini */}
         <div className="hidden md:block text-right">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
             Update Terakhir
@@ -93,11 +94,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* --- 2. STATS CARDS --- */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* CARD 1: TOTAL DATA (Hero Card - Lime Theme) */}
-        <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-[24px] p-6 shadow-xl shadow-slate-900/20 text-white overflow-hidden group">
-          {/* Dekorasi Background */}
+
+        {/* CARD 1: TOTAL DATA */}
+        <div className="relative bg-linear-to-br from-slate-900 to-slate-800 rounded-[24px] p-6 shadow-xl shadow-slate-900/20 text-white overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <BarChart3 size={100} />
           </div>
@@ -120,7 +121,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* CARD 2: HOTEL (Semantic Blue) */}
+        {/* CARD 2: HOTEL */}
         <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-blue-100/50 hover:border-blue-200 transition-all duration-300 group">
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -140,7 +141,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* CARD 3: CAFE (Semantic Orange) */}
+        {/* CARD 3: CAFE */}
         <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-orange-100/50 hover:border-orange-200 transition-all duration-300 group">
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-orange-50 rounded-2xl text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
@@ -160,7 +161,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* CARD 4: WISATA (Semantic Purple) */}
+        {/* CARD 4: WISATA */}
         <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:shadow-purple-100/50 hover:border-purple-200 transition-all duration-300 group">
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-purple-50 rounded-2xl text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
@@ -182,9 +183,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* --- 3. MAIN CONTENT GRID --- */}
+      {/* Main Content  */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT COL: CHART (Lebar 2/3) */}
+        {/* Kolom Kiri: Chart */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-slate-100 h-full">
             <div className="flex items-center justify-between mb-6">
@@ -206,7 +207,7 @@ export default function Dashboard() {
                 ></span>
               </div>
             </div>
-            {/* Komponen Chart Existing */}
+            {/* Komponen Chart */}
             <ChartData
               data={{
                 hotel: hotelCount,
@@ -217,7 +218,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* RIGHT COL: QUICK ACTIONS & INFO (Lebar 1/3) */}
+        {/* Kolom Kanan: Quick Actions & Info */}
         <div className="flex flex-col gap-6">
           {/* Quick Actions Card */}
           <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
@@ -263,17 +264,17 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* System Status / Info Card */}
+          {/* System Status */}
           <div className="bg-lime-900 rounded-[32px] p-8 text-white relative overflow-hidden flex-1 flex flex-col justify-center">
             {/* Dekorasi Background */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-lime-500/30 blur-[50px] rounded-full"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/20 blur-[40px] rounded-full"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/20 blur-2xl rounded-full"></div>
 
             <div className="relative z-10 text-center">
               <h4 className="text-lime-300 font-bold text-sm uppercase tracking-widest mb-1">
                 Saat Ini (WIB)
               </h4>
-              {/* Jam Digital Besar */}
+              {/* Jam Digital */}
               <p className="text-4xl md:text-5xl font-black tracking-tighter mb-2 text-white">
                 {time.toLocaleTimeString("id-ID", {
                   hour: "2-digit",
@@ -281,6 +282,7 @@ export default function Dashboard() {
                   second: "2-digit",
                 })}
               </p>
+
               {/* Tanggal */}
               <p className="text-lime-100 font-medium text-sm">
                 {time.toLocaleDateString("id-ID", {

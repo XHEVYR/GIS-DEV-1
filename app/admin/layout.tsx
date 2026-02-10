@@ -13,7 +13,7 @@ export default function AdminLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // 1. STATE UNTUK MENGONTROL SIDEBAR
+  // SIDEBAR CONTROL
   const [isMinimized, setIsMinimized] = useState(false);
 
   // Security Check
@@ -23,7 +23,7 @@ export default function AdminLayout({
     }
   }, [status, router]);
 
-  // --- TAMPILAN LOADING (Sesuaikan dengan Lime) ---
+  // TAMPILAN LOADING
   if (status === "loading") {
     return (
       // Background disamakan dengan halaman utama (Slate-50)
@@ -39,28 +39,26 @@ export default function AdminLayout({
     );
   }
 
-  // --- MAIN LAYOUT ---
+  // MAIN LAYOUT
   return (
     // UBAH BACKGROUND: bg-slate-50 (Lebih bersih & premium dibanding gray-100)
     <div className="flex min-h-screen bg-slate-50">
       
-      {/* 2. SIDEBAR (Hitam + Lime) */}
+      {/* SIDEBAR */}
       <AdminSidebar 
         isMinimized={isMinimized} 
         setIsMinimized={setIsMinimized} 
       />
 
-      {/* 3. KONTEN UTAMA */}
+      {/* KONTEN UTAMA */}
       <main 
         className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
           isMinimized ? "ml-20" : "ml-64"
         }`}
       >
         
-        {/* HEADER: Glassmorphism Putih */}
+        {/* HEADER*/}
         <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-30 transition-all">
-          
-          {/* Breadcrumb / Page Title Kecil */}
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-lime-500 animate-pulse"></div>
             <h2 className="text-slate-400 text-xs font-bold uppercase tracking-widest">
@@ -73,16 +71,15 @@ export default function AdminLayout({
               <p className="text-sm font-bold text-slate-700">
                 {session?.user?.name || "Super Admin"}
               </p>
-              {/* Badge Status Online (Lime) */}
+              
               <div className="flex justify-end">
-                 <span className="text-[10px] font-bold text-lime-600 bg-lime-100 px-2 py-0.5 rounded-full">
-                   ONLINE
-                 </span>
+                <span className="text-[10px] font-bold text-lime-600 bg-lime-100 px-2 py-0.5 rounded-full">
+                  ONLINE
+                </span>
               </div>
             </div>
             
-            {/* AVATAR PROFILE (Tema Lime) */}
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-lime-100 to-white flex items-center justify-center text-lime-700 font-black border border-lime-200 shadow-sm cursor-pointer hover:shadow-md transition-all">
+            <div className="h-10 w-10 rounded-xl bg-linear-to-br from-lime-100 to-white flex items-center justify-center text-lime-700 font-black border border-lime-200 shadow-sm cursor-pointer hover:shadow-md transition-all">
               {session?.user?.name?.charAt(0).toUpperCase() || "A"}
             </div>
           </div>

@@ -11,10 +11,9 @@ export default function InputPage() {
   const router = useRouter();
   const [success, setSuccess] = useState(false);
 
-  // Function ini akan dipanggil ketika tombol "Simpan" di PlaceForm diklik
+  // Function ini akan dipanggil ketika tombol "Simpan" di pencet
   const handleSave = async (data: Place) => {
-    // Data yang dikirim dari PlaceForm sudah rapi (termasuk array images)
-    // Kita tinggal kirim ke API POST
+    // Kirim ke API POST
     const res = await fetch("/api/places", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -31,7 +30,7 @@ export default function InputPage() {
     setTimeout(() => router.push("/admin/data?success=true"), 1500);
   };
 
-  // --- TAMPILAN SUKSES (ANIMASI) ---
+  // TAMPILAN SUKSES 
   if (success) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm animate-in fade-in duration-300">
@@ -57,13 +56,9 @@ export default function InputPage() {
     );
   }
 
-  // --- RENDER UTAMA ---
+  // RENDER UTAMA
   return (
     <div className="w-full transition-all duration-500">
-      {/* Panggil PlaceForm TANPA props `initialData`.
-         Otomatis PlaceForm akan tahu ini adalah mode "TAMBAH DATA".
-         Fitur 5 gambar, peta, dan validasi sudah otomatis ikut.
-      */}
       <PlaceForm onSave={handleSave} onCancel={() => router.back()} />
     </div>
   );

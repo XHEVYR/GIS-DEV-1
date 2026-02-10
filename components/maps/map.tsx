@@ -149,7 +149,7 @@ export default function Map() {
                     </p>
                     <button
                       onClick={() => setSelectedPlace(place)}
-                      className="w-full bg-blue-600 text-white py-1.5 px-4 rounded-md text-sm hover:bg-blue-700"
+                      className="w-full bg-lime-600 text-white py-1.5 px-4 rounded-md text-sm hover:bg-lime-700"
                     >
                       Lihat Detail
                     </button>

@@ -39,13 +39,13 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     // Agar data user ikut tersimpan di sesi browser
-    async session({ session, token }: any) {
+    async session({ session, token }) {
       if (session?.user) {
         session.user.username = token.username;
       }
       return session;
     },
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
       if (user) {
         token.username = user.username;
       }

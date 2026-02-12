@@ -8,10 +8,12 @@ export default function AutoLogout() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if (session && 
-        !pathname.startsWith("/admin") && 
-        !pathname.startsWith("/auth") && 
-        pathname !== "/"
+    if (
+      session &&
+      !pathname.startsWith("/admin") &&
+      !pathname.startsWith("/auth") &&
+      pathname !== "/" &&
+      pathname !== "/map"
     ) {
       console.log("Admin tersesat ke halaman yang tidak dikenal -> Logout.");
       signOut({ redirect: false });

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
-  X,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -10,7 +9,7 @@ import {
   Globe,
   CheckSquare,
 } from "lucide-react";
-import { Place } from "@/types";
+import { Place, ScheduleItem } from "@/types";
 
 interface PlaceDetailModalProps {
   place: Place;
@@ -52,9 +51,9 @@ export default function PlaceDetailModal({
   }, [images.length, nextImage]);
 
   return (
-    <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+    <div className="absolute inset-0 z-1000 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative flex flex-col">
-        <div className="relative w-full h-64 sm:h-80 flex-shrink-0 bg-gray-900 group">
+        <div className="relative w-full h-64 sm:h-80 shrink-0 bg-gray-900 group">
           {hasImages ? (
             <>
               {/* GAMBAR UTAMA */}
@@ -103,7 +102,7 @@ export default function PlaceDetailModal({
             </div>
           )}
 
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 pointer-events-none">
             <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
               {place.category}
             </span>
@@ -162,7 +161,69 @@ export default function PlaceDetailModal({
                               ? "Jam Operasional"
                               : "Waktu Akses"}
                       </span>
-                      {place.detail.accessInfo}
+                      {(() => {
+                        try {
+                          // Coba parse jika string JSON
+                          if (place.detail.accessInfo?.startsWith("[")) {
+                            const schedule = JSON.parse(
+                              place.detail.accessInfo,
+                            );
+                            return (
+                              <div className="mt-1 space-y-1">
+                                {schedule.map(
+                                  (item: ScheduleItem, idx: number) => {
+                                    const isHoliday =
+                                      item.isClosed ||
+                                      [
+                                        "Libur Nasional",
+                                        "Tanggal Merah",
+                                      ].includes(
+                                        item.startDay || item.day || "",
+                                      );
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className="flex justify-between gap-4 text-xs"
+                                      >
+                                        <span className="font-medium text-slate-700 w-24">
+                                          {item.startDay || item.day}
+                                          {item.endDay &&
+                                          item.endDay !== item.startDay
+                                            ? ` - ${item.endDay}`
+                                            : ""}
+                                        </span>
+                                        <span
+                                          className={
+                                            isHoliday
+                                              ? "text-red-500 font-bold"
+                                              : "text-slate-600"
+                                          }
+                                        >
+                                          {isHoliday
+                                            ? "TUTUP"
+                                            : `${item.open} - ${item.close}`}
+                                        </span>
+                                      </div>
+                                    );
+                                  },
+                                )}
+                              </div>
+                            );
+                          }
+                          // Fallback untuk data lama (string biasa)
+                          return (
+                            <div className="mt-1 font-medium">
+                              {place.detail.accessInfo}
+                            </div>
+                          );
+                        } catch {
+                          return (
+                            <div className="mt-1 font-medium">
+                              {place.detail.accessInfo}
+                            </div>
+                          );
+                        }
+                      })()}
                     </div>
                   </div>
                 )}
@@ -180,7 +241,23 @@ export default function PlaceDetailModal({
                               ? "Tiket Masuk"
                               : "Harga"}
                       </span>
-                      {place.detail.priceInfo}
+                      {(() => {
+                        const priceInfo = place.detail.priceInfo;
+                        if (!priceInfo) return "-";
+
+                        const formatCurrency = (val: string) => {
+                          const num = parseInt(val.replace(/\D/g, "")); // Clean non-digits just in case
+                          if (isNaN(num)) return val;
+                          return `Rp. ${num.toLocaleString("id-ID")}`;
+                        };
+
+                        if (priceInfo.includes(" - ")) {
+                          const [min, max] = priceInfo.split(" - ");
+                          return `${formatCurrency(min)} - ${formatCurrency(max)}`;
+                        }
+
+                        return formatCurrency(priceInfo);
+                      })()}
                     </div>
                   </div>
                 )}
@@ -208,13 +285,13 @@ export default function PlaceDetailModal({
                     />
                     <div>
                       <span className="block text-xs font-bold text-slate-400 uppercase">
-                        Website / Sosmed
+                        Website / Sosial Media
                       </span>
                       <a
                         href={place.detail.webUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-blue-600 hover:underline truncate block max-w-[200px]"
+                        className="text-blue-600 hover:underline truncate block max-w-50"
                       >
                         Kunjungi URL
                       </a>

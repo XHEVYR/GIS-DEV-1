@@ -25,7 +25,7 @@ export default function Navbar({
     >
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="bg-gradient-to-br from-lime-500 to-emerald-600 p-2 rounded-xl shadow-lg shadow-lime-500/20 text-white">
+          <div className="bg-linear-to-br from-lime-500 to-emerald-600 p-2 rounded-xl shadow-lg shadow-lime-500/20 text-white">
             <Globe size={20} strokeWidth={3} />
           </div>
           <span className="text-xl font-bold tracking-tight text-black">

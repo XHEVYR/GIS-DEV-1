@@ -7,10 +7,12 @@ import AboutSection from "@/components/landing/AboutSection";
 import CategoriesSection from "@/components/landing/CategoriesSection";
 import Footer from "@/components/landing/Footer";
 
+// Landing page component
 export default function LandingPage() {
+  // Fullscreen state
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  // Fix Leaflet Resize Bug saat Fullscreen toggle
+  // Fix map resize on fullscreen toggle
   useEffect(() => {
     const timer = setTimeout(() => {
       window.dispatchEvent(new Event("resize"));
@@ -18,6 +20,7 @@ export default function LandingPage() {
     return () => clearTimeout(timer);
   }, [isFullScreen]);
 
+  // Event handlers
   const handleOpenMap = () => setIsFullScreen(true);
   const handleCloseMap = () => setIsFullScreen(false);
 
@@ -34,12 +37,14 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 font-sans selection:bg-lime-200 selection:text-lime-900">
+      {/* Navbar */}
       <Navbar
         isFullScreen={isFullScreen}
         onOpenMap={handleOpenMap}
         onScrollTo={handleScrollTo}
       />
 
+      {/* Main content sections */}
       <main className="flex-1 pt-20">
         <HeroSection
           isFullScreen={isFullScreen}
@@ -55,4 +60,4 @@ export default function LandingPage() {
       <Footer onOpenMap={handleOpenMap} onScrollTo={handleScrollTo} />
     </div>
   );
-}
+} 

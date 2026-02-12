@@ -21,7 +21,7 @@ import { useAdminData } from "@/hooks/useAdminData";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
-// --- STYLES ---
+// Styles
 const STYLES = {
   headerIcon:
     "bg-black text-lime-400 p-2.5 rounded-xl shadow-xl shadow-slate-900/10",
@@ -38,6 +38,8 @@ const STYLES = {
 
 export default function DataPage() {
   const searchParams = useSearchParams();
+
+  // Hook untuk state management
   const {
     currentPlaces,
     filteredPlaces,
@@ -57,73 +59,6 @@ export default function DataPage() {
     showNotification,
   } = useAdminData();
 
-  // --- 2. DEFINISI FUNGSI START TOUR (Bisa dipanggil manual) ---
-  const startTour = () => {
-    const driverObj = driver({
-      showProgress: true,
-      animate: true,
-      nextBtnText: 'Lanjut ➡',
-      prevBtnText: '⬅ Kembali',
-      doneBtnText: 'Selesai ✨',
-      steps: [
-        {
-          element: '#tour-search',
-          popover: {
-            title: 'Pencarian Cepat',
-            description: 'Ketik nama lokasi atau kategori di sini untuk menyaring data secara instan.',
-            side: "bottom",
-            align: 'start'
-          }
-        },
-        {
-          element: '#tour-filter',
-          popover: {
-            title: 'Atur Tampilan',
-            description: 'Tentukan berapa banyak baris data yang ingin Anda lihat dalam satu halaman.',
-            side: "bottom",
-            align: 'center'
-          }
-        },
-        {
-          element: '#tour-add-btn',
-          popover: {
-            title: 'Tambah Lokasi',
-            description: 'Klik tombol ini untuk membuka formulir input data geospasial baru.',
-            side: "left",
-            align: 'center'
-          }
-        },
-        {
-          element: '#tour-action-buttons',
-          popover: {
-            title: 'Edit & Hapus Data',
-            description: 'Gunakan tombol di kolom aksi ini untuk mengedit atau menghapus data lokasi yang spesifik.',
-            side: "left",
-            align: 'center'
-          }
-        }
-      ]
-    });
-
-    driverObj.drive();
-  };
-
-  // --- 3. LOGIC AUTO START TOUR (Hanya sekali) ---
-  useEffect(() => {
-    if (filteredPlaces.length > 0) {
-      const continueFromDashboard = sessionStorage.getItem('continueTourFromDashboard');
-      const hasSeenDataTour = localStorage.getItem('hasSeenDataPageTour');
-
-      if (continueFromDashboard || !hasSeenDataTour) {
-        setTimeout(() => {
-          startTour();
-          localStorage.setItem('hasSeenDataPageTour', 'true');
-          sessionStorage.removeItem('continueTourFromDashboard');
-        }, 1000);
-      }
-    }
-  }, [filteredPlaces.length]);
-
   // Success notification handler
   useEffect(() => {
     if (searchParams.get("success") === "true") {
@@ -134,6 +69,7 @@ export default function DataPage() {
     }
   }, [searchParams, showNotification]);
 
+  // Edit form handler
   if (editingPlace) {
     return (
       <div className="w-full transition-all duration-500">
@@ -148,6 +84,7 @@ export default function DataPage() {
 
   return (
     <>
+      {/* Notification toast */}
       {notification.show && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500">
           <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 min-w-[320px] flex flex-col gap-3">
@@ -162,6 +99,7 @@ export default function DataPage() {
                 <p className="text-xs text-slate-500">{notification.message}</p>
               </div>
             </div>
+            {/* Progress bar */}
             <div className="h-1 bg-slate-100 rounded-full overflow-hidden w-full">
               <div className="h-full bg-emerald-500 w-full origin-left animate-[shrinkBar_5s_linear_forwards]"></div>
             </div>
@@ -170,6 +108,7 @@ export default function DataPage() {
       )}
 
       <div className="w-full transition-all duration-500 ease-in-out">
+        {/* Header */}
         <header className="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200 py-5 px-6 md:px-12 transition-all">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             
@@ -200,7 +139,7 @@ export default function DataPage() {
               </p>
             </div>
 
-            {/* --- HEADER KANAN (Actions) --- */}
+            {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
               <div id="tour-search" className="flex-1 min-w-50 lg:w-72">
                 <SearchBar
@@ -208,7 +147,8 @@ export default function DataPage() {
                   placeholder="Cari nama atau kategori..."
                 />
               </div>
-              <div id="tour-filter" className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm hover:border-lime-300 transition-colors">
+              {/* Rows per page */}
+              <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm hover:border-lime-300 transition-colors">
                 <Settings2 size={14} className="text-slate-400" />
                 <select
                   className="text-xs font-bold text-slate-600 outline-none bg-transparent cursor-pointer hover:text-black transition-colors"
@@ -232,7 +172,8 @@ export default function DataPage() {
           </div>
         </header>
 
-        <div className="w-full">
+        {/* Table */}
+        <div className="w-full overflow-hidden border-t border-b border-slate-200 bg-white">
           <PlaceTable
             data={currentPlaces}
             onEdit={(place) => setEditingPlace(place)}
@@ -242,6 +183,7 @@ export default function DataPage() {
           />
         </div>
 
+        {/* Pagination */}
         <div className={STYLES.paginationWrapper}>
           <div className="text-center md:text-left pl-2">
             <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">

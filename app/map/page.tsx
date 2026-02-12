@@ -2,61 +2,53 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useSession } from "next-auth/react"; // <--- 1. Import useSession
+import { useSession } from "next-auth/react";
+import { LayoutDashboard} from "lucide-react";
 
-// Import Peta
+// Import Peta secara dinamis (Client side only)
 const Map = dynamic(() => import("@/components/maps/map"), {
   ssr: false,
   loading: () => (
-    <div className="h-screen w-full flex items-center justify-center bg-gray-100 text-gray-500">
-      Memuat Peta...
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 text-slate-400 gap-3">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-lime-600"></div>
+      <p className="text-sm font-bold animate-pulse uppercase tracking-widest">
+        Memuat Peta Kawasan...
+      </p>
     </div>
   ),
 });
 
-export default function HomePage() {
-  const { data: session } = useSession(); // <--- 2. Cek status login
+export default function UniversalMapPage() {
+  const { data: session } = useSession();
 
   return (
-    <div className="h-screen w-full flex flex-col">
-      {/* Navbar Atas */}
-      <nav className="bg-white p-4 text-indigo-600 font-bold flex justify-between items-center shadow-sm z-10 border-b">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold tracking-tight text-slate-800">
-            GIS <span className="text-indigo-600">KOTA BLITAR</span>
-          </span>
-        </div>
-
-        {/* LOGIKA TOMBOL PINTAR */}
-        {session ? (
-          // JIKA SUDAH LOGIN: Tampilkan tombol Dashboard & Nama Admin
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-500 hidden sm:block">
-              Halo,{" "}
-              <span className="font-bold text-indigo-600">
-                {session.user?.name}
-              </span>
-            </span>
-            <Link
-              href="/admin"
-              className="bg-emerald-600 text-white px-5 py-2 rounded-full font-bold text-sm tracking-wide hover:bg-emerald-700 transition shadow-lg"
-            >
-              KEMBALI KE DASHBOARD
-            </Link>
-          </div>
-        ) : (
-          // JIKA BELUM LOGIN: Tampilkan tombol Login biasa
+    <div className="h-screen w-full flex flex-col overflow-hidden relative">
+      {/* Floating Navigation Controls */}
+      <div className="absolute top-6 left-6 z-1000 flex gap-3">
+        {session && (
           <Link
-            href="/auth/login"
-            className="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold text-sm tracking-wide hover:bg-indigo-700 transition shadow-lg"
+            href="/admin"
+            className="bg-slate-900/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-slate-700 text-white hover:bg-black hover:scale-105 transition-all flex items-center gap-2 group"
           >
-            LOGIN ADMIN
+            <LayoutDashboard size={18} className="text-lime-400" />
+            <span className="text-sm font-bold">Dashboard</span>
           </Link>
         )}
-      </nav>
+      </div>
 
-      {/* Area Peta */}
-      <div className="flex-1 relative z-0 bg-slate-100">
+      {/* Info Badge */}
+      <div className="absolute top-6 right-6 z-1000 hidden md:block">
+        <div className="bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-lg border border-white/50 flex items-center gap-3">
+          <div className="h-2 w-2 rounded-full bg-lime-500 animate-pulse"></div>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+            GIS <span className="text-lime-600">Kawasan Blitar</span> • Live
+            Mode
+          </p>
+        </div>
+      </div>
+
+      {/* Area Peta Fullscreen */}
+      <div className="flex-1 relative z-0">
         <Map />
       </div>
     </div>

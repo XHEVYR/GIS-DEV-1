@@ -10,92 +10,34 @@ import {
   Plus,
   Map,
   ArrowUpRight,
-  HelpCircle, // Icon baru untuk trigger manual tour
 } from "lucide-react";
 import ChartData from "@/components/dashboard/ChartData";
 import { Place } from "@/types";
-
-// --- IMPORT DRIVER.JS ---
-import { driver } from "driver.js";
-import "driver.js/dist/driver.css";
 
 export default function Dashboard() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const [time, setTime] = useState(new Date());
 
-  // --- FUNGSI START TOUR (GUIDE) ---
-  const startTour = () => {
-    const driverObj = driver({
-      showProgress: true,
-      animate: true,
-      // Kustomisasi warna tombol agar sesuai tema Lime/Green
-      nextBtnText: 'Lanjut',
-      prevBtnText: 'Kembali',
-      doneBtnText: 'Selesai',
-      steps: [
-        {
-          element: '#tour-welcome',
-          popover: {
-            title: 'Selamat Datang di Dashboard GIS!',
-            description: 'Mari kita jelajahi fitur-fitur utama untuk memantau data geospasial kawasan Blitar.',
-            side: "bottom",
-            align: 'start'
-          }
-        },
-        {
-          element: '#tour-total-data',
-          popover: {
-            title: 'Total Data Keseluruhan',
-            description: 'Kartu ini menampilkan jumlah total lokasi yang tersimpan di database saat ini.',
-            side: "right",
-            align: 'start'
-          }
-        },
-        {
-          element: '#tour-kategori-cards',
-          popover: {
-            title: 'Rincian Per Kategori',
-            description: 'Klik pada kartu Hotel, Cafe, atau Wisata untuk melihat tabel data spesifik kategori tersebut.',
-            side: "bottom",
-            align: 'start'
-          }
-        },
-        {
-          element: '#tour-chart',
-          popover: {
-            title: 'Visualisasi Statistik',
-            description: 'Grafik ini membantu Anda membandingkan proporsi jumlah lokasi antar kategori secara visual.',
-            side: "top",
-            align: 'start'
-          }
-        },
-        {
-          element: '#tour-quick-actions',
-          popover: {
-            title: 'Aksi Cepat (Shortcuts)',
-            description: 'Gunakan tombol ini untuk menambah data baru atau melompat ke peta utama tanpa melalui sidebar.',
-            side: "left",
-            align: 'start'
-          }
-        },
-        {
-          element: '#tour-realtime-clock',
-          popover: {
-            title: 'Waktu Real-time',
-            description: 'Pastikan data yang Anda pantau sesuai dengan waktu operasional saat ini.',
-            side: "left",
-            align: 'start'
-          }
-        },
-      ]
-    });
-
-    driverObj.drive();
+  // --- PERBAIKAN: Definisi fungsi fetchPlaces ---
+  const fetchPlaces = async () => {
+    try {
+      // Pastikan endpoint API ini sesuai dengan backend Anda (misal: /api/places)
+      const response = await fetch("/api/places");
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data");
+      }
+      const data = await response.json();
+      setPlaces(data);
+    } catch (error) {
+      console.error("Error fetching places:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchPlaces(); // Initial fetch
+    fetchPlaces(); // Panggil saat mount
 
     // Auto refresh setiap 5 detik
     const refreshInterval = setInterval(fetchPlaces, 5000);
@@ -107,22 +49,6 @@ export default function Dashboard() {
       clearInterval(clockInterval);
     };
   }, []);
-
-  // --- AUTO START TOUR SAAT LOAD SELESAI ---
-  useEffect(() => {
-    if (!loading) {
-      // Cek apakah user sudah pernah melihat tour (disimpan di localStorage)
-      const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
-      
-      if (!hasSeenTour) {
-        // Beri sedikit delay agar rendering sempurna
-        setTimeout(() => {
-          startTour();
-          localStorage.setItem('hasSeenDashboardTour', 'true');
-        }, 1000);
-      }
-    }
-  }, [loading]);
 
   // --- HITUNG STATISTIK ---
   const totalData = places.length;
@@ -153,7 +79,7 @@ export default function Dashboard() {
             Dashboard <span className="text-lime-600">Overview</span>
           </h1>
           <p className="text-slate-500 mt-2 font-medium">
-            Pantau perkembangan data geospasial Kota Blitar secara real-time.
+            Pantau perkembangan data geospasial kawasan Blitar secara real-time.
           </p>
         </div>
 
@@ -265,7 +191,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Kolom Kiri: Chart */}
         <div className="lg:col-span-2">
-          <div id="tour-chart" className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-slate-100 h-full">
+          <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-slate-100 h-full">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-slate-800">
                 Statistik Kategori
@@ -301,8 +227,8 @@ export default function Dashboard() {
 
         {/* Kolom Kanan: Quick Actions & Info */}
         <div className="flex flex-col gap-6">
-          {/* Quick Actions Card (ID: tour-quick-actions) */}
-          <div id="tour-quick-actions" className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
+          {/* Quick Actions Card */}
+          <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
             <h3 className="text-lg font-bold text-slate-800 mb-4">
               Aksi Cepat
             </h3>

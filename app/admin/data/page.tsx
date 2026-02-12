@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Plus, Database, Settings2, CheckCircle, HelpCircle } from "lucide-react";
+import { Plus, Database, Settings2, CheckCircle } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -18,8 +18,6 @@ import PlaceTable from "@/components/places/PlaceTable";
 import PlaceForm from "@/components/places/PlaceForm";
 import { generatePagination } from "@/lib/utils";
 import { useAdminData } from "@/hooks/useAdminData";
-import { driver } from "driver.js";
-import "driver.js/dist/driver.css";
 
 // Styles
 const STYLES = {
@@ -122,26 +120,18 @@ export default function DataPage() {
                   Data <span className="text-lime-600">Lokasi</span>
                 </h1>
                 
-                {/* 4. TOMBOL REPLAY TOUR DISINI */}
-                <button 
-                  onClick={startTour}
-                  className="hidden md:flex items-center gap-2 text-[10px] font-bold text-lime-600 bg-lime-50 px-3 py-1.5 rounded-full hover:bg-lime-100 transition-colors border border-lime-200"
-                  title="Putar Ulang Panduan"
-                >
-                  <HelpCircle size={14} />
-                  Panduan
-                </button>
+                {/* Tombol Panduan/Tour dihapus dari sini */}
               </div>
 
               <p className={STYLES.subTitle}>
-                Kelola total {filteredPlaces.length} data geospasial Kota
+                Kelola total {filteredPlaces.length} data geospasial kawasan
                 Blitar.
               </p>
             </div>
 
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-              <div id="tour-search" className="flex-1 min-w-50 lg:w-72">
+              <div className="flex-1 min-w-50 lg:w-72">
                 <SearchBar
                   onSearch={handleSearch}
                   placeholder="Cari nama atau kategori..."
@@ -164,7 +154,7 @@ export default function DataPage() {
                   <option value={100}>100 Baris</option>
                 </select>
               </div>
-              <Link id="tour-add-btn" href="/admin/input" className={STYLES.actionButton}>
+              <Link href="/admin/input" className={STYLES.actionButton}>
                 <Plus size={20} strokeWidth={3} />{" "}
                 <span className="hidden sm:inline">Tambah</span>
               </Link>

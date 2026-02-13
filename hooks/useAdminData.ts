@@ -10,6 +10,7 @@ export function useAdminData() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Place;
     direction: "asc" | "desc";
@@ -49,13 +50,19 @@ export function useAdminData() {
   useEffect(() => {
     let result = [...places];
 
+    if (categoryFilter !== "all") {
+      result = result.filter(
+        (p) => p.category.toLowerCase() === categoryFilter.toLowerCase(),
+      );
+    }
+
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(lowerQuery) ||
           p.address?.toLowerCase().includes(lowerQuery) ||
-          p.category.includes(lowerQuery),
+          p.category.toLowerCase().includes(lowerQuery),
       );
     }
 
@@ -70,7 +77,7 @@ export function useAdminData() {
     }
 
     setFilteredPlaces(result);
-  }, [places, searchQuery, sortConfig]);
+  }, [places, searchQuery, sortConfig, categoryFilter]);
 
   // Logika Pagination
   const totalPages = Math.ceil(filteredPlaces.length / itemsPerPage);
@@ -177,11 +184,14 @@ export function useAdminData() {
     itemsPerPage,
     editingPlace,
     sortConfig,
+    searchQuery,
+    categoryFilter,
     notification,
 
     // Actions
     setItemsPerPage,
     setEditingPlace,
+    setCategoryFilter,
     handlePageChange,
     handleSearch,
     handleSort,

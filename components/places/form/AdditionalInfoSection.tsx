@@ -52,7 +52,13 @@ export default function AdditionalInfoSection({
     <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-4">
       <div className="flex items-center gap-2 mb-2 text-slate-700 font-bold border-b pb-2">
         <Info size={18} />
-        <h3>Detail Tambahan ({category || "Umum"})</h3>
+        <h3>
+          Detail Tambahan (
+          {category === "cafe" || category === "Cafe"
+            ? "Cafe & Resto"
+            : category || "Umum"}
+          )
+        </h3>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -200,129 +206,236 @@ export default function AdditionalInfoSection({
 
                               const val = e.target.value;
                               current[index].isClosed = val === "tutup";
-                              if (val === "tutup") {
+                              current[index].is24Hours = val === "24jam";
+
+                              if (val === "tutup" || val === "24jam") {
                                 current[index].open = "";
                                 current[index].close = "";
                               }
                               onChange("accessInfo", JSON.stringify(current));
                             }}
-                            className={`w-full p-2 border rounded-lg text-sm outline-none font-bold ${item.isClosed ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
+                            className={`w-full p-2 border rounded-lg text-sm outline-none font-bold ${
+                              item.isClosed
+                                ? "bg-red-50 text-red-600 border-red-200"
+                                : item.is24Hours
+                                  ? "bg-blue-50 text-blue-600 border-blue-200"
+                                  : "bg-green-50 text-green-600 border-green-200"
+                            }`}
                           >
                             <option value="buka">BUKA</option>
                             <option value="tutup">TUTUP</option>
+                            <option value="24jam">24 JAM</option>
                           </select>
                         </div>
 
-                        {/* Time Inputs */}
-                        <div className="col-span-8 flex items-center gap-2">
+                        {/* Time Inputs / Shifts Area (NEW) */}
+                        <div className="col-span-8 flex flex-col gap-2">
                           {isRowClosed ? (
                             <div className="w-full p-2 bg-slate-100 text-slate-400 text-sm font-bold text-center border border-slate-200 rounded-lg">
                               LIBUR
                             </div>
+                          ) : item.is24Hours ? (
+                            <div className="w-full p-2 bg-blue-50 text-blue-600 text-sm font-bold text-center border border-blue-200 rounded-lg uppercase tracking-wider">
+                              Non-Stop 24 Jam
+                            </div>
                           ) : (
-                            <>
-                              <input
-                                type="text"
-                                value={item.open}
-                                placeholder="00:00"
-                                maxLength={5}
-                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-mono"
-                                onChange={(e) => {
-                                  let val = e.target.value.replace(
-                                    /[^0-9:]/g,
-                                    "",
-                                  );
+                            <div className="space-y-2">
+                              {/* Render existing shifts or legacy open/close */}
+                              {(!item.shifts || item.shifts.length === 0
+                                ? [
+                                    {
+                                      open: item.open || "",
+                                      close: item.close || "",
+                                    },
+                                  ]
+                                : item.shifts
+                              ).map((shift, sIndex) => (
+                                <div
+                                  key={sIndex}
+                                  className="flex items-center gap-2 group/shift"
+                                >
+                                  <input
+                                    type="text"
+                                    value={shift.open}
+                                    placeholder="00:00"
+                                    maxLength={5}
+                                    className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-mono"
+                                    onChange={(e) => {
+                                      let val = e.target.value.replace(
+                                        /[^0-9:]/g,
+                                        "",
+                                      );
+                                      if (
+                                        val.length === 2 &&
+                                        !val.includes(":")
+                                      )
+                                        val = val + ":";
 
-                                  // Auto-insert colon after 2 digits
-                                  if (val.length === 2 && !val.includes(":")) {
-                                    val = val + ":";
-                                  }
+                                      const current: ScheduleItem[] =
+                                        detail.accessInfo?.startsWith("[")
+                                          ? JSON.parse(detail.accessInfo)
+                                          : [];
+                                      if (!current[index].shifts) {
+                                        current[index].shifts = [
+                                          {
+                                            open: current[index].open || "",
+                                            close: current[index].close || "",
+                                          },
+                                        ];
+                                      }
+                                      current[index].shifts![sIndex].open = val;
+                                      // Sync back to legacy fields for backward compatibility if it's the first shift
+                                      if (sIndex === 0)
+                                        current[index].open = val;
 
+                                      onChange(
+                                        "accessInfo",
+                                        JSON.stringify(current),
+                                      );
+                                    }}
+                                  />
+                                  <span className="text-slate-400 font-bold">
+                                    -
+                                  </span>
+                                  <input
+                                    type="text"
+                                    value={shift.close}
+                                    placeholder="00:00"
+                                    maxLength={5}
+                                    className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-mono"
+                                    onChange={(e) => {
+                                      let val = e.target.value.replace(
+                                        /[^0-9:]/g,
+                                        "",
+                                      );
+                                      if (
+                                        val.length === 2 &&
+                                        !val.includes(":")
+                                      )
+                                        val = val + ":";
+
+                                      const current: ScheduleItem[] =
+                                        detail.accessInfo?.startsWith("[")
+                                          ? JSON.parse(detail.accessInfo)
+                                          : [];
+                                      if (!current[index].shifts) {
+                                        current[index].shifts = [
+                                          {
+                                            open: current[index].open || "",
+                                            close: current[index].close || "",
+                                          },
+                                        ];
+                                      }
+                                      current[index].shifts![sIndex].close =
+                                        val;
+                                      if (sIndex === 0)
+                                        current[index].close = val;
+
+                                      onChange(
+                                        "accessInfo",
+                                        JSON.stringify(current),
+                                      );
+                                    }}
+                                  />
+                                  {/* Delete shift (only if more than 1) */}
+                                  {item.shifts && item.shifts.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const current: ScheduleItem[] =
+                                          JSON.parse(detail.accessInfo!);
+                                        current[index].shifts = current[
+                                          index
+                                        ].shifts!.filter(
+                                          (_, i) => i !== sIndex,
+                                        );
+                                        // Sync legacy fields
+                                        if (
+                                          sIndex === 0 &&
+                                          current[index].shifts!.length > 0
+                                        ) {
+                                          current[index].open =
+                                            current[index].shifts![0].open;
+                                          current[index].close =
+                                            current[index].shifts![0].close;
+                                        }
+                                        onChange(
+                                          "accessInfo",
+                                          JSON.stringify(current),
+                                        );
+                                      }}
+                                      className="p-1.5 text-red-400 hover:text-red-600 transition-colors"
+                                      title="Hapus Shift"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="3"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      >
+                                        <path d="M18 6 6 18" />
+                                        <path d="m6 6 12 12" />
+                                      </svg>
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+
+                              {/* Add Shift Button */}
+                              <button
+                                type="button"
+                                onClick={() => {
                                   const current: ScheduleItem[] =
                                     detail.accessInfo?.startsWith("[")
                                       ? JSON.parse(detail.accessInfo)
-                                      : [
-                                          {
-                                            startDay: "Senin",
-                                            endDay: "Jumat",
-                                            open: "",
-                                            close: "",
-                                          },
-                                        ];
-                                  current[index].open = val;
+                                      : [];
+                                  if (!current[index].shifts) {
+                                    current[index].shifts = [
+                                      {
+                                        open: current[index].open || "",
+                                        close: current[index].close || "",
+                                      },
+                                    ];
+                                  }
+                                  current[index].shifts.push({
+                                    open: "",
+                                    close: "",
+                                  });
                                   onChange(
                                     "accessInfo",
                                     JSON.stringify(current),
                                   );
                                 }}
-                                onBlur={(e) => {
-                                  const val = e.target.value;
-                                  if (
-                                    val &&
-                                    !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(
-                                      val,
-                                    )
-                                  ) {
-                                    alert(
-                                      "Format jam harus HH:mm (contoh: 08:00, 14:30)",
-                                    );
-                                  }
-                                }}
-                              />
-                              <span className="text-slate-400 font-bold">
-                                -
-                              </span>
-                              <input
-                                type="text"
-                                value={item.close}
-                                placeholder="00:00"
-                                maxLength={5}
-                                className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-mono"
-                                onChange={(e) => {
-                                  let val = e.target.value.replace(
-                                    /[^0-9:]/g,
-                                    "",
-                                  );
-
-                                  // Auto-insert colon after 2 digits
-                                  if (val.length === 2 && !val.includes(":")) {
-                                    val = val + ":";
-                                  }
-
-                                  const current: ScheduleItem[] =
-                                    detail.accessInfo?.startsWith("[")
-                                      ? JSON.parse(detail.accessInfo)
-                                      : [
-                                          {
-                                            startDay: "Senin",
-                                            endDay: "Jumat",
-                                            open: "",
-                                            close: "",
-                                          },
-                                        ];
-                                  current[index].close = val;
-                                  onChange(
-                                    "accessInfo",
-                                    JSON.stringify(current),
-                                  );
-                                }}
-                                onBlur={(e) => {
-                                  const val = e.target.value;
-                                  if (
-                                    val &&
-                                    !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(
-                                      val,
-                                    )
-                                  ) {
-                                    alert(
-                                      "Format jam harus HH:mm (contoh: 08:00, 14:30)",
-                                    );
-                                  }
-                                }}
-                              />
-                            </>
+                                className="w-full py-1 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-md hover:bg-blue-100 hover:border-blue-200 transition-all flex items-center justify-center gap-1.5 uppercase tracking-tighter"
+                              >
+                                <span>+ Tambah Shift</span>
+                              </button>
+                            </div>
                           )}
                         </div>
+                      </div>
+
+                      {/* Note Input (New) */}
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          value={item.note || ""}
+                          placeholder="Catatan tambahan (misal: Tutup saat Imlek, Sholat Jumat, dll)"
+                          className="w-full p-2 border border-slate-200 bg-white rounded-lg text-[11px] focus:ring-2 focus:ring-blue-500 outline-none"
+                          onChange={(e) => {
+                            const current: ScheduleItem[] =
+                              detail.accessInfo?.startsWith("[")
+                                ? JSON.parse(detail.accessInfo)
+                                : [];
+                            current[index].note = e.target.value;
+                            onChange("accessInfo", JSON.stringify(current));
+                          }}
+                        />
                       </div>
                     </div>
 
@@ -407,12 +520,29 @@ export default function AdditionalInfoSection({
               Tambah Jadwal Baru
             </button>
           </div>
+
+          <div className="mt-4 p-3 bg-blue-50/50 rounded-lg border border-blue-100 flex items-start gap-2">
+            <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
+            <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+              <strong className="text-blue-600 block mb-0.5 uppercase tracking-wider text-[9px]">
+                Tips Input:
+              </strong>
+              Anda bisa menambah baris baru dengan hari yang sama (misal: Jumat)
+              untuk membuat jadwal shift atau jam istirahat. Gunakan kolom
+              catatan untuk info khusus hari tersebut.
+            </p>
+          </div>
         </div>
 
         {/* Price Info */}
         <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-            <Tag size={12} /> {labels.priceInfo}
+          <label className="text-xs font-bold text-slate-500 uppercase flex items-center justify-between gap-1">
+            <span className="flex items-center gap-1">
+              <Tag size={12} /> {labels.priceInfo}
+            </span>
+            <span className="text-[10px] normal-case font-medium text-blue-500 italic">
+              * Isi 0 untuk &quot;Gratis&quot;
+            </span>
           </label>
           <div className="flex items-center gap-2">
             <input

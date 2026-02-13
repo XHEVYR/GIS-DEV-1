@@ -8,7 +8,7 @@ interface PlaceTableProps {
   data: Place[];
   onEdit: (place: Place) => void;
   onDelete: (id: string, name: string) => void;
-  onSort?: (key: keyof Place) => void; 
+  onSort?: (key: keyof Place) => void;
   sortConfig?: { key: keyof Place; direction: "asc" | "desc" } | null;
 }
 
@@ -19,10 +19,14 @@ export default function PlaceTable({
   onSort,
   sortConfig,
 }: PlaceTableProps) {
-  
   const getSortIcon = (columnName: keyof Place) => {
     if (!sortConfig || sortConfig.key !== columnName) {
-      return <ArrowUpDown size={14} className="text-slate-300 opacity-50 group-hover:opacity-100" />;
+      return (
+        <ArrowUpDown
+          size={14}
+          className="text-slate-300 opacity-50 group-hover:opacity-100"
+        />
+      );
     }
     return sortConfig.direction === "asc" ? (
       <ArrowUp size={14} className="text-lime-600" />
@@ -45,7 +49,7 @@ export default function PlaceTable({
         <thead>
           <tr className="bg-slate-50 border-b border-slate-200">
             {/* Header Nama (25%) */}
-            <th 
+            <th
               className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[25%] cursor-pointer hover:bg-slate-100 transition-colors group select-none"
               onClick={() => onSort && onSort("name")}
             >
@@ -56,7 +60,7 @@ export default function PlaceTable({
             </th>
 
             {/* Header Kategori (15%) */}
-            <th 
+            <th
               className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%] cursor-pointer hover:bg-slate-100 transition-colors group select-none"
               onClick={() => onSort && onSort("category")}
             >
@@ -67,9 +71,15 @@ export default function PlaceTable({
             </th>
 
             {/* Header Lainnya */}
-            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%]">Koordinat</th>
-            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[30%]">Alamat</th>
-            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%] text-center">Aksi</th>
+            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%]">
+              Koordinat
+            </th>
+            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[30%]">
+              Alamat
+            </th>
+            <th className="p-5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 w-[15%] text-center">
+              Aksi
+            </th>
           </tr>
         </thead>
 
@@ -93,36 +103,48 @@ export default function PlaceTable({
               </td>
 
               <td className="p-5 align-middle">
-                <span className={`px-3 py-1.5 text-[10px] font-black rounded-lg border tracking-wide inline-block shadow-sm ${
-                    place.category === "wisata" ? "bg-purple-50 text-purple-700 border-purple-200" : 
-                    place.category === "hotel" ? "bg-blue-50 text-blue-700 border-blue-200" : 
-                    "bg-orange-50 text-orange-700 border-orange-200"
+                <span
+                  className={`px-3 py-1.5 text-[10px] font-black rounded-lg border tracking-wide inline-block shadow-sm ${
+                    place.category === "wisata"
+                      ? "bg-purple-50 text-purple-700 border-purple-200"
+                      : place.category === "hotel"
+                        ? "bg-blue-50 text-blue-700 border-blue-200"
+                        : "bg-orange-50 text-orange-700 border-orange-200"
                   }`}
                 >
-                  {place.category.toUpperCase()}
+                  {place.category.toLowerCase() === "cafe"
+                    ? "CAFE & RESTO"
+                    : place.category.toUpperCase()}
                 </span>
               </td>
 
               <td className="p-5 align-middle">
                 <div className="font-mono text-[12px] text-slate-500 font-medium leading-relaxed group-hover:text-slate-700 transition-colors">
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-400 text-[10px] uppercase font-bold group-hover:text-lime-600 transition-colors">Lat</span>
+                    <span className="text-slate-400 text-[10px] uppercase font-bold group-hover:text-lime-600 transition-colors">
+                      Lat
+                    </span>
                     {Number(place.lat).toFixed(6)}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-400 text-[10px] uppercase font-bold group-hover:text-lime-600 transition-colors">Lon</span>
+                    <span className="text-slate-400 text-[10px] uppercase font-bold group-hover:text-lime-600 transition-colors">
+                      Lon
+                    </span>
                     {Number(place.lon).toFixed(6)}
                   </div>
                 </div>
               </td>
 
               <td className="p-5 align-middle">
-                <p className="text-slate-600 text-[13px] leading-relaxed line-clamp-2 font-medium" title={place.address}>
+                <p
+                  className="text-slate-600 text-[13px] leading-relaxed line-clamp-2 font-medium"
+                  title={place.address}
+                >
                   {place.address || "-"}
                 </p>
               </td>
 
-              <td 
+              <td
                 id={index === 0 ? "tour-action-buttons" : undefined}
                 className="p-5 align-middle text-center"
               >

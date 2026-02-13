@@ -104,7 +104,9 @@ export default function PlaceDetailModal({
 
           <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 pointer-events-none">
             <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-              {place.category}
+              {place.category === "cafe" || place.category === "Cafe"
+                ? "Cafe & Resto"
+                : place.category}
             </span>
             <h2 className="text-3xl font-bold text-white mt-2">{place.name}</h2>
           </div>
@@ -153,56 +155,128 @@ export default function PlaceDetailModal({
                     />
                     <div>
                       <span className="block text-xs font-bold text-slate-400 uppercase">
-                        {place.category === "Hotel"
+                        {place.category.toLowerCase() === "hotel"
                           ? "Check-in/Out"
-                          : place.category === "Cafe"
+                          : place.category.toLowerCase() === "cafe"
                             ? "Jam Buka"
-                            : place.category === "Wisata"
+                            : place.category.toLowerCase() === "wisata"
                               ? "Jam Operasional"
                               : "Waktu Akses"}
                       </span>
                       {(() => {
                         try {
+                          const accessInfo = place.detail.accessInfo;
+                          if (!accessInfo) return "-";
+
                           // Coba parse jika string JSON
-                          if (place.detail.accessInfo?.startsWith("[")) {
-                            const schedule = JSON.parse(
-                              place.detail.accessInfo,
+                          if (accessInfo.startsWith("[")) {
+                            const schedule: ScheduleItem[] =
+                              JSON.parse(accessInfo);
+
+                            // Grouping shifts by day label
+                            const groupedSchedule = schedule.reduce(
+                              (acc: Record<string, ScheduleItem[]>, item) => {
+                                const dayLabel = `${item.startDay || item.day || ""}${
+                                  item.endDay && item.endDay !== item.startDay
+                                    ? ` - ${item.endDay}`
+                                    : ""
+                                }`;
+                                if (!acc[dayLabel]) acc[dayLabel] = [];
+                                acc[dayLabel].push(item);
+                                return acc;
+                              },
+                              {},
                             );
+
                             return (
-                              <div className="mt-1 space-y-1">
-                                {schedule.map(
-                                  (item: ScheduleItem, idx: number) => {
-                                    const isHoliday =
-                                      item.isClosed ||
-                                      [
-                                        "Libur Nasional",
-                                        "Tanggal Merah",
-                                      ].includes(
-                                        item.startDay || item.day || "",
-                                      );
+                              <div className="mt-1 space-y-3">
+                                {Object.entries(groupedSchedule).map(
+                                  ([dayLabel, items], idx) => {
+                                    const isHoliday = items.some(
+                                      (item) =>
+                                        item.isClosed ||
+                                        [
+                                          "Libur Nasional",
+                                          "Tanggal Merah",
+                                        ].includes(
+                                          item.startDay || item.day || "",
+                                        ),
+                                    );
+
                                     return (
                                       <div
                                         key={idx}
-                                        className="flex justify-between gap-4 text-xs"
+                                        className={`flex flex-col gap-1 border-l-2 pl-2 ml-1 ${
+                                          isHoliday
+                                            ? "border-red-200"
+                                            : "border-slate-100"
+                                        }`}
                                       >
-                                        <span className="font-medium text-slate-700 w-24">
-                                          {item.startDay || item.day}
-                                          {item.endDay &&
-                                          item.endDay !== item.startDay
-                                            ? ` - ${item.endDay}`
-                                            : ""}
-                                        </span>
-                                        <span
-                                          className={
-                                            isHoliday
-                                              ? "text-red-500 font-bold"
-                                              : "text-slate-600"
-                                          }
-                                        >
-                                          {isHoliday
-                                            ? "TUTUP"
-                                            : `${item.open} - ${item.close}`}
-                                        </span>
+                                        <div className="flex justify-between gap-4 text-xs font-medium">
+                                          <span
+                                            className={
+                                              isHoliday
+                                                ? "text-red-500 font-bold"
+                                                : "text-slate-700 w-24"
+                                            }
+                                          >
+                                            {dayLabel}
+                                          </span>
+                                          <div className="flex flex-col items-end">
+                                            {items.map((item, i) => {
+                                              const itemShifts =
+                                                item.shifts &&
+                                                item.shifts.length > 0
+                                                  ? item.shifts
+                                                  : [
+                                                      {
+                                                        open: item.open,
+                                                        close: item.close,
+                                                      },
+                                                    ];
+
+                                              return (
+                                                <div
+                                                  key={i}
+                                                  className="flex flex-col items-end"
+                                                >
+                                                  {itemShifts.map(
+                                                    (shift, si) => (
+                                                      <span
+                                                        key={si}
+                                                        className={
+                                                          item.isClosed
+                                                            ? "text-red-500 font-bold"
+                                                            : item.is24Hours
+                                                              ? "text-blue-600 font-bold"
+                                                              : "text-slate-600"
+                                                        }
+                                                      >
+                                                        {item.isClosed
+                                                          ? "TUTUP"
+                                                          : item.is24Hours
+                                                            ? "24 JAM"
+                                                            : `${shift.open} - ${shift.close}`}
+                                                      </span>
+                                                    ),
+                                                  )}
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        </div>
+                                        {/* Notes display */}
+                                        {items.map(
+                                          (item, i) =>
+                                            item.note && (
+                                              <div
+                                                key={`note-${i}`}
+                                                className="text-[10px] text-slate-400 italic text-right bg-slate-50 px-2 py-0.5 rounded"
+                                              >
+                                                {item.note}
+                                              </div>
+                                            ),
+                                        )}
                                       </div>
                                     );
                                   },
@@ -210,15 +284,17 @@ export default function PlaceDetailModal({
                               </div>
                             );
                           }
+
                           // Fallback untuk data lama (string biasa)
                           return (
-                            <div className="mt-1 font-medium">
-                              {place.detail.accessInfo}
+                            <div className="mt-1 font-medium italic text-slate-500">
+                              {accessInfo}
                             </div>
                           );
-                        } catch {
+                        } catch (e) {
+                          console.error("Error parsing schedule:", e);
                           return (
-                            <div className="mt-1 font-medium">
+                            <div className="mt-1 font-medium text-slate-500">
                               {place.detail.accessInfo}
                             </div>
                           );
@@ -233,11 +309,11 @@ export default function PlaceDetailModal({
                     <Tag size={16} className="mt-0.5 text-green-500 shrink-0" />
                     <div>
                       <span className="block text-xs font-bold text-slate-400 uppercase">
-                        {place.category === "Hotel"
+                        {place.category.toLowerCase() === "hotel"
                           ? "Range Harga"
-                          : place.category === "Cafe"
+                          : place.category.toLowerCase() === "cafe"
                             ? "Range Harga"
-                            : place.category === "Wisata"
+                            : place.category.toLowerCase() === "wisata"
                               ? "Tiket Masuk"
                               : "Harga"}
                       </span>
@@ -246,14 +322,21 @@ export default function PlaceDetailModal({
                         if (!priceInfo) return "-";
 
                         const formatCurrency = (val: string) => {
-                          const num = parseInt(val.replace(/\D/g, "")); // Clean non-digits just in case
+                          const num = parseInt(val.replace(/\D/g, ""));
                           if (isNaN(num)) return val;
+                          if (num === 0) return "Gratis";
                           return `Rp. ${num.toLocaleString("id-ID")}`;
                         };
 
                         if (priceInfo.includes(" - ")) {
                           const [min, max] = priceInfo.split(" - ");
-                          return `${formatCurrency(min)} - ${formatCurrency(max)}`;
+                          const fmtMin = formatCurrency(min);
+                          const fmtMax = formatCurrency(max);
+
+                          if (fmtMin === "Gratis" && fmtMax === "Gratis") {
+                            return "Gratis";
+                          }
+                          return `${fmtMin} - ${fmtMax}`;
                         }
 
                         return formatCurrency(priceInfo);

@@ -109,15 +109,22 @@ export default function DataPage() {
         {/* Header */}
         <header className="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200 py-5 px-6 md:px-12 transition-all">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            
+            {/* --- HEADER KIRI --- */}
             <div>
-              <h1 className={STYLES.pageTitle}>
-                <span className={STYLES.headerIcon}>
-                  <Database size={22} />
-                </span>
-                Data <span className="text-lime-600">Lokasi</span>
-              </h1>
+              <div className="flex items-center gap-4">
+                <h1 className={STYLES.pageTitle}>
+                  <span className={STYLES.headerIcon}>
+                    <Database size={22} />
+                  </span>
+                  Data <span className="text-lime-600">Lokasi</span>
+                </h1>
+                
+                {/* Tombol Panduan/Tour dihapus dari sini */}
+              </div>
+
               <p className={STYLES.subTitle}>
-                Kelola total {filteredPlaces.length} data geospasial Kota
+                Kelola total {filteredPlaces.length} data geospasial kawasan
                 Blitar.
               </p>
             </div>

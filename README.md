@@ -1,67 +1,86 @@
-# WebGIS 1.1
+# Aplikasi Web GIS (WebGIS)
 
-Proyek ini adalah aplikasi Sistem Informasi Geografis (GIS) berbasis web yang dibangun menggunakan Next.js. Aplikasi ini memungkinkan pengelolaan data lokasi (Point of Interest) dengan visualisasi peta interaktif dan manajemen admin.
+Aplikasi Web GIS yang lengkap dan interaktif, dibangun menggunakan Next.js. Aplikasi ini memungkinkan pengelolaan data spasial, visualisasi peta interaktif, dan dashboard admin yang komprehensif.
 
-## Fitur Utama
+## 🚀 Teknologi yang Digunakan
 
-- **Peta Interaktif**: Visualisasi lokasi menggunakan Leaflet dengan fitur marker clustering untuk performa optimal.
-- **Manajemen Data (CRUD)**: Admin dapat menambah, melihat, memperbarui, dan menghapus data lokasi (*Place*).
-- **Autentikasi Admin**: Sistem login aman untuk mengelola data menggunakan NextAuth.js.
-- **Visualisasi Data**: Dashboard yang menyertakan grafik/chart menggunakan Recharts.
-- **Pencarian & Filtrasi**: Memudahkan pencarian lokasi berdasarkan kategori atau nama.
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Directory)
+- **Bahasa**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Database & ORM**: [Prisma](https://www.prisma.io/) dengan PostgreSQL
+- **Peta**: [Leaflet](https://leafletjs.com/) & [React Leaflet](https://react-leaflet.js.org/)
+- **Autentikasi**: [NextAuth.js](https://next-auth.js.org/)
+- **Ikon**: [Lucide React](https://lucide.dev/)
+- **Komponen UI**: [Radix UI](https://www.radix-ui.com/)
+- **Visualisasi Data**: [Recharts](https://recharts.org/) & [Three.js](https://threejs.org/)
 
-## Teknologi yang Digunakan
+## ✨ Fitur Utama
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Bahasa Pemrograman**: TypeScript
-- **Database & ORM**: PostgreSQL dengan Prisma ORM
-- **Styling**: Tailwind CSS & Radix UI
-- **Peta**: Leaflet, React-Leaflet, dan React-Leaflet-Cluster
-- **Autentikasi**: NextAuth.js
-- **Grafik**: Recharts
+- **Peta Interaktif**: Menampilkan dan berinteraksi dengan titik data spasial (Hotel, Cafe, Objek Wisata).
+- **Dashboard Admin**: Mengelola data tempat, melihat statistik, dan mengelola autentikasi pengguna.
+- **Formulir Dinamis**: Mengelola jam operasional, fasilitas, dan detail lainnya dengan input yang fleksibel.
+- **Clustering**: Menampilkan banyak marker secara efisien menggunakan teknik clustering pada peta.
+- **Desain Responsif**: Tampilan yang optimal baik di desktop maupun perangkat mobile.
 
-## Prasyarat Instalasi
+## 🛠️ Panduan Instalasi (Getting Started)
 
-Sebelum memulai, pastikan Anda telah menginstal:
-- Node.js (versi terbaru disarankan)
-- PostgreSQL Database
-- Package Manager (NPM, Yarn, atau PNPM)
+### Prasyarat
 
-## Instalasi
+- [Node.js](https://nodejs.org/) (Disarankan versi LTS)
+- [PostgreSQL](https://www.postgresql.org/) database
 
-1.  **Clone repository:**
+### Langkah Instalasi
+
+1.  **Clone Repository**
+
     ```bash
-    git clone [https://github.com/username/gis-dev.git](https://github.com/username/gis-dev.git)
-    cd GIS-Dev
+    git clone https://github.com/RafliF1/GIS-Dev.git
+    cd <direktori-project>
     ```
 
-2.  **Instal dependensi:**
+2.  **Install Dependencies**
+
     ```bash
     npm install
     ```
 
-3.  **Konfigurasi Environment Variable:**
-    Buat file `.env` di direktori utama dan tambahkan kredensial database Anda:
-    ```text
-    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
-    NEXTAUTH_SECRET="your-secret-key"
+3.  **Konfigurasi Environment**
+
+    Buat file `.env` di direktori utama (root) dan sesuaikan variabel environment berikut:
+
+    ```env
+    # Koneksi Database
+    DATABASE_URL="postgresql://user:password@localhost:5432/nama_database_anda"
+
+    # Konfigurasi NextAuth
+    NEXTAUTH_SECRET="kunci-rahasia-anda"
+    NEXTAUTH_URL="http://localhost:3000"
     ```
 
-4.  **Setup Database (Prisma):**
+4.  **Setup Database**
+
+    Generate Prisma client dan push schema ke database Anda:
+
     ```bash
     npx prisma generate
-    npx prisma migrate dev --name init
+    npx prisma db push
     ```
 
-5.  **Jalankan aplikasi:**
+5.  **Jalankan Aplikasi**
+
+    Mulai server development:
+
     ```bash
     npm run dev
     ```
-    Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-## Contoh Penggunaan
+    Buka [http://localhost:3000](http://localhost:3000) di browser Anda untuk melihat hasilnya.
 
--   **Melihat Peta**: Akses halaman utama untuk melihat semua titik lokasi yang terdaftar.
--   **Login Admin**: Masuk ke direktori `/auth/login` untuk mengakses fitur manajemen data.
--   **Input Data**: Gunakan form di halaman admin untuk menambahkan koordinat (Latitude/Longitude) serta informasi tempat seperti kategori dan gambar.
+## 📂 Struktur Project
 
+- `app/`: Halaman dan layout menggunakan App Router.
+- `components/`: Komponen UI yang dapat digunakan kembali (Peta, Form, Layout).
+- `lib/`: Fungsi utilitas dan konfigurasi (Auth, Database).
+- `prisma/`: Schema database dan migrasi.
+- `types/`: Definisi tipe TypeScript.
+- `public/`: Aset statis (Gambar, Ikon).

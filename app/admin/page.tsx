@@ -19,20 +19,25 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [time, setTime] = useState(new Date());
 
+  // --- PERBAIKAN: Definisi fungsi fetchPlaces ---
   const fetchPlaces = async () => {
     try {
-      const res = await fetch("/api/places");
-      const data = await res.json();
-      setPlaces(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error fetching places:", err);
+      // Pastikan endpoint API ini sesuai dengan backend Anda (misal: /api/places)
+      const response = await fetch("/api/places");
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data");
+      }
+      const data = await response.json();
+      setPlaces(data);
+    } catch (error) {
+      console.error("Error fetching places:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPlaces(); // Initial fetch
+    fetchPlaces(); // Panggil saat mount
 
     // Auto refresh setiap 5 detik
     const refreshInterval = setInterval(fetchPlaces, 5000);
@@ -51,7 +56,7 @@ export default function Dashboard() {
   const cafeCount = places.filter((p) => p.category === "cafe").length;
   const wisataCount = places.filter((p) => p.category === "wisata").length;
 
-  // --- LOADING STATE (Tema Lime) ---
+  // --- LOADING STATE ---
   if (loading) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
@@ -74,7 +79,7 @@ export default function Dashboard() {
             Dashboard <span className="text-lime-600">Overview</span>
           </h1>
           <p className="text-slate-500 mt-2 font-medium">
-            Pantau perkembangan data geospasial Kota Blitar secara real-time.
+            Pantau perkembangan data geospasial kawasan Blitar secara real-time.
           </p>
         </div>
 
@@ -102,7 +107,6 @@ export default function Dashboard() {
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <BarChart3 size={100} />
           </div>
-
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2.5 bg-lime-500/20 rounded-xl backdrop-blur-sm border border-lime-500/30 text-lime-400">

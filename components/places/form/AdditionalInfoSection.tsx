@@ -206,16 +206,25 @@ export default function AdditionalInfoSection({
 
                               const val = e.target.value;
                               current[index].isClosed = val === "tutup";
-                              if (val === "tutup") {
+                              current[index].is24Hours = val === "24jam";
+
+                              if (val === "tutup" || val === "24jam") {
                                 current[index].open = "";
                                 current[index].close = "";
                               }
                               onChange("accessInfo", JSON.stringify(current));
                             }}
-                            className={`w-full p-2 border rounded-lg text-sm outline-none font-bold ${item.isClosed ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
+                            className={`w-full p-2 border rounded-lg text-sm outline-none font-bold ${
+                              item.isClosed
+                                ? "bg-red-50 text-red-600 border-red-200"
+                                : item.is24Hours
+                                  ? "bg-blue-50 text-blue-600 border-blue-200"
+                                  : "bg-green-50 text-green-600 border-green-200"
+                            }`}
                           >
                             <option value="buka">BUKA</option>
                             <option value="tutup">TUTUP</option>
+                            <option value="24jam">24 JAM</option>
                           </select>
                         </div>
 
@@ -224,6 +233,10 @@ export default function AdditionalInfoSection({
                           {isRowClosed ? (
                             <div className="w-full p-2 bg-slate-100 text-slate-400 text-sm font-bold text-center border border-slate-200 rounded-lg">
                               LIBUR
+                            </div>
+                          ) : item.is24Hours ? (
+                            <div className="w-full p-2 bg-blue-50 text-blue-600 text-sm font-bold text-center border border-blue-200 rounded-lg uppercase tracking-wider">
+                              Non-Stop 24 Jam
                             </div>
                           ) : (
                             <>
@@ -330,6 +343,24 @@ export default function AdditionalInfoSection({
                           )}
                         </div>
                       </div>
+
+                      {/* Note Input (New) */}
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          value={item.note || ""}
+                          placeholder="Catatan tambahan (misal: Tutup saat Imlek, Sholat Jumat, dll)"
+                          className="w-full p-2 border border-slate-200 bg-white rounded-lg text-[11px] focus:ring-2 focus:ring-blue-500 outline-none"
+                          onChange={(e) => {
+                            const current: ScheduleItem[] =
+                              detail.accessInfo?.startsWith("[")
+                                ? JSON.parse(detail.accessInfo)
+                                : [];
+                            current[index].note = e.target.value;
+                            onChange("accessInfo", JSON.stringify(current));
+                          }}
+                        />
+                      </div>
                     </div>
 
                     {/* ACTION: DELETE */}
@@ -412,6 +443,18 @@ export default function AdditionalInfoSection({
               </svg>
               Tambah Jadwal Baru
             </button>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-50/50 rounded-lg border border-blue-100 flex items-start gap-2">
+            <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
+            <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+              <strong className="text-blue-600 block mb-0.5 uppercase tracking-wider text-[9px]">
+                Tips Input:
+              </strong>
+              Anda bisa menambah baris baru dengan hari yang sama (misal: Jumat)
+              untuk membuat jadwal shift atau jam istirahat. Gunakan kolom
+              catatan untuk info khusus hari tersebut.
+            </p>
           </div>
         </div>
 

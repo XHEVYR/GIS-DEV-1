@@ -165,46 +165,96 @@ export default function PlaceDetailModal({
                       </span>
                       {(() => {
                         try {
+                          const accessInfo = place.detail.accessInfo;
+                          if (!accessInfo) return "-";
+
                           // Coba parse jika string JSON
-                          if (place.detail.accessInfo?.startsWith("[")) {
-                            const schedule = JSON.parse(
-                              place.detail.accessInfo,
+                          if (accessInfo.startsWith("[")) {
+                            const schedule: ScheduleItem[] =
+                              JSON.parse(accessInfo);
+
+                            // Grouping shifts by day label
+                            const groupedSchedule = schedule.reduce(
+                              (acc: Record<string, ScheduleItem[]>, item) => {
+                                const dayLabel = `${item.startDay || item.day || ""}${
+                                  item.endDay && item.endDay !== item.startDay
+                                    ? ` - ${item.endDay}`
+                                    : ""
+                                }`;
+                                if (!acc[dayLabel]) acc[dayLabel] = [];
+                                acc[dayLabel].push(item);
+                                return acc;
+                              },
+                              {},
                             );
+
                             return (
-                              <div className="mt-1 space-y-1">
-                                {schedule.map(
-                                  (item: ScheduleItem, idx: number) => {
-                                    const isHoliday =
-                                      item.isClosed ||
-                                      [
-                                        "Libur Nasional",
-                                        "Tanggal Merah",
-                                      ].includes(
-                                        item.startDay || item.day || "",
-                                      );
+                              <div className="mt-1 space-y-3">
+                                {Object.entries(groupedSchedule).map(
+                                  ([dayLabel, items], idx) => {
+                                    const isHoliday = items.some(
+                                      (item) =>
+                                        item.isClosed ||
+                                        [
+                                          "Libur Nasional",
+                                          "Tanggal Merah",
+                                        ].includes(
+                                          item.startDay || item.day || "",
+                                        ),
+                                    );
+
                                     return (
                                       <div
                                         key={idx}
-                                        className="flex justify-between gap-4 text-xs"
+                                        className={`flex flex-col gap-1 border-l-2 pl-2 ml-1 ${
+                                          isHoliday
+                                            ? "border-red-200"
+                                            : "border-slate-100"
+                                        }`}
                                       >
-                                        <span className="font-medium text-slate-700 w-24">
-                                          {item.startDay || item.day}
-                                          {item.endDay &&
-                                          item.endDay !== item.startDay
-                                            ? ` - ${item.endDay}`
-                                            : ""}
-                                        </span>
-                                        <span
-                                          className={
-                                            isHoliday
-                                              ? "text-red-500 font-bold"
-                                              : "text-slate-600"
-                                          }
-                                        >
-                                          {isHoliday
-                                            ? "TUTUP"
-                                            : `${item.open} - ${item.close}`}
-                                        </span>
+                                        <div className="flex justify-between gap-4 text-xs font-medium">
+                                          <span
+                                            className={
+                                              isHoliday
+                                                ? "text-red-500 font-bold"
+                                                : "text-slate-700 w-24"
+                                            }
+                                          >
+                                            {dayLabel}
+                                          </span>
+                                          <div className="flex flex-col items-end">
+                                            {items.map((item, i) => (
+                                              <span
+                                                key={i}
+                                                className={
+                                                  item.isClosed
+                                                    ? "text-red-500 font-bold"
+                                                    : item.is24Hours
+                                                      ? "text-blue-600 font-bold"
+                                                      : "text-slate-600"
+                                                }
+                                              >
+                                                {item.isClosed
+                                                  ? "TUTUP"
+                                                  : item.is24Hours
+                                                    ? "24 JAM"
+                                                    : `${item.open} - ${item.close}`}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                        {/* Notes display */}
+                                        {items.map(
+                                          (item, i) =>
+                                            item.note && (
+                                              <div
+                                                key={`note-${i}`}
+                                                className="text-[10px] text-slate-400 italic text-right bg-slate-50 px-2 py-0.5 rounded"
+                                              >
+                                                {item.note}
+                                              </div>
+                                            ),
+                                        )}
                                       </div>
                                     );
                                   },
@@ -212,15 +262,17 @@ export default function PlaceDetailModal({
                               </div>
                             );
                           }
+
                           // Fallback untuk data lama (string biasa)
                           return (
-                            <div className="mt-1 font-medium">
-                              {place.detail.accessInfo}
+                            <div className="mt-1 font-medium italic text-slate-500">
+                              {accessInfo}
                             </div>
                           );
-                        } catch {
+                        } catch (e) {
+                          console.error("Error parsing schedule:", e);
                           return (
-                            <div className="mt-1 font-medium">
+                            <div className="mt-1 font-medium text-slate-500">
                               {place.detail.accessInfo}
                             </div>
                           );

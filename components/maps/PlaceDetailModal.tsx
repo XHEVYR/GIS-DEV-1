@@ -223,24 +223,46 @@ export default function PlaceDetailModal({
                                             {dayLabel}
                                           </span>
                                           <div className="flex flex-col items-end">
-                                            {items.map((item, i) => (
-                                              <span
-                                                key={i}
-                                                className={
-                                                  item.isClosed
-                                                    ? "text-red-500 font-bold"
-                                                    : item.is24Hours
-                                                      ? "text-blue-600 font-bold"
-                                                      : "text-slate-600"
-                                                }
-                                              >
-                                                {item.isClosed
-                                                  ? "TUTUP"
-                                                  : item.is24Hours
-                                                    ? "24 JAM"
-                                                    : `${item.open} - ${item.close}`}
-                                              </span>
-                                            ))}
+                                            {items.map((item, i) => {
+                                              const itemShifts =
+                                                item.shifts &&
+                                                item.shifts.length > 0
+                                                  ? item.shifts
+                                                  : [
+                                                      {
+                                                        open: item.open,
+                                                        close: item.close,
+                                                      },
+                                                    ];
+
+                                              return (
+                                                <div
+                                                  key={i}
+                                                  className="flex flex-col items-end"
+                                                >
+                                                  {itemShifts.map(
+                                                    (shift, si) => (
+                                                      <span
+                                                        key={si}
+                                                        className={
+                                                          item.isClosed
+                                                            ? "text-red-500 font-bold"
+                                                            : item.is24Hours
+                                                              ? "text-blue-600 font-bold"
+                                                              : "text-slate-600"
+                                                        }
+                                                      >
+                                                        {item.isClosed
+                                                          ? "TUTUP"
+                                                          : item.is24Hours
+                                                            ? "24 JAM"
+                                                            : `${shift.open} - ${shift.close}`}
+                                                      </span>
+                                                    ),
+                                                  )}
+                                                </div>
+                                              );
+                                            })}
                                           </div>
                                         </div>
                                         {/* Notes display */}

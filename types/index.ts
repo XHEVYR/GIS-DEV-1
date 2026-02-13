@@ -30,6 +30,7 @@ export interface ScheduleItem {
   close: string;
   isClosed?: boolean;
   is24Hours?: boolean;
+  shifts?: { open: string; close: string }[];
   note?: string;
   day?: string;
 }

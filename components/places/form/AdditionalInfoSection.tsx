@@ -411,8 +411,13 @@ export default function AdditionalInfoSection({
 
         {/* Price Info */}
         <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-            <Tag size={12} /> {labels.priceInfo}
+          <label className="text-xs font-bold text-slate-500 uppercase flex items-center justify-between gap-1">
+            <span className="flex items-center gap-1">
+              <Tag size={12} /> {labels.priceInfo}
+            </span>
+            <span className="text-[10px] normal-case font-medium text-blue-500 italic">
+              * Isi 0 untuk &quot;Gratis&quot;
+            </span>
           </label>
           <div className="flex items-center gap-2">
             <input

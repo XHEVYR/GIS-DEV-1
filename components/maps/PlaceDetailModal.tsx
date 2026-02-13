@@ -246,14 +246,21 @@ export default function PlaceDetailModal({
                         if (!priceInfo) return "-";
 
                         const formatCurrency = (val: string) => {
-                          const num = parseInt(val.replace(/\D/g, "")); // Clean non-digits just in case
+                          const num = parseInt(val.replace(/\D/g, ""));
                           if (isNaN(num)) return val;
+                          if (num === 0) return "Gratis";
                           return `Rp. ${num.toLocaleString("id-ID")}`;
                         };
 
                         if (priceInfo.includes(" - ")) {
                           const [min, max] = priceInfo.split(" - ");
-                          return `${formatCurrency(min)} - ${formatCurrency(max)}`;
+                          const fmtMin = formatCurrency(min);
+                          const fmtMax = formatCurrency(max);
+
+                          if (fmtMin === "Gratis" && fmtMax === "Gratis") {
+                            return "Gratis";
+                          }
+                          return `${fmtMin} - ${fmtMax}`;
                         }
 
                         return formatCurrency(priceInfo);

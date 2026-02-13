@@ -46,9 +46,12 @@ export default function DataPage() {
     itemsPerPage,
     editingPlace,
     sortConfig,
+    searchQuery,
+    categoryFilter,
     notification,
     setItemsPerPage,
     setEditingPlace,
+    setCategoryFilter,
     handlePageChange,
     handleSearch,
     handleSort,
@@ -109,7 +112,6 @@ export default function DataPage() {
         {/* Header */}
         <header className="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200 py-5 px-6 md:px-12 transition-all">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            
             {/* --- HEADER KIRI --- */}
             <div>
               <div className="flex items-center gap-4">
@@ -119,7 +121,7 @@ export default function DataPage() {
                   </span>
                   Data <span className="text-lime-600">Lokasi</span>
                 </h1>
-                
+
                 {/* Tombol Panduan/Tour dihapus dari sini */}
               </div>
 
@@ -131,12 +133,35 @@ export default function DataPage() {
 
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+              {/* Search */}
               <div className="flex-1 min-w-50 lg:w-72">
                 <SearchBar
                   onSearch={handleSearch}
+                  defaultValue={searchQuery}
                   placeholder="Cari nama atau kategori..."
                 />
               </div>
+
+              {/* Category Filter */}
+              <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm hover:border-lime-300 transition-colors">
+                <span className="text-slate-400">
+                  <Settings2 size={14} />
+                </span>
+                <select
+                  className="text-xs font-bold text-slate-600 outline-none bg-transparent cursor-pointer hover:text-black transition-colors"
+                  value={categoryFilter}
+                  onChange={(e) => {
+                    setCategoryFilter(e.target.value);
+                    handlePageChange(1);
+                  }}
+                >
+                  <option value="all">Semua Kategori</option>
+                  <option value="wisata">Destinasi Wisata</option>
+                  <option value="hotel">Hotel & Penginapan</option>
+                  <option value="cafe">Cafe & Resto</option>
+                </select>
+              </div>
+
               {/* Rows per page */}
               <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm hover:border-lime-300 transition-colors">
                 <Settings2 size={14} className="text-slate-400" />

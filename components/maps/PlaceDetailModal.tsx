@@ -104,7 +104,9 @@ export default function PlaceDetailModal({
 
           <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 pointer-events-none">
             <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-              {place.category}
+              {place.category === "cafe" || place.category === "Cafe"
+                ? "Cafe & Resto"
+                : place.category}
             </span>
             <h2 className="text-3xl font-bold text-white mt-2">{place.name}</h2>
           </div>
@@ -153,11 +155,11 @@ export default function PlaceDetailModal({
                     />
                     <div>
                       <span className="block text-xs font-bold text-slate-400 uppercase">
-                        {place.category === "Hotel"
+                        {place.category.toLowerCase() === "hotel"
                           ? "Check-in/Out"
-                          : place.category === "Cafe"
+                          : place.category.toLowerCase() === "cafe"
                             ? "Jam Buka"
-                            : place.category === "Wisata"
+                            : place.category.toLowerCase() === "wisata"
                               ? "Jam Operasional"
                               : "Waktu Akses"}
                       </span>
@@ -233,11 +235,11 @@ export default function PlaceDetailModal({
                     <Tag size={16} className="mt-0.5 text-green-500 shrink-0" />
                     <div>
                       <span className="block text-xs font-bold text-slate-400 uppercase">
-                        {place.category === "Hotel"
+                        {place.category.toLowerCase() === "hotel"
                           ? "Range Harga"
-                          : place.category === "Cafe"
+                          : place.category.toLowerCase() === "cafe"
                             ? "Range Harga"
-                            : place.category === "Wisata"
+                            : place.category.toLowerCase() === "wisata"
                               ? "Tiket Masuk"
                               : "Harga"}
                       </span>

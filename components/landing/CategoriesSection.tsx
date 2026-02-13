@@ -43,7 +43,7 @@ export default function CategoriesSection() {
               <Coffee size={32} strokeWidth={2} />
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">
-              Cafe & Restoran
+              Cafe & Resto
             </h3>
             <p className="text-slate-500 text-sm leading-relaxed">
               Tempat nongkrong hits dan kuliner lezat khas Blitar.

@@ -52,7 +52,13 @@ export default function AdditionalInfoSection({
     <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-4">
       <div className="flex items-center gap-2 mb-2 text-slate-700 font-bold border-b pb-2">
         <Info size={18} />
-        <h3>Detail Tambahan ({category || "Umum"})</h3>
+        <h3>
+          Detail Tambahan (
+          {category === "cafe" || category === "Cafe"
+            ? "Cafe & Resto"
+            : category || "Umum"}
+          )
+        </h3>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
